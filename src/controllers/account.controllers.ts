@@ -59,3 +59,13 @@ export const refreshTokenController = async (
     }
   })
 }
+
+// Xác thực email
+export const verifyEmailController = async (req: Request, res: Response) => {
+  const { accountId } = req.decodedVerifyEmailToken as TokenPayload
+  const result = await accountService.verifyEmail(accountId)
+  return res.json({
+    message: ACCOUNT_MESSAGES.VERIFY_EMAIL_SUCCEED,
+    data: result
+  })
+}

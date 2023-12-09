@@ -25,3 +25,8 @@ export type LogoutReqBody = {
 export type RefreshTokenReqBody = {
   refreshToken: string
 }
+
+// Body: Xác thực email
+export type VerifyEmailReqBody = {
+  verifyEmailToken: string
+}

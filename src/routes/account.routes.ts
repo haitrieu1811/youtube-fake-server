@@ -4,15 +4,22 @@ import {
   loginController,
   logoutController,
   refreshTokenController,
-  registerController
+  registerController,
+  verifyEmailController
 } from '~/controllers/account.controllers'
 import { wrapRequestHandler } from '~/lib/handlers'
-import { loginValidator, refreshTokenValidator, registerAccountValidator } from '~/middlewares/account.middlewares'
+import {
+  accessTokenValidator,
+  loginValidator,
+  refreshTokenValidator,
+  registerValidator,
+  verifyEmailValidator
+} from '~/middlewares/account.middlewares'
 
 const accountRouter = Router()
 
 // Đăng ký tài khoản
-accountRouter.post('/register', registerAccountValidator, wrapRequestHandler(registerController))
+accountRouter.post('/register', registerValidator, wrapRequestHandler(registerController))
 
 // Đăng nhập
 accountRouter.post('/login', loginValidator, wrapRequestHandler(loginController))
@@ -22,5 +29,13 @@ accountRouter.post('/logout', refreshTokenValidator, wrapRequestHandler(logoutCo
 
 // Refresh token
 accountRouter.post('/refresh-token', refreshTokenValidator, wrapRequestHandler(refreshTokenController))
+
+// Verify email
+accountRouter.post(
+  '/verify-email',
+  accessTokenValidator,
+  verifyEmailValidator,
+  wrapRequestHandler(verifyEmailController)
+)
 
 export default accountRouter

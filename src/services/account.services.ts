@@ -183,6 +183,48 @@ class AccountService {
       newRefreshToken
     }
   }
+
+  // Xác thực email
+  async verifyEmail(accountId: string) {
+    const updatedAccount = await databaseService.accounts.findOneAndUpdate(
+      {
+        _id: new ObjectId(accountId)
+      },
+      {
+        $set: {
+          verify: AccountVerifyStatus.Verified,
+          verifyEmailToken: ''
+        },
+        $currentDate: {
+          updatedAt: true
+        }
+      },
+      {
+        projection: {
+          password: 0,
+          role: 0,
+          status: 0,
+          verify: 0,
+          forgotPasswordToken: 0,
+          verifyEmailToken: 0
+        }
+      }
+    )
+    const { _id, role, status, verify } = updatedAccount as WithId<Account>
+    const [accessToken, refreshToken] = await this.signAccessAndRefreshToken({
+      data: {
+        accountId: _id.toString(),
+        role,
+        status,
+        verify
+      }
+    })
+    return {
+      accessToken,
+      refreshToken,
+      account: updatedAccount
+    }
+  }
 }
 
 const accountService = new AccountService()

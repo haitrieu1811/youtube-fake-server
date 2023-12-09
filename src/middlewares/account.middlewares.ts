@@ -10,6 +10,7 @@ import { hashPassword } from '~/lib/crypto'
 import { verifyToken } from '~/lib/jwt'
 import { validate } from '~/lib/validation'
 import { ErrorWithStatus } from '~/models/Errors'
+import { TokenPayload } from '~/models/requests/Account.requests'
 import databaseService from '~/services/database.services'
 
 const emailSchema: ParamSchema = {
@@ -37,7 +38,7 @@ const passwordSchema: ParamSchema = {
 }
 
 // Đăng ký tài khoản
-export const registerAccountValidator = validate(
+export const registerValidator = validate(
   checkSchema(
     {
       email: {
@@ -132,10 +133,11 @@ export const refreshTokenValidator = validate(
               if (!refreshToken) {
                 throw new ErrorWithStatus({
                   message: ACCOUNT_MESSAGES.REFRESH_TOKEN_IS_USED_OR_NOT_EXISTED,
-                  status: HttpStatusCode.Unauthorized
+                  status: HttpStatusCode.NotFound
                 })
               }
               ;(req as Request).decodedRefreshToken = decodedRefreshToken
+              return true
             } catch (error) {
               if (error instanceof JsonWebTokenError) {
                 throw new ErrorWithStatus({
@@ -145,7 +147,97 @@ export const refreshTokenValidator = validate(
               }
               throw error
             }
-            return true
+          }
+        }
+      }
+    },
+    ['body']
+  )
+)
+
+// Validate: Access token
+export const accessTokenValidator = validate(
+  checkSchema(
+    {
+      Authorization: {
+        trim: true,
+        custom: {
+          options: async (value: string, { req }) => {
+            const accessToken = (value ?? '').split(' ')[1]
+            if (!accessToken) {
+              throw new ErrorWithStatus({
+                message: ACCOUNT_MESSAGES.ACCESS_TOKEN_IS_REQUIRED,
+                status: HttpStatusCode.Unauthorized
+              })
+            }
+            try {
+              const decodedAuthorization = await verifyToken({
+                token: accessToken,
+                secretOrPublicKey: ENV_CONFIG.JWT_ACCESS_TOKEN_SECRET
+              })
+              ;(req as Request).decodedAuthorization = decodedAuthorization
+              return true
+            } catch (error) {
+              throw new ErrorWithStatus({
+                message: capitalize((error as JsonWebTokenError).message),
+                status: HttpStatusCode.Unauthorized
+              })
+            }
+          }
+        }
+      }
+    },
+    ['headers']
+  )
+)
+
+// Xác thực email
+export const verifyEmailValidator = validate(
+  checkSchema(
+    {
+      verifyEmailToken: {
+        trim: true,
+        custom: {
+          options: async (value: string, { req }) => {
+            if (!value) {
+              throw new ErrorWithStatus({
+                message: ACCOUNT_MESSAGES.VERIFY_EMAIL_TOKEN_IS_REQUIRED,
+                status: HttpStatusCode.Unauthorized
+              })
+            }
+            try {
+              const [decodedVerifyEmailToken, account] = await Promise.all([
+                verifyToken({
+                  token: value,
+                  secretOrPublicKey: ENV_CONFIG.JWT_VERIFY_EMAIL_TOKEN_SECRET
+                }),
+                databaseService.accounts.findOne({ verifyEmailToken: value })
+              ])
+              if (!account) {
+                throw new ErrorWithStatus({
+                  message: ACCOUNT_MESSAGES.ACCOUNT_BY_TOKEN_NOT_FOUND,
+                  status: HttpStatusCode.NotFound
+                })
+              }
+              if (
+                decodedVerifyEmailToken.accountId !== ((req as Request).decodedAuthorization as TokenPayload).accountId
+              ) {
+                throw new ErrorWithStatus({
+                  message: ACCOUNT_MESSAGES.VERIFY_EMAIL_TOKEN_AUTHOR_IS_INVALID,
+                  status: HttpStatusCode.BadRequest
+                })
+              }
+              ;(req as Request).decodedVerifyEmailToken = decodedVerifyEmailToken
+              return true
+            } catch (error) {
+              if (error instanceof JsonWebTokenError) {
+                throw new ErrorWithStatus({
+                  message: capitalize(error.message),
+                  status: HttpStatusCode.Unauthorized
+                })
+              }
+              throw error
+            }
           }
         }
       }
