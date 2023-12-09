@@ -1,6 +1,7 @@
-import { Db, MongoClient } from 'mongodb'
+import { Collection, Db, MongoClient } from 'mongodb'
 
 import { ENV_CONFIG } from '~/constants/config'
+import Account from '~/models/schemas/Account.schema'
 
 const uri = `mongodb+srv://${ENV_CONFIG.DB_USERNAME}:${ENV_CONFIG.DB_PASSWORD}@youtube-fake-cluster.zodfbyg.mongodb.net/?retryWrites=true&w=majority`
 
@@ -22,6 +23,10 @@ class DatabaseService {
       console.log('Error', error)
       throw error
     }
+  }
+
+  get accounts(): Collection<Account> {
+    return this.db.collection(ENV_CONFIG.DB_ACCOUNTS_COLLECTION_NAME)
   }
 }
 
