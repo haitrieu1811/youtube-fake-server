@@ -3,7 +3,7 @@ import { ObjectId } from 'mongodb'
 import { AccountRole, AccountStatus, AccountVerifyStatus } from '~/constants/enum'
 import { generateRandomString } from '~/lib/utils'
 
-interface AccountConstructor {
+type AccountConstructor = {
   _id?: ObjectId
   email: string
   password: string

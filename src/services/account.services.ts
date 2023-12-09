@@ -2,11 +2,12 @@ import { ObjectId, WithId } from 'mongodb'
 
 import { ENV_CONFIG } from '~/constants/config'
 import { AccountRole, AccountStatus, AccountVerifyStatus, TokenType } from '~/constants/enum'
-import { signToken } from '~/lib/jwt'
+import { signToken, verifyToken } from '~/lib/jwt'
 import { RegisterAccountReqBody, TokenPayload } from '~/models/requests/Account.requests'
 import databaseService from './database.services'
 import Account from '~/models/schemas/Account.schema'
 import { hashPassword } from '~/lib/crypto'
+import RefreshToken from '~/models/schemas/RefreshToken.schema'
 
 type SignToken = Pick<TokenPayload, 'accountId' | 'role' | 'status' | 'verify'>
 
@@ -82,8 +83,16 @@ class AccountService {
     return Promise.all([this.signAccessToken(data), this.signRefreshToken({ data, exp })])
   }
 
+  // Giải mã refresh token
+  private decodeRefreshToken(refresh_token: string) {
+    return verifyToken({
+      token: refresh_token,
+      secretOrPublicKey: ENV_CONFIG.JWT_REFRESH_TOKEN_SECRET
+    })
+  }
+
   // Đăng ký
-  async registerAccount(body: RegisterAccountReqBody) {
+  async register(body: RegisterAccountReqBody) {
     const accountId = new ObjectId()
     const [[accessToken, refreshToken], verifyEmailToken] = await Promise.all([
       this.signAccessAndRefreshToken({
@@ -121,6 +130,31 @@ class AccountService {
       accessToken,
       refreshToken,
       account
+    }
+  }
+
+  // Đăng nhập
+  async login(account: Account) {
+    const { _id, role, status, verify } = account
+    const [accessToken, refreshToken] = await this.signAccessAndRefreshToken({
+      data: {
+        accountId: (_id as ObjectId).toString(),
+        role,
+        status,
+        verify
+      }
+    })
+    const { iat, exp } = await this.decodeRefreshToken(refreshToken)
+    await databaseService.refreshTokens.insertOne(
+      new RefreshToken({
+        token: refreshToken,
+        iat,
+        exp
+      })
+    )
+    return {
+      accessToken,
+      refreshToken
     }
   }
 }
