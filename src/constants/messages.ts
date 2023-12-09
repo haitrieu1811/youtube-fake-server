@@ -9,5 +9,8 @@ export const ACCOUNT_MESSAGES = {
   CONFIRM_PASSWORD_NOT_MATCH: 'Xác nhận mật khẩu không chính xác',
   CONFIRM_PASSWORD_IS_REQUIRED: 'Xác nhận mật khẩu là bắt buộc',
   EMAIL_OR_PASSWORD_IS_INVALID: 'Email hoặc mật khẩu không chính xác',
-  LOGIN_SUCCEED: 'Đăng nhập thành công'
+  LOGIN_SUCCEED: 'Đăng nhập thành công',
+  REFRESH_TOKEN_IS_REQUIRED: 'Refresh token là bắt buộc',
+  REFRESH_TOKEN_IS_USED_OR_NOT_EXISTED: 'Refresh token không tồn tại hoặc đã được sử dụng',
+  LOGOUT_SUCCEED: 'Đăng xuất thành công'
 } as const

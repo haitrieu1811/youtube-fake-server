@@ -10,7 +10,13 @@ export type TokenPayload = {
   exp: number
 }
 
-export type RegisterAccountReqBody = {
+// Body: Đăng ký
+export type RegisterReqBody = {
   email: string
   password: string
+}
+
+// Body: Đăng xuất
+export type LogoutReqBody = {
+  refreshToken: string
 }

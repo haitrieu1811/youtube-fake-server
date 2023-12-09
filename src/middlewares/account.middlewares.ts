@@ -1,9 +1,15 @@
 import { Request } from 'express'
 import { ParamSchema, checkSchema } from 'express-validator'
+import { JsonWebTokenError } from 'jsonwebtoken'
+import capitalize from 'lodash/capitalize'
 
+import { ENV_CONFIG } from '~/constants/config'
+import { HttpStatusCode } from '~/constants/enum'
 import { ACCOUNT_MESSAGES } from '~/constants/messages'
 import { hashPassword } from '~/lib/crypto'
+import { verifyToken } from '~/lib/jwt'
 import { validate } from '~/lib/validation'
+import { ErrorWithStatus } from '~/models/Errors'
 import databaseService from '~/services/database.services'
 
 const emailSchema: ParamSchema = {
@@ -92,6 +98,53 @@ export const loginValidator = validate(
               throw new Error(ACCOUNT_MESSAGES.EMAIL_OR_PASSWORD_IS_INVALID)
             }
             ;(req as Request).account = account
+            return true
+          }
+        }
+      }
+    },
+    ['body']
+  )
+)
+
+// Validate: Refresh token
+export const refreshTokenValidator = validate(
+  checkSchema(
+    {
+      refreshToken: {
+        trim: true,
+        custom: {
+          options: async (value: string, { req }) => {
+            if (!value) {
+              throw new ErrorWithStatus({
+                message: ACCOUNT_MESSAGES.REFRESH_TOKEN_IS_REQUIRED,
+                status: HttpStatusCode.Unauthorized
+              })
+            }
+            try {
+              const [decodedRefreshToken, refreshToken] = await Promise.all([
+                verifyToken({
+                  token: value,
+                  secretOrPublicKey: ENV_CONFIG.JWT_REFRESH_TOKEN_SECRET
+                }),
+                databaseService.refreshTokens.findOne({ token: value })
+              ])
+              if (!refreshToken) {
+                throw new ErrorWithStatus({
+                  message: ACCOUNT_MESSAGES.REFRESH_TOKEN_IS_USED_OR_NOT_EXISTED,
+                  status: HttpStatusCode.Unauthorized
+                })
+              }
+              ;(req as Request).decodedRefreshToken = decodedRefreshToken
+            } catch (error) {
+              if (error instanceof JsonWebTokenError) {
+                throw new ErrorWithStatus({
+                  message: capitalize(error.message),
+                  status: HttpStatusCode.Unauthorized
+                })
+              }
+              throw error
+            }
             return true
           }
         }

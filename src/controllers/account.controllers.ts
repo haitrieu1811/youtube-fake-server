@@ -1,19 +1,16 @@
 import { Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
-import { WithId } from 'mongodb'
 import omit from 'lodash/omit'
+import { WithId } from 'mongodb'
 
 import { HttpStatusCode } from '~/constants/enum'
 import { ACCOUNT_MESSAGES } from '~/constants/messages'
-import { RegisterAccountReqBody } from '~/models/requests/Account.requests'
+import { LogoutReqBody, RegisterReqBody } from '~/models/requests/Account.requests'
 import Account from '~/models/schemas/Account.schema'
 import accountService from '~/services/account.services'
 
 // Đăng ký tài khoản
-export const registerController = async (
-  req: Request<ParamsDictionary, any, RegisterAccountReqBody>,
-  res: Response
-) => {
+export const registerController = async (req: Request<ParamsDictionary, any, RegisterReqBody>, res: Response) => {
   const result = await accountService.register(req.body)
   return res.status(HttpStatusCode.Created).json({
     message: ACCOUNT_MESSAGES.REGISTER_SUCCEED,
@@ -32,5 +29,13 @@ export const loginController = async (req: Request, res: Response) => {
       ...result,
       account: _account
     }
+  })
+}
+
+// Đăng xuất
+export const logoutController = async (req: Request<ParamsDictionary, any, LogoutReqBody>, res: Response) => {
+  await accountService.logout(req.body.refreshToken)
+  return res.json({
+    message: ACCOUNT_MESSAGES.LOGOUT_SUCCEED
   })
 }

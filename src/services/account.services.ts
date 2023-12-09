@@ -3,7 +3,7 @@ import { ObjectId, WithId } from 'mongodb'
 import { ENV_CONFIG } from '~/constants/config'
 import { AccountRole, AccountStatus, AccountVerifyStatus, TokenType } from '~/constants/enum'
 import { signToken, verifyToken } from '~/lib/jwt'
-import { RegisterAccountReqBody, TokenPayload } from '~/models/requests/Account.requests'
+import { RegisterReqBody, TokenPayload } from '~/models/requests/Account.requests'
 import databaseService from './database.services'
 import Account from '~/models/schemas/Account.schema'
 import { hashPassword } from '~/lib/crypto'
@@ -92,7 +92,7 @@ class AccountService {
   }
 
   // Đăng ký
-  async register(body: RegisterAccountReqBody) {
+  async register(body: RegisterReqBody) {
     const accountId = new ObjectId()
     const [[accessToken, refreshToken], verifyEmailToken] = await Promise.all([
       this.signAccessAndRefreshToken({
@@ -156,6 +156,12 @@ class AccountService {
       accessToken,
       refreshToken
     }
+  }
+
+  // Đăng xuất
+  async logout(refreshToken: string) {
+    await databaseService.refreshTokens.deleteOne({ token: refreshToken })
+    return true
   }
 }
 

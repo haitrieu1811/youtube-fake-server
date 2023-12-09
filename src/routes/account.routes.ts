@@ -1,8 +1,8 @@
 import { Router } from 'express'
 
-import { loginController, registerController } from '~/controllers/account.controllers'
+import { loginController, logoutController, registerController } from '~/controllers/account.controllers'
 import { wrapRequestHandler } from '~/lib/handlers'
-import { loginValidator, registerAccountValidator } from '~/middlewares/account.middlewares'
+import { loginValidator, refreshTokenValidator, registerAccountValidator } from '~/middlewares/account.middlewares'
 
 const accountRouter = Router()
 
@@ -11,5 +11,8 @@ accountRouter.post('/register', registerAccountValidator, wrapRequestHandler(reg
 
 // Đăng nhập
 accountRouter.post('/login', loginValidator, wrapRequestHandler(loginController))
+
+// Đăng xuất
+accountRouter.post('/logout', refreshTokenValidator, wrapRequestHandler(logoutController))
 
 export default accountRouter
