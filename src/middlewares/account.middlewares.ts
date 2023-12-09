@@ -1,5 +1,5 @@
 import { Request, NextFunction, Response } from 'express'
-import { ParamSchema, checkSchema } from 'express-validator'
+import { ParamSchema, check, checkSchema } from 'express-validator'
 import { JsonWebTokenError } from 'jsonwebtoken'
 import capitalize from 'lodash/capitalize'
 
@@ -259,3 +259,25 @@ export const resendEmailVerifyAccountValidator = async (req: Request, res: Respo
   }
   next()
 }
+
+// Gửi yêu cầu quên mật khẩu
+export const forgotPasswordValidator = validate(
+  checkSchema(
+    {
+      email: {
+        ...emailSchema,
+        custom: {
+          options: async (value: string, { req }) => {
+            const account = await databaseService.accounts.findOne({ email: value })
+            if (!account) {
+              throw new Error(ACCOUNT_MESSAGES.EMAIL_NOT_EXISTED)
+            }
+            ;(req as Request).account = account
+            return true
+          }
+        }
+      }
+    },
+    ['body']
+  )
+)

@@ -65,11 +65,11 @@ class AccountService {
   }
 
   // Tạo forgot password token
-  private signForgotPasswordToken({ accountId, data }: { accountId: string; data: SignToken }) {
+  private signForgotPasswordToken(accountId: string) {
     return signToken({
       payload: {
-        ...data,
-        token_type: TokenType.ForgotPasswordToken
+        accountId,
+        tokenType: TokenType.ForgotPasswordToken
       },
       privateKey: ENV_CONFIG.JWT_FORGOT_PASSWORD_TOKEN_SECRET,
       options: {
@@ -235,6 +235,23 @@ class AccountService {
       {
         $set: {
           verifyEmailToken
+        },
+        $currentDate: {
+          updatedAt: true
+        }
+      }
+    )
+    return true
+  }
+
+  // Gửi yêu cầu quên mật khẩu
+  async forgotPassword(accountId: string) {
+    const forgotPasswordToken = await this.signForgotPasswordToken(accountId)
+    await databaseService.accounts.updateOne(
+      { _id: new ObjectId(accountId) },
+      {
+        $set: {
+          forgotPasswordToken
         },
         $currentDate: {
           updatedAt: true

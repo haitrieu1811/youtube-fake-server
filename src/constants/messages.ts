@@ -20,5 +20,7 @@ export const ACCOUNT_MESSAGES = {
   VERIFY_EMAIL_SUCCEED: 'Xác thực email thành công',
   VERIFY_EMAIL_TOKEN_AUTHOR_IS_INVALID: 'Bạn không là chủ sở hữu của verify email token này',
   RESEND_EMAIL_VERIFY_ACCOUNT_SUCCEED: 'Gửi lại email xác thực tài khoản thành công',
-  ACCOUNT_VERIFIED_BEFORE: 'Tài khoản đã được xác thực trước đó'
+  ACCOUNT_VERIFIED_BEFORE: 'Tài khoản đã được xác thực trước đó',
+  EMAIL_NOT_EXISTED: 'Email không tồn tại',
+  FORGOT_PASSWORD_SUCCEED: 'Yêu cầu quên mật khẩu được chấp nhận, vui lòng kiểm tra email để đặt lại mật khẩu'
 } as const

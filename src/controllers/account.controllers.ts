@@ -78,3 +78,12 @@ export const resendEmailVerifyAccountController = async (req: Request, res: Resp
     message: ACCOUNT_MESSAGES.RESEND_EMAIL_VERIFY_ACCOUNT_SUCCEED
   })
 }
+
+// Gửi yêu cầu quên mật khẩu
+export const forgotPasswordController = async (req: Request, res: Response) => {
+  const account = req.account as WithId<Account>
+  await accountService.forgotPassword(account._id.toString())
+  return res.json({
+    message: ACCOUNT_MESSAGES.FORGOT_PASSWORD_SUCCEED
+  })
+}

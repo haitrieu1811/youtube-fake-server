@@ -1,6 +1,7 @@
 import { Router } from 'express'
 
 import {
+  forgotPasswordController,
   loginController,
   logoutController,
   refreshTokenController,
@@ -11,6 +12,7 @@ import {
 import { wrapRequestHandler } from '~/lib/handlers'
 import {
   accessTokenValidator,
+  forgotPasswordValidator,
   loginValidator,
   refreshTokenValidator,
   registerValidator,
@@ -47,5 +49,8 @@ accountRouter.post(
   resendEmailVerifyAccountValidator,
   wrapRequestHandler(resendEmailVerifyAccountController)
 )
+
+// Gửi yêu cầu quên mật khẩu
+accountRouter.post('/forgot-password', forgotPasswordValidator, wrapRequestHandler(forgotPasswordController))
 
 export default accountRouter
