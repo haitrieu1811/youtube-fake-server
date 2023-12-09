@@ -5,6 +5,7 @@ import {
   logoutController,
   refreshTokenController,
   registerController,
+  resendEmailVerifyAccountController,
   verifyEmailController
 } from '~/controllers/account.controllers'
 import { wrapRequestHandler } from '~/lib/handlers'
@@ -13,6 +14,7 @@ import {
   loginValidator,
   refreshTokenValidator,
   registerValidator,
+  resendEmailVerifyAccountValidator,
   verifyEmailValidator
 } from '~/middlewares/account.middlewares'
 
@@ -30,12 +32,20 @@ accountRouter.post('/logout', refreshTokenValidator, wrapRequestHandler(logoutCo
 // Refresh token
 accountRouter.post('/refresh-token', refreshTokenValidator, wrapRequestHandler(refreshTokenController))
 
-// Verify email
+// Xác thực tài khoản
 accountRouter.post(
   '/verify-email',
   accessTokenValidator,
   verifyEmailValidator,
   wrapRequestHandler(verifyEmailController)
+)
+
+// Gửi lại email xác thực tài khoản
+accountRouter.post(
+  '/resend-email-verify-account',
+  accessTokenValidator,
+  resendEmailVerifyAccountValidator,
+  wrapRequestHandler(resendEmailVerifyAccountController)
 )
 
 export default accountRouter

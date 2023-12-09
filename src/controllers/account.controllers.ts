@@ -69,3 +69,12 @@ export const verifyEmailController = async (req: Request, res: Response) => {
     data: result
   })
 }
+
+// Gửi lại email xác thực tài khoản
+export const resendEmailVerifyAccountController = async (req: Request, res: Response) => {
+  const { accountId } = req.decodedAuthorization as TokenPayload
+  await accountService.resendEmailVerifyAccount(accountId)
+  return res.json({
+    message: ACCOUNT_MESSAGES.RESEND_EMAIL_VERIFY_ACCOUNT_SUCCEED
+  })
+}

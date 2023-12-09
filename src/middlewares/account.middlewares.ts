@@ -1,10 +1,10 @@
-import { Request } from 'express'
+import { Request, NextFunction, Response } from 'express'
 import { ParamSchema, checkSchema } from 'express-validator'
 import { JsonWebTokenError } from 'jsonwebtoken'
 import capitalize from 'lodash/capitalize'
 
 import { ENV_CONFIG } from '~/constants/config'
-import { HttpStatusCode } from '~/constants/enum'
+import { AccountVerifyStatus, HttpStatusCode } from '~/constants/enum'
 import { ACCOUNT_MESSAGES } from '~/constants/messages'
 import { hashPassword } from '~/lib/crypto'
 import { verifyToken } from '~/lib/jwt'
@@ -245,3 +245,17 @@ export const verifyEmailValidator = validate(
     ['body']
   )
 )
+
+// Gửi lại email xác thực tài khoản
+export const resendEmailVerifyAccountValidator = async (req: Request, res: Response, next: NextFunction) => {
+  const { verify } = req.decodedAuthorization as TokenPayload
+  if (verify === AccountVerifyStatus.Verified) {
+    next(
+      new ErrorWithStatus({
+        message: ACCOUNT_MESSAGES.ACCOUNT_VERIFIED_BEFORE,
+        status: HttpStatusCode.BadRequest
+      })
+    )
+  }
+  next()
+}

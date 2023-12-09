@@ -207,7 +207,8 @@ class AccountService {
           verify: 0,
           forgotPasswordToken: 0,
           verifyEmailToken: 0
-        }
+        },
+        returnDocument: 'after'
       }
     )
     const { _id, role, status, verify } = updatedAccount as WithId<Account>
@@ -224,6 +225,23 @@ class AccountService {
       refreshToken,
       account: updatedAccount
     }
+  }
+
+  // Yêu cầu gửi lại email xác thực khi token hết hạn hoặc bị mất email
+  async resendEmailVerifyAccount(accountId: string) {
+    const verifyEmailToken = await this.signVerifyEmailToken(accountId)
+    await databaseService.accounts.updateOne(
+      { _id: new ObjectId(accountId) },
+      {
+        $set: {
+          verifyEmailToken
+        },
+        $currentDate: {
+          updatedAt: true
+        }
+      }
+    )
+    return true
   }
 }
 
