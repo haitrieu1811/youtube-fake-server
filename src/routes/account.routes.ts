@@ -1,6 +1,11 @@
 import { Router } from 'express'
 
-import { loginController, logoutController, registerController } from '~/controllers/account.controllers'
+import {
+  loginController,
+  logoutController,
+  refreshTokenController,
+  registerController
+} from '~/controllers/account.controllers'
 import { wrapRequestHandler } from '~/lib/handlers'
 import { loginValidator, refreshTokenValidator, registerAccountValidator } from '~/middlewares/account.middlewares'
 
@@ -14,5 +19,8 @@ accountRouter.post('/login', loginValidator, wrapRequestHandler(loginController)
 
 // Đăng xuất
 accountRouter.post('/logout', refreshTokenValidator, wrapRequestHandler(logoutController))
+
+// Refresh token
+accountRouter.post('/refresh-token', refreshTokenValidator, wrapRequestHandler(refreshTokenController))
 
 export default accountRouter

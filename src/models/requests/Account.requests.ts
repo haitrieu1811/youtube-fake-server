@@ -20,3 +20,8 @@ export type RegisterReqBody = {
 export type LogoutReqBody = {
   refreshToken: string
 }
+
+// Body: Refresh token
+export type RefreshTokenReqBody = {
+  refreshToken: string
+}

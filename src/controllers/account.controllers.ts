@@ -5,7 +5,7 @@ import { WithId } from 'mongodb'
 
 import { HttpStatusCode } from '~/constants/enum'
 import { ACCOUNT_MESSAGES } from '~/constants/messages'
-import { LogoutReqBody, RegisterReqBody } from '~/models/requests/Account.requests'
+import { LogoutReqBody, RefreshTokenReqBody, RegisterReqBody, TokenPayload } from '~/models/requests/Account.requests'
 import Account from '~/models/schemas/Account.schema'
 import accountService from '~/services/account.services'
 
@@ -37,5 +37,25 @@ export const logoutController = async (req: Request<ParamsDictionary, any, Logou
   await accountService.logout(req.body.refreshToken)
   return res.json({
     message: ACCOUNT_MESSAGES.LOGOUT_SUCCEED
+  })
+}
+
+// Refresh token
+export const refreshTokenController = async (
+  req: Request<ParamsDictionary, any, RefreshTokenReqBody>,
+  res: Response
+) => {
+  const { accountId, role, status, verify, exp } = req.decodedRefreshToken as TokenPayload
+  const { newAccessToken, newRefreshToken } = await accountService.refreshToken({
+    data: { accountId, role, status, verify },
+    refreshToken: req.body.refreshToken,
+    exp
+  })
+  return res.json({
+    message: ACCOUNT_MESSAGES.REFRESH_TOKEN_SUCCEED,
+    data: {
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken
+    }
   })
 }

@@ -2,12 +2,12 @@ import { ObjectId, WithId } from 'mongodb'
 
 import { ENV_CONFIG } from '~/constants/config'
 import { AccountRole, AccountStatus, AccountVerifyStatus, TokenType } from '~/constants/enum'
+import { hashPassword } from '~/lib/crypto'
 import { signToken, verifyToken } from '~/lib/jwt'
 import { RegisterReqBody, TokenPayload } from '~/models/requests/Account.requests'
-import databaseService from './database.services'
 import Account from '~/models/schemas/Account.schema'
-import { hashPassword } from '~/lib/crypto'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
+import databaseService from './database.services'
 
 type SignToken = Pick<TokenPayload, 'accountId' | 'role' | 'status' | 'verify'>
 
@@ -84,9 +84,9 @@ class AccountService {
   }
 
   // Giải mã refresh token
-  private decodeRefreshToken(refresh_token: string) {
+  private decodeRefreshToken(refreshToken: string) {
     return verifyToken({
-      token: refresh_token,
+      token: refreshToken,
       secretOrPublicKey: ENV_CONFIG.JWT_REFRESH_TOKEN_SECRET
     })
   }
@@ -162,6 +162,26 @@ class AccountService {
   async logout(refreshToken: string) {
     await databaseService.refreshTokens.deleteOne({ token: refreshToken })
     return true
+  }
+
+  // Refresh token
+  async refreshToken({ data, exp, refreshToken }: { data: SignToken; exp?: number; refreshToken: string }) {
+    const [[newAccessToken, newRefreshToken]] = await Promise.all([
+      this.signAccessAndRefreshToken({ data, exp }),
+      databaseService.refreshTokens.deleteOne({ token: refreshToken })
+    ])
+    const decodedRefreshToken = await this.decodeRefreshToken(newRefreshToken)
+    await databaseService.refreshTokens.insertOne(
+      new RefreshToken({
+        token: newRefreshToken,
+        iat: decodedRefreshToken.iat,
+        exp: decodedRefreshToken.exp
+      })
+    )
+    return {
+      newAccessToken,
+      newRefreshToken
+    }
   }
 }
 
