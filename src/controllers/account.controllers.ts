@@ -5,7 +5,14 @@ import { WithId } from 'mongodb'
 
 import { HttpStatusCode } from '~/constants/enum'
 import { ACCOUNT_MESSAGES } from '~/constants/messages'
-import { LogoutReqBody, RefreshTokenReqBody, RegisterReqBody, TokenPayload } from '~/models/requests/Account.requests'
+import {
+  AccountIdReqParams,
+  LogoutReqBody,
+  RefreshTokenReqBody,
+  RegisterReqBody,
+  ResetPasswordReqBody,
+  TokenPayload
+} from '~/models/requests/Account.requests'
 import Account from '~/models/schemas/Account.schema'
 import accountService from '~/services/account.services'
 
@@ -90,11 +97,24 @@ export const forgotPasswordController = async (req: Request, res: Response) => {
 
 // Xác thực forgot password token
 export const verifyForgotPasswordTokenController = (req: Request, res: Response) => {
-  const { accountId } = req.decodedForgotPasswordToken as TokenPayload
+  const account = req.account as WithId<Account>
   return res.json({
     message: ACCOUNT_MESSAGES.VERIFY_FORGOT_PASSWORD_TOKEN_SUCCEED,
     data: {
-      accountId
+      forgotPasswordToken: account.forgotPasswordToken
     }
+  })
+}
+
+// Đặt lại mật khẩu
+export const resetPasswordController = async (
+  req: Request<AccountIdReqParams, any, ResetPasswordReqBody>,
+  res: Response
+) => {
+  const account = req.account as WithId<Account>
+  const result = await accountService.resetPassword({ accountId: account._id.toString(), body: req.body })
+  return res.json({
+    message: ACCOUNT_MESSAGES.RESET_PASSWORD_SUCCEED,
+    data: result
   })
 }

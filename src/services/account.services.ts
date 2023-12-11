@@ -4,7 +4,7 @@ import { ENV_CONFIG } from '~/constants/config'
 import { AccountRole, AccountStatus, AccountVerifyStatus, TokenType } from '~/constants/enum'
 import { hashPassword } from '~/lib/crypto'
 import { signToken, verifyToken } from '~/lib/jwt'
-import { RegisterReqBody, TokenPayload } from '~/models/requests/Account.requests'
+import { RegisterReqBody, ResetPasswordReqBody, TokenPayload } from '~/models/requests/Account.requests'
 import Account from '~/models/schemas/Account.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import databaseService from './database.services'
@@ -259,6 +259,48 @@ class AccountService {
       }
     )
     return true
+  }
+
+  // Đặt lại mật khẩu
+  async resetPassword({ body, accountId }: { body: ResetPasswordReqBody; accountId: string }) {
+    const updatedAccount = (await databaseService.accounts.findOneAndUpdate(
+      {
+        _id: new ObjectId(accountId)
+      },
+      {
+        $set: {
+          password: hashPassword(body.password),
+          forgotPasswordToken: ''
+        },
+        $currentDate: {
+          updatedAt: true
+        }
+      },
+      {
+        returnDocument: 'after',
+        projection: {
+          password: 0,
+          role: 0,
+          status: 0,
+          verify: 0,
+          forgotPasswordToken: 0,
+          verifyEmailToken: 0
+        }
+      }
+    )) as WithId<Account>
+    const [accessToken, refreshToken] = await this.signAccessAndRefreshToken({
+      data: {
+        accountId: updatedAccount._id.toString(),
+        role: updatedAccount.role,
+        status: updatedAccount.status,
+        verify: updatedAccount.verify
+      }
+    })
+    return {
+      accessToken,
+      refreshToken,
+      account: updatedAccount
+    }
   }
 }
 

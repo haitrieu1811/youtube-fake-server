@@ -2,6 +2,7 @@ import { Request, NextFunction, Response } from 'express'
 import { ParamSchema, check, checkSchema } from 'express-validator'
 import { JsonWebTokenError } from 'jsonwebtoken'
 import capitalize from 'lodash/capitalize'
+import { ObjectId } from 'mongodb'
 
 import { ENV_CONFIG } from '~/constants/config'
 import { AccountVerifyStatus, HttpStatusCode } from '~/constants/enum'
@@ -37,6 +38,21 @@ const passwordSchema: ParamSchema = {
   }
 }
 
+const confirmPasswordSchema: ParamSchema = {
+  trim: true,
+  notEmpty: {
+    errorMessage: ACCOUNT_MESSAGES.CONFIRM_PASSWORD_IS_REQUIRED
+  },
+  custom: {
+    options: (value: string, { req }) => {
+      if (value !== req.body.password) {
+        throw new Error(ACCOUNT_MESSAGES.CONFIRM_PASSWORD_NOT_MATCH)
+      }
+      return true
+    }
+  }
+}
+
 // Đăng ký tài khoản
 export const registerValidator = validate(
   checkSchema(
@@ -54,20 +70,7 @@ export const registerValidator = validate(
         }
       },
       password: passwordSchema,
-      confirmPassword: {
-        trim: true,
-        notEmpty: {
-          errorMessage: ACCOUNT_MESSAGES.CONFIRM_PASSWORD_IS_REQUIRED
-        },
-        custom: {
-          options: (value: string, { req }) => {
-            if (value !== req.body.password) {
-              throw new Error(ACCOUNT_MESSAGES.CONFIRM_PASSWORD_NOT_MATCH)
-            }
-            return true
-          }
-        }
-      }
+      confirmPassword: confirmPasswordSchema
     },
     ['body']
   )
@@ -275,7 +278,7 @@ export const forgotPasswordValidator = validate(
 )
 
 // Xác thực forgot password token
-export const verifyForgotPasswordTokenValidator = validate(
+export const forgotPasswordTokenValidator = validate(
   checkSchema(
     {
       forgotPasswordToken: {
@@ -289,7 +292,7 @@ export const verifyForgotPasswordTokenValidator = validate(
               })
             }
             try {
-              const [decodedForgotPasswordToken, account] = await Promise.all([
+              const [, account] = await Promise.all([
                 verifyToken({
                   token: value,
                   secretOrPublicKey: ENV_CONFIG.JWT_FORGOT_PASSWORD_TOKEN_SECRET
@@ -302,7 +305,7 @@ export const verifyForgotPasswordTokenValidator = validate(
                   status: HttpStatusCode.NotFound
                 })
               }
-              ;(req as Request).decodedForgotPasswordToken = decodedForgotPasswordToken
+              ;(req as Request).account = account
               return true
             } catch (error) {
               if (error instanceof JsonWebTokenError) {
@@ -316,6 +319,53 @@ export const verifyForgotPasswordTokenValidator = validate(
           }
         }
       }
+    },
+    ['params', 'body']
+  )
+)
+
+// Validatate: Account id
+export const accountIdValidator = validate(
+  checkSchema(
+    {
+      accountId: {
+        trim: true,
+        custom: {
+          options: async (value: string) => {
+            if (value) {
+              throw new ErrorWithStatus({
+                message: ACCOUNT_MESSAGES.ACCOUNT_ID_IS_REQUIRED,
+                status: HttpStatusCode.BadRequest
+              })
+            }
+            if (!ObjectId.isValid(value)) {
+              throw new ErrorWithStatus({
+                message: ACCOUNT_MESSAGES.ACCOUNT_ID_IS_INVALID,
+                status: HttpStatusCode.BadRequest
+              })
+            }
+            const account = await databaseService.accounts.findOne({ _id: new ObjectId(value) })
+            if (!account) {
+              throw new ErrorWithStatus({
+                message: ACCOUNT_MESSAGES.ACCOUNT_NOT_FOUND,
+                status: HttpStatusCode.NotFound
+              })
+            }
+            return true
+          }
+        }
+      }
+    },
+    ['params']
+  )
+)
+
+// Đặt lại mật khẩu
+export const resetPasswordValidator = validate(
+  checkSchema(
+    {
+      password: passwordSchema,
+      confirmPassword: confirmPasswordSchema
     },
     ['body']
   )

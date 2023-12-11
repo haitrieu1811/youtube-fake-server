@@ -1,3 +1,5 @@
+import { ParamsDictionary } from 'express-serve-static-core'
+
 import { AccountRole, AccountStatus, AccountVerifyStatus, TokenType } from '~/constants/enum'
 
 export type TokenPayload = {
@@ -8,6 +10,11 @@ export type TokenPayload = {
   tokenType: TokenType
   iat: number
   exp: number
+}
+
+// Params: Account id
+export type AccountIdReqParams = ParamsDictionary & {
+  accountId: string
 }
 
 // Body: Đăng ký
@@ -29,4 +36,11 @@ export type RefreshTokenReqBody = {
 // Body: Xác thực email
 export type VerifyEmailReqBody = {
   verifyEmailToken: string
+}
+
+// Body: Đặt lại mật khẩu
+export type ResetPasswordReqBody = {
+  password: string
+  confirmPassword: string
+  forgotPasswordToken: string
 }

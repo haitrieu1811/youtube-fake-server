@@ -21,7 +21,12 @@ export const ACCOUNT_MESSAGES = {
   RESEND_EMAIL_VERIFY_ACCOUNT_SUCCEED: 'Gửi lại email xác thực tài khoản thành công',
   ACCOUNT_VERIFIED_BEFORE: 'Tài khoản đã được xác thực trước đó',
   EMAIL_NOT_EXISTED: 'Email không tồn tại',
-  FORGOT_PASSWORD_SUCCEED: 'Yêu cầu quên mật khẩu được chấp nhận, vui lòng kiểm tra email để đặt lại mật khẩu',
+  FORGOT_PASSWORD_SUCCEED:
+    'Yêu cầu quên mật khẩu được chấp nhận, vui lòng kiểm tra email để đặt lại mật khẩu, email có hiệu lực trong vòng 5 phút',
   FORGOT_PASSWORD_TOKEN_IS_REQUIRED: 'Forgot password token là bắt buộc',
-  VERIFY_FORGOT_PASSWORD_TOKEN_SUCCEED: 'Xác thực forgot password token thành công'
+  VERIFY_FORGOT_PASSWORD_TOKEN_SUCCEED: 'Xác thực forgot password token thành công',
+  ACCOUNT_ID_IS_REQUIRED: 'Account id là bắt buộc',
+  ACCOUNT_ID_IS_INVALID: 'Account id không hợp lệ',
+  ACCOUNT_NOT_FOUND: 'Không tìm thấy account',
+  RESET_PASSWORD_SUCCEED: 'Đặt lại mật khẩu thành công'
 } as const
