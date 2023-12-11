@@ -67,7 +67,7 @@ accountRouter.post(
 )
 
 // Đặt lại mật khẩu
-accountRouter.post(
+accountRouter.patch(
   '/reset-password',
   forgotPasswordTokenValidator,
   resetPasswordValidator,
