@@ -370,3 +370,36 @@ export const resetPasswordValidator = validate(
     ['body']
   )
 )
+
+// Thay đổi mật khẩu
+export const changePasswordValidator = validate(
+  checkSchema(
+    {
+      oldPassword: {
+        trim: true,
+        custom: {
+          options: async (value: string, { req }) => {
+            if (!value) {
+              throw new Error(ACCOUNT_MESSAGES.OLD_PASSWORD_IS_REQUIRED)
+            }
+            const { accountId } = (req as Request).decodedAuthorization as TokenPayload
+            const account = await databaseService.accounts.findOne({ _id: new ObjectId(accountId) })
+            if (!account) {
+              throw new ErrorWithStatus({
+                message: ACCOUNT_MESSAGES.ACCOUNT_NOT_FOUND,
+                status: HttpStatusCode.NotFound
+              })
+            }
+            if (hashPassword(value) !== account.password) {
+              throw new Error(ACCOUNT_MESSAGES.OLD_PASSWORD_IS_INCORRECT)
+            }
+            return true
+          }
+        }
+      },
+      password: passwordSchema,
+      confirmPassword: confirmPasswordSchema
+    },
+    ['body']
+  )
+)

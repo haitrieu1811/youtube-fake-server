@@ -44,3 +44,10 @@ export type ResetPasswordReqBody = {
   confirmPassword: string
   forgotPasswordToken: string
 }
+
+// Body: Thay đổi mật khẩu
+export type ChangePasswordReqBody = {
+  oldPassword: string
+  password: string
+  confirmPassword: string
+}

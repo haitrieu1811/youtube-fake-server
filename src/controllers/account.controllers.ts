@@ -7,6 +7,7 @@ import { HttpStatusCode } from '~/constants/enum'
 import { ACCOUNT_MESSAGES } from '~/constants/messages'
 import {
   AccountIdReqParams,
+  ChangePasswordReqBody,
   LogoutReqBody,
   RefreshTokenReqBody,
   RegisterReqBody,
@@ -108,13 +109,26 @@ export const verifyForgotPasswordTokenController = (req: Request, res: Response)
 
 // Đặt lại mật khẩu
 export const resetPasswordController = async (
-  req: Request<AccountIdReqParams, any, ResetPasswordReqBody>,
+  req: Request<ParamsDictionary, any, ResetPasswordReqBody>,
   res: Response
 ) => {
   const account = req.account as WithId<Account>
   const result = await accountService.resetPassword({ accountId: account._id.toString(), body: req.body })
   return res.json({
     message: ACCOUNT_MESSAGES.RESET_PASSWORD_SUCCEED,
+    data: result
+  })
+}
+
+// Thay đổi mật khẩu
+export const changePasswordController = async (
+  req: Request<ParamsDictionary, any, ChangePasswordReqBody>,
+  res: Response
+) => {
+  const { accountId } = req.decodedAuthorization as TokenPayload
+  const result = await accountService.changePassword({ accountId, body: req.body })
+  return res.json({
+    message: ACCOUNT_MESSAGES.CHANGE_PASSWORD_SUCCEED,
     data: result
   })
 }

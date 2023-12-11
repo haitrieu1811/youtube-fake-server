@@ -1,6 +1,7 @@
 import { Router } from 'express'
 
 import {
+  changePasswordController,
   forgotPasswordController,
   loginController,
   logoutController,
@@ -14,6 +15,7 @@ import {
 import { wrapRequestHandler } from '~/lib/handlers'
 import {
   accessTokenValidator,
+  changePasswordValidator,
   forgotPasswordTokenValidator,
   forgotPasswordValidator,
   loginValidator,
@@ -70,6 +72,14 @@ accountRouter.post(
   forgotPasswordTokenValidator,
   resetPasswordValidator,
   wrapRequestHandler(resetPasswordController)
+)
+
+// Thay đổi mật khẩu
+accountRouter.patch(
+  '/change-password',
+  accessTokenValidator,
+  changePasswordValidator,
+  wrapRequestHandler(changePasswordController)
 )
 
 export default accountRouter

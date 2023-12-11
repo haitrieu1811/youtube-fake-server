@@ -28,5 +28,8 @@ export const ACCOUNT_MESSAGES = {
   ACCOUNT_ID_IS_REQUIRED: 'Account id là bắt buộc',
   ACCOUNT_ID_IS_INVALID: 'Account id không hợp lệ',
   ACCOUNT_NOT_FOUND: 'Không tìm thấy account',
-  RESET_PASSWORD_SUCCEED: 'Đặt lại mật khẩu thành công'
+  RESET_PASSWORD_SUCCEED: 'Đặt lại mật khẩu thành công',
+  CHANGE_PASSWORD_SUCCEED: 'Thay đổi mật khẩu thành công',
+  OLD_PASSWORD_IS_INCORRECT: 'Mật khẩu cũ không chính xác',
+  OLD_PASSWORD_IS_REQUIRED: 'Mật khẩu cũ là bắt buộc'
 } as const
