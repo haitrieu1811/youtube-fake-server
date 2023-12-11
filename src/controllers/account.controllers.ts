@@ -87,3 +87,14 @@ export const forgotPasswordController = async (req: Request, res: Response) => {
     message: ACCOUNT_MESSAGES.FORGOT_PASSWORD_SUCCEED
   })
 }
+
+// Xác thực forgot password token
+export const verifyForgotPasswordTokenController = (req: Request, res: Response) => {
+  const { accountId } = req.decodedForgotPasswordToken as TokenPayload
+  return res.json({
+    message: ACCOUNT_MESSAGES.VERIFY_FORGOT_PASSWORD_TOKEN_SUCCEED,
+    data: {
+      accountId
+    }
+  })
+}

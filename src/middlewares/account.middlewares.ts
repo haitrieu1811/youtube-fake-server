@@ -273,3 +273,50 @@ export const forgotPasswordValidator = validate(
     ['body']
   )
 )
+
+// Xác thực forgot password token
+export const verifyForgotPasswordTokenValidator = validate(
+  checkSchema(
+    {
+      forgotPasswordToken: {
+        trim: true,
+        custom: {
+          options: async (value, { req }) => {
+            if (!value) {
+              throw new ErrorWithStatus({
+                message: ACCOUNT_MESSAGES.FORGOT_PASSWORD_TOKEN_IS_REQUIRED,
+                status: HttpStatusCode.Unauthorized
+              })
+            }
+            try {
+              const [decodedForgotPasswordToken, account] = await Promise.all([
+                verifyToken({
+                  token: value,
+                  secretOrPublicKey: ENV_CONFIG.JWT_FORGOT_PASSWORD_TOKEN_SECRET
+                }),
+                databaseService.accounts.findOne({ forgotPasswordToken: value })
+              ])
+              if (!account) {
+                throw new ErrorWithStatus({
+                  message: ACCOUNT_MESSAGES.ACCOUNT_BY_TOKEN_NOT_FOUND,
+                  status: HttpStatusCode.NotFound
+                })
+              }
+              ;(req as Request).decodedForgotPasswordToken = decodedForgotPasswordToken
+              return true
+            } catch (error) {
+              if (error instanceof JsonWebTokenError) {
+                throw new ErrorWithStatus({
+                  message: capitalize(error.message),
+                  status: HttpStatusCode.Unauthorized
+                })
+              }
+              throw error
+            }
+          }
+        }
+      }
+    },
+    ['body']
+  )
+)

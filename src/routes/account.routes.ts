@@ -7,7 +7,8 @@ import {
   refreshTokenController,
   registerController,
   resendEmailVerifyAccountController,
-  verifyEmailController
+  verifyEmailController,
+  verifyForgotPasswordTokenController
 } from '~/controllers/account.controllers'
 import { wrapRequestHandler } from '~/lib/handlers'
 import {
@@ -17,7 +18,8 @@ import {
   refreshTokenValidator,
   registerValidator,
   resendEmailVerifyAccountValidator,
-  verifyEmailValidator
+  verifyEmailValidator,
+  verifyForgotPasswordTokenValidator
 } from '~/middlewares/account.middlewares'
 
 const accountRouter = Router()
@@ -52,5 +54,12 @@ accountRouter.post(
 
 // Gửi yêu cầu quên mật khẩu
 accountRouter.post('/forgot-password', forgotPasswordValidator, wrapRequestHandler(forgotPasswordController))
+
+// Xác thực forgot password token
+accountRouter.post(
+  '/verify-forgot-password-token',
+  verifyForgotPasswordTokenValidator,
+  wrapRequestHandler(verifyForgotPasswordTokenController)
+)
 
 export default accountRouter
