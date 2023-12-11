@@ -31,5 +31,6 @@ export const ACCOUNT_MESSAGES = {
   RESET_PASSWORD_SUCCEED: 'Đặt lại mật khẩu thành công',
   CHANGE_PASSWORD_SUCCEED: 'Thay đổi mật khẩu thành công',
   OLD_PASSWORD_IS_INCORRECT: 'Mật khẩu cũ không chính xác',
-  OLD_PASSWORD_IS_REQUIRED: 'Mật khẩu cũ là bắt buộc'
+  OLD_PASSWORD_IS_REQUIRED: 'Mật khẩu cũ là bắt buộc',
+  GET_ME_SUCCEED: 'Lấy thông tin tài khoản đăng nhập thành công'
 } as const

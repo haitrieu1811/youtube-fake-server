@@ -1,4 +1,5 @@
 import { ObjectId, WithId } from 'mongodb'
+import omit from 'lodash/omit'
 
 import { ENV_CONFIG } from '~/constants/config'
 import { AccountRole, AccountStatus, AccountVerifyStatus, TokenType } from '~/constants/enum'
@@ -346,6 +347,25 @@ class AccountService {
       accessToken,
       refreshToken,
       account: updatedAccount
+    }
+  }
+
+  // Thông tin tài khoản đăng nhập
+  async getMe(accountId: string) {
+    const me = (await databaseService.accounts.findOne({ _id: new ObjectId(accountId) })) as WithId<Account>
+    const [accessToken, refreshToken] = await this.signAccessAndRefreshToken({
+      data: {
+        accountId: me._id.toString(),
+        role: me.role,
+        status: me.status,
+        verify: me.verify
+      }
+    })
+    const _me = omit(me, ['password', 'role', 'status', 'verify', 'forgotPasswordToken', 'verifyEmailToken'])
+    return {
+      accessToken,
+      refreshToken,
+      me: _me
     }
   }
 }

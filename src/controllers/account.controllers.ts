@@ -132,3 +132,13 @@ export const changePasswordController = async (
     data: result
   })
 }
+
+// Thông tin tài khoản đăng nhập
+export const getMeController = async (req: Request, res: Response) => {
+  const { accountId } = req.decodedAuthorization as TokenPayload
+  const result = await accountService.getMe(accountId)
+  return res.json({
+    message: ACCOUNT_MESSAGES.GET_ME_SUCCEED,
+    data: result
+  })
+}

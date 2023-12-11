@@ -3,6 +3,7 @@ import { Router } from 'express'
 import {
   changePasswordController,
   forgotPasswordController,
+  getMeController,
   loginController,
   logoutController,
   refreshTokenController,
@@ -81,5 +82,8 @@ accountRouter.patch(
   changePasswordValidator,
   wrapRequestHandler(changePasswordController)
 )
+
+// Thông tin tài khoản đăng nhập
+accountRouter.get('/me', accessTokenValidator, wrapRequestHandler(getMeController))
 
 export default accountRouter
