@@ -219,14 +219,6 @@ export const verifyEmailValidator = validate(
                   status: HttpStatusCode.NotFound
                 })
               }
-              if (
-                decodedVerifyEmailToken.accountId !== ((req as Request).decodedAuthorization as TokenPayload).accountId
-              ) {
-                throw new ErrorWithStatus({
-                  message: ACCOUNT_MESSAGES.VERIFY_EMAIL_TOKEN_AUTHOR_IS_INVALID,
-                  status: HttpStatusCode.BadRequest
-                })
-              }
               ;(req as Request).decodedVerifyEmailToken = decodedVerifyEmailToken
               return true
             } catch (error) {

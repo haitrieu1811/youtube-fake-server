@@ -18,7 +18,6 @@ export const ACCOUNT_MESSAGES = {
   ACCOUNT_BY_TOKEN_NOT_FOUND: 'Không tìm thấy tài khoản chứa token này',
   VERIFY_EMAIL_TOKEN_IS_REQUIRED: 'Verify email token là bắt buộc',
   VERIFY_EMAIL_SUCCEED: 'Xác thực email thành công',
-  VERIFY_EMAIL_TOKEN_AUTHOR_IS_INVALID: 'Bạn không là chủ sở hữu của verify email token này',
   RESEND_EMAIL_VERIFY_ACCOUNT_SUCCEED: 'Gửi lại email xác thực tài khoản thành công',
   ACCOUNT_VERIFIED_BEFORE: 'Tài khoản đã được xác thực trước đó',
   EMAIL_NOT_EXISTED: 'Email không tồn tại',
