@@ -26,6 +26,7 @@ import {
   resendEmailVerifyAccountValidator,
   resetPasswordValidator,
   updateMeValidator,
+  verifiedAccountValidator,
   verifyEmailValidator
 } from '~/middlewares/account.middlewares'
 import { filterReqBodyMiddleware } from '~/middlewares/common.middlewares'
@@ -94,6 +95,7 @@ accountRouter.get('/me', accessTokenValidator, wrapRequestHandler(getMeControlle
 accountRouter.patch(
   '/me',
   accessTokenValidator,
+  verifiedAccountValidator,
   updateMeValidator,
   filterReqBodyMiddleware<UpdateMeReqBody>(['username', 'channelName', 'bio', 'avatar', 'bio']),
   wrapRequestHandler(updateMeController)

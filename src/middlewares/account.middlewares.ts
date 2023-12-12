@@ -194,6 +194,20 @@ export const accessTokenValidator = validate(
   )
 )
 
+// Validate: Tài khoản phải được xác thực
+export const verifiedAccountValidator = (req: Request, res: Response, next: NextFunction) => {
+  const { verify } = req.decodedAuthorization as TokenPayload
+  if (verify === AccountVerifyStatus.Unverified) {
+    next(
+      new ErrorWithStatus({
+        message: ACCOUNT_MESSAGES.ACCOUNT_IS_UNVERIFIED,
+        status: HttpStatusCode.Forbidden
+      })
+    )
+  }
+  next()
+}
+
 // Xác thực email
 export const verifyEmailValidator = validate(
   checkSchema(
