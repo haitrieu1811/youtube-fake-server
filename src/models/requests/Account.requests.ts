@@ -51,3 +51,12 @@ export type ChangePasswordReqBody = {
   password: string
   confirmPassword: string
 }
+
+// Body: Cập nhật thông tin tài khoản đăng nhập
+export type UpdateMeReqBody = {
+  username?: string
+  channelName?: string
+  bio?: string
+  avatar?: string
+  cover?: string
+}

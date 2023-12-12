@@ -12,7 +12,8 @@ import {
   RefreshTokenReqBody,
   RegisterReqBody,
   ResetPasswordReqBody,
-  TokenPayload
+  TokenPayload,
+  UpdateMeReqBody
 } from '~/models/requests/Account.requests'
 import Account from '~/models/schemas/Account.schema'
 import accountService from '~/services/account.services'
@@ -139,6 +140,16 @@ export const getMeController = async (req: Request, res: Response) => {
   const result = await accountService.getMe(accountId)
   return res.json({
     message: ACCOUNT_MESSAGES.GET_ME_SUCCEED,
+    data: result
+  })
+}
+
+// Cập nhật tông tin tài khoản đăng nhập
+export const updateMeController = async (req: Request<ParamsDictionary, any, UpdateMeReqBody>, res: Response) => {
+  const { accountId } = req.decodedAuthorization as TokenPayload
+  const result = await accountService.updateMe({ accountId, body: req.body })
+  return res.json({
+    message: ACCOUNT_MESSAGES.UPDATE_ME_SUCCEED,
     data: result
   })
 }

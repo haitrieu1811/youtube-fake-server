@@ -1,5 +1,7 @@
 import { ObjectId, WithId } from 'mongodb'
 import omit from 'lodash/omit'
+import omitBy from 'lodash/omitBy'
+import isUndefined from 'lodash/isUndefined'
 
 import { ENV_CONFIG } from '~/constants/config'
 import { AccountRole, AccountStatus, AccountVerifyStatus, TokenType } from '~/constants/enum'
@@ -9,7 +11,8 @@ import {
   ChangePasswordReqBody,
   RegisterReqBody,
   ResetPasswordReqBody,
-  TokenPayload
+  TokenPayload,
+  UpdateMeReqBody
 } from '~/models/requests/Account.requests'
 import Account from '~/models/schemas/Account.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
@@ -366,6 +369,46 @@ class AccountService {
       accessToken,
       refreshToken,
       me: _me
+    }
+  }
+
+  // Cập nhật tài khoản đăng nhập
+  async updateMe({ accountId, body }: { accountId: string; body: UpdateMeReqBody }) {
+    const _body = omitBy(body, isUndefined)
+    const updatedAccount = (await databaseService.accounts.findOneAndUpdate(
+      {
+        _id: new ObjectId(accountId)
+      },
+      {
+        $set: _body,
+        $currentDate: {
+          updatedAt: true
+        }
+      },
+      {
+        returnDocument: 'after',
+        projection: {
+          password: 0,
+          role: 0,
+          status: 0,
+          verify: 0,
+          forgotPasswordToken: 0,
+          verifyEmailToken: 0
+        }
+      }
+    )) as WithId<Account>
+    const [accessToken, refreshToken] = await this.signAccessAndRefreshToken({
+      data: {
+        accountId: updatedAccount._id.toString(),
+        role: updatedAccount.role,
+        status: updatedAccount.status,
+        verify: updatedAccount.verify
+      }
+    })
+    return {
+      accessToken,
+      refreshToken,
+      account: updatedAccount
     }
   }
 }

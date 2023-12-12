@@ -403,3 +403,93 @@ export const changePasswordValidator = validate(
     ['body']
   )
 )
+
+// Cập nhật thông tin tài khoản đăng nhập
+export const updateMeValidator = validate(
+  checkSchema(
+    {
+      username: {
+        optional: true,
+        trim: true,
+        isLength: {
+          options: {
+            min: 6,
+            max: 32
+          },
+          errorMessage: ACCOUNT_MESSAGES.USERNAME_LENGTH_IS_INVALID
+        },
+        custom: {
+          options: async (value: string) => {
+            const account = await databaseService.accounts.findOne({ username: value })
+            if (account) {
+              throw new Error(ACCOUNT_MESSAGES.USERNAME_ALREADY_EXIST)
+            }
+            return true
+          }
+        }
+      },
+      channelName: {
+        optional: true,
+        trim: true,
+        isLength: {
+          options: {
+            min: 6,
+            max: 32
+          },
+          errorMessage: ACCOUNT_MESSAGES.CHANNEL_NAME_LENGTH_IS_INVALID
+        },
+        custom: {
+          options: async (value: string) => {
+            const account = await databaseService.accounts.findOne({ username: value })
+            if (account) {
+              throw new Error(ACCOUNT_MESSAGES.CHANNEL_NAME_ALREADY_EXIST)
+            }
+            return true
+          }
+        }
+      },
+      bio: {
+        optional: true,
+        trim: true,
+        isLength: {
+          options: {
+            min: 6,
+            max: 255
+          },
+          errorMessage: ACCOUNT_MESSAGES.BIO_LENGTH_IS_INVALID
+        }
+      },
+      avatar: {
+        optional: true,
+        trim: true,
+        custom: {
+          options: (value: string) => {
+            if (!ObjectId.isValid(value)) {
+              throw new ErrorWithStatus({
+                message: ACCOUNT_MESSAGES.AVATAR_IS_INVALID,
+                status: HttpStatusCode.BadRequest
+              })
+            }
+            return true
+          }
+        }
+      },
+      cover: {
+        optional: true,
+        trim: true,
+        custom: {
+          options: (value: string) => {
+            if (!ObjectId.isValid(value)) {
+              throw new ErrorWithStatus({
+                message: ACCOUNT_MESSAGES.COVER_IS_INVALID,
+                status: HttpStatusCode.BadRequest
+              })
+            }
+            return true
+          }
+        }
+      }
+    },
+    ['body']
+  )
+)

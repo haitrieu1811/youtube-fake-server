@@ -32,5 +32,13 @@ export const ACCOUNT_MESSAGES = {
   CHANGE_PASSWORD_SUCCEED: 'Thay đổi mật khẩu thành công',
   OLD_PASSWORD_IS_INCORRECT: 'Mật khẩu cũ không chính xác',
   OLD_PASSWORD_IS_REQUIRED: 'Mật khẩu cũ là bắt buộc',
-  GET_ME_SUCCEED: 'Lấy thông tin tài khoản đăng nhập thành công'
+  GET_ME_SUCCEED: 'Lấy thông tin tài khoản đăng nhập thành công',
+  UPDATE_ME_SUCCEED: 'Cập nhật thông tin tài khoản thành công',
+  USERNAME_LENGTH_IS_INVALID: 'Username phải có độ dài từ 6 đến 32 ký tự',
+  USERNAME_ALREADY_EXIST: 'Username đã tồn tại',
+  CHANNEL_NAME_LENGTH_IS_INVALID: 'Tên channel phải có độ dài từ 6 đến 32 ký tự',
+  CHANNEL_NAME_ALREADY_EXIST: 'Tên channel đã tồn tại',
+  BIO_LENGTH_IS_INVALID: 'Bio phải dài từ 6 đến 255 ký tự',
+  AVATAR_IS_INVALID: 'Ảnh đại diện không hợp lệ',
+  COVER_IS_INVALID: 'Ảnh bìa không hợp lệ'
 } as const

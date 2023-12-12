@@ -10,6 +10,7 @@ import {
   registerController,
   resendEmailVerifyAccountController,
   resetPasswordController,
+  updateMeController,
   verifyEmailController,
   verifyForgotPasswordTokenController
 } from '~/controllers/account.controllers'
@@ -24,8 +25,11 @@ import {
   registerValidator,
   resendEmailVerifyAccountValidator,
   resetPasswordValidator,
+  updateMeValidator,
   verifyEmailValidator
 } from '~/middlewares/account.middlewares'
+import { filterReqBodyMiddleware } from '~/middlewares/common.middlewares'
+import { UpdateMeReqBody } from '~/models/requests/Account.requests'
 
 const accountRouter = Router()
 
@@ -85,5 +89,14 @@ accountRouter.patch(
 
 // Thông tin tài khoản đăng nhập
 accountRouter.get('/me', accessTokenValidator, wrapRequestHandler(getMeController))
+
+// Cập nhật tài khoản đăng nhập
+accountRouter.patch(
+  '/me',
+  accessTokenValidator,
+  updateMeValidator,
+  filterReqBodyMiddleware<UpdateMeReqBody>(['username', 'channelName', 'bio', 'avatar', 'bio']),
+  wrapRequestHandler(updateMeController)
+)
 
 export default accountRouter
