@@ -41,5 +41,8 @@ export const ACCOUNT_MESSAGES = {
   BIO_LENGTH_IS_INVALID: 'Bio phải dài từ 6 đến 255 ký tự',
   AVATAR_IS_INVALID: 'Ảnh đại diện không hợp lệ',
   COVER_IS_INVALID: 'Ảnh bìa không hợp lệ',
-  ACCOUNT_IS_UNVERIFIED: 'Tài khoản chưa được xác thực'
+  ACCOUNT_IS_UNVERIFIED: 'Tài khoản chưa được xác thực',
+  GET_PROFILE_PAGE_SUCCEED: 'Lấy thông tin trang cá nhân thành công',
+  USERNAME_IS_REQUIRED: 'Username là bắt buộc',
+  USERNAME_MUST_WITHOUT_SPACES: 'Username phải viết liền không được chứa khoảng trắng'
 } as const

@@ -1,7 +1,7 @@
-import { ObjectId, WithId } from 'mongodb'
+import isUndefined from 'lodash/isUndefined'
 import omit from 'lodash/omit'
 import omitBy from 'lodash/omitBy'
-import isUndefined from 'lodash/isUndefined'
+import { ObjectId, WithId } from 'mongodb'
 
 import { ENV_CONFIG } from '~/constants/config'
 import { AccountRole, AccountStatus, AccountVerifyStatus, TokenType } from '~/constants/enum'
@@ -409,6 +409,28 @@ class AccountService {
       accessToken,
       refreshToken,
       account: updatedAccount
+    }
+  }
+
+  // Lấy thông tin trang cá nhân theo username
+  async getProfilePage(username: string) {
+    const account = (await databaseService.accounts.findOne(
+      {
+        username
+      },
+      {
+        projection: {
+          password: 0,
+          role: 0,
+          status: 0,
+          verify: 0,
+          forgotPasswordToken: 0,
+          verifyEmailToken: 0
+        }
+      }
+    )) as WithId<Account>
+    return {
+      account
     }
   }
 }

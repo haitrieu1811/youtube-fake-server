@@ -4,6 +4,7 @@ import {
   changePasswordController,
   forgotPasswordController,
   getMeController,
+  getProfilePageController,
   loginController,
   logoutController,
   refreshTokenController,
@@ -26,6 +27,7 @@ import {
   resendEmailVerifyAccountValidator,
   resetPasswordValidator,
   updateMeValidator,
+  usernameValidator,
   verifiedAccountValidator,
   verifyEmailValidator
 } from '~/middlewares/account.middlewares'
@@ -100,5 +102,8 @@ accountRouter.patch(
   filterReqBodyMiddleware<UpdateMeReqBody>(['username', 'channelName', 'bio', 'avatar', 'bio']),
   wrapRequestHandler(updateMeController)
 )
+
+// Lấy thông tin trang cá nhân
+accountRouter.get('/profile/:username', usernameValidator, wrapRequestHandler(getProfilePageController))
 
 export default accountRouter

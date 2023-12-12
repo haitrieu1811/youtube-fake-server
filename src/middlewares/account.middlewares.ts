@@ -434,6 +434,10 @@ export const updateMeValidator = validate(
         },
         custom: {
           options: async (value: string) => {
+            const nameArr = value.split(' ')
+            if (nameArr.length > 1) {
+              throw new Error(ACCOUNT_MESSAGES.USERNAME_MUST_WITHOUT_SPACES)
+            }
             const account = await databaseService.accounts.findOne({ username: value })
             if (account) {
               throw new Error(ACCOUNT_MESSAGES.USERNAME_ALREADY_EXIST)
@@ -505,5 +509,35 @@ export const updateMeValidator = validate(
       }
     },
     ['body']
+  )
+)
+
+// Validate: Username
+export const usernameValidator = validate(
+  checkSchema(
+    {
+      username: {
+        trim: true,
+        custom: {
+          options: async (value: string) => {
+            if (!value) {
+              throw new ErrorWithStatus({
+                message: ACCOUNT_MESSAGES.USERNAME_IS_REQUIRED,
+                status: HttpStatusCode.BadRequest
+              })
+            }
+            const account = await databaseService.accounts.findOne({ username: value })
+            if (!account) {
+              throw new ErrorWithStatus({
+                message: ACCOUNT_MESSAGES.ACCOUNT_NOT_FOUND,
+                status: HttpStatusCode.NotFound
+              })
+            }
+            return true
+          }
+        }
+      }
+    },
+    ['params']
   )
 )

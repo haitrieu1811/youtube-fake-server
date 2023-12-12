@@ -13,7 +13,8 @@ import {
   RegisterReqBody,
   ResetPasswordReqBody,
   TokenPayload,
-  UpdateMeReqBody
+  UpdateMeReqBody,
+  UsernameReqParams
 } from '~/models/requests/Account.requests'
 import Account from '~/models/schemas/Account.schema'
 import accountService from '~/services/account.services'
@@ -150,6 +151,15 @@ export const updateMeController = async (req: Request<ParamsDictionary, any, Upd
   const result = await accountService.updateMe({ accountId, body: req.body })
   return res.json({
     message: ACCOUNT_MESSAGES.UPDATE_ME_SUCCEED,
+    data: result
+  })
+}
+
+// Lấy thông tin trang cá nhân theo username
+export const getProfilePageController = async (req: Request<UsernameReqParams>, res: Response) => {
+  const result = await accountService.getProfilePage(req.params.username)
+  return res.json({
+    message: ACCOUNT_MESSAGES.GET_PROFILE_PAGE_SUCCEED,
     data: result
   })
 }

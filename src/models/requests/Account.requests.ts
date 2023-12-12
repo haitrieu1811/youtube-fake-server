@@ -60,3 +60,8 @@ export type UpdateMeReqBody = {
   avatar?: string
   cover?: string
 }
+
+// Params: Username
+export type UsernameReqParams = {
+  username: string
+}
