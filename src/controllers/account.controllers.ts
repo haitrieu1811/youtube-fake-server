@@ -7,7 +7,9 @@ import { HttpStatusCode } from '~/constants/enum'
 import { ACCOUNT_MESSAGES } from '~/constants/messages'
 import {
   AccountIdReqParams,
+  AdminUpdateAccountUserReqBody,
   ChangePasswordReqBody,
+  GetAllAccountsReqQuery,
   LogoutReqBody,
   RefreshTokenReqBody,
   RegisterReqBody,
@@ -160,6 +162,33 @@ export const getProfilePageController = async (req: Request<UsernameReqParams>, 
   const result = await accountService.getProfilePage(req.params.username)
   return res.json({
     message: ACCOUNT_MESSAGES.GET_PROFILE_PAGE_SUCCEED,
+    data: result
+  })
+}
+
+// Lấy danh sách toàn bộ account trên hệ thống (chỉ admin)
+export const getAllAccountsController = async (
+  req: Request<ParamsDictionary, any, any, GetAllAccountsReqQuery>,
+  res: Response
+) => {
+  const { accounts, ...pagination } = await accountService.getAllAccounts(req.query)
+  return res.json({
+    message: ACCOUNT_MESSAGES.GET_ALL_ACCOUNTS_SUCCEED,
+    data: {
+      accounts,
+      pagination
+    }
+  })
+}
+
+// Admin cập nhật account user
+export const adminUpdateAccountUserController = async (
+  req: Request<AccountIdReqParams, any, AdminUpdateAccountUserReqBody>,
+  res: Response
+) => {
+  const result = await accountService.adminUpdateAccountUser({ body: req.body, accountId: req.params.accountId })
+  return res.json({
+    message: ACCOUNT_MESSAGES.UPDATE_ACCOUNT_SUCCEED,
     data: result
   })
 }

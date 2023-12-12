@@ -1,6 +1,7 @@
 import { ParamsDictionary } from 'express-serve-static-core'
 
 import { AccountRole, AccountStatus, AccountVerifyStatus, TokenType } from '~/constants/enum'
+import { PaginationReqQuery } from './Common.requests'
 
 export type TokenPayload = {
   accountId: string
@@ -64,4 +65,16 @@ export type UpdateMeReqBody = {
 // Params: Username
 export type UsernameReqParams = {
   username: string
+}
+
+// Query: Lấy danh sách toàn bộ tài khoản trên hệ thống
+export type GetAllAccountsReqQuery = PaginationReqQuery & {
+  status: AccountStatus
+}
+
+// Body: Admin cập nhật account user
+export type AdminUpdateAccountUserReqBody = {
+  tick?: boolean
+  role?: AccountRole
+  status?: AccountStatus
 }

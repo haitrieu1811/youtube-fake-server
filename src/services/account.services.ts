@@ -8,7 +8,9 @@ import { AccountRole, AccountStatus, AccountVerifyStatus, TokenType } from '~/co
 import { hashPassword } from '~/lib/crypto'
 import { signToken, verifyToken } from '~/lib/jwt'
 import {
+  AdminUpdateAccountUserReqBody,
   ChangePasswordReqBody,
+  GetAllAccountsReqQuery,
   RegisterReqBody,
   ResetPasswordReqBody,
   TokenPayload,
@@ -431,6 +433,73 @@ class AccountService {
     )) as WithId<Account>
     return {
       account
+    }
+  }
+
+  // Lấy danh sách toàn bộ account trên hệ thống (chỉ admin)
+  async getAllAccounts(query: GetAllAccountsReqQuery) {
+    const { page, limit } = query
+    const _page = Number(page) || 1
+    const _limit = Number(limit) || 20
+    const [accounts, totalRows] = await Promise.all([
+      databaseService.accounts
+        .aggregate<Account>([
+          {
+            $project: {
+              password: 0,
+              role: 0,
+              status: 0,
+              verify: 0,
+              forgotPasswordToken: 0,
+              verifyEmailToken: 0
+            }
+          },
+          {
+            $skip: (_page - 1) * _limit
+          },
+          {
+            $limit: _limit
+          }
+        ])
+        .toArray(),
+      databaseService.accounts.countDocuments({})
+    ])
+    return {
+      page: _page,
+      limit: _limit,
+      totalRows,
+      totalPages: Math.ceil(totalRows / _limit),
+      accounts
+    }
+  }
+
+  // Admin cập nhật account user
+  async adminUpdateAccountUser({ body, accountId }: { body: AdminUpdateAccountUserReqBody; accountId: string }) {
+    const _body = omitBy(body, isUndefined)
+    const updatedAccount = (await databaseService.accounts.findOneAndUpdate(
+      {
+        _id: new ObjectId(accountId)
+      },
+      {
+        $set: _body,
+        $currentDate: {
+          updatedAt: true
+        }
+      },
+      {
+        returnDocument: 'after',
+        projection: {
+          password: 0,
+          role: 0,
+          status: 0,
+          verify: 0,
+          forgotPasswordToken: 0,
+          verifyEmailToken: 0
+        }
+      }
+    )) as WithId<Account>
+    return {
+      account: updatedAccount
     }
   }
 }

@@ -1,8 +1,10 @@
 import { Router } from 'express'
 
 import {
+  adminUpdateAccountUserController,
   changePasswordController,
   forgotPasswordController,
+  getAllAccountsController,
   getMeController,
   getProfilePageController,
   loginController,
@@ -18,6 +20,9 @@ import {
 import { wrapRequestHandler } from '~/lib/handlers'
 import {
   accessTokenValidator,
+  accountIdValidator,
+  adminRoleValidator,
+  adminUpdateAccountUserValidator,
   changePasswordValidator,
   forgotPasswordTokenValidator,
   forgotPasswordValidator,
@@ -31,8 +36,8 @@ import {
   verifiedAccountValidator,
   verifyEmailValidator
 } from '~/middlewares/account.middlewares'
-import { filterReqBodyMiddleware } from '~/middlewares/common.middlewares'
-import { UpdateMeReqBody } from '~/models/requests/Account.requests'
+import { filterReqBodyMiddleware, paginationValidator } from '~/middlewares/common.middlewares'
+import { AdminUpdateAccountUserReqBody, UpdateMeReqBody } from '~/models/requests/Account.requests'
 
 const accountRouter = Router()
 
@@ -105,5 +110,27 @@ accountRouter.patch(
 
 // Lấy thông tin trang cá nhân
 accountRouter.get('/profile/:username', usernameValidator, wrapRequestHandler(getProfilePageController))
+
+// Lấy danh sách toàn bộ account trên hệ thống (chỉ admin)
+accountRouter.get(
+  '/all',
+  accessTokenValidator,
+  verifiedAccountValidator,
+  adminRoleValidator,
+  paginationValidator,
+  wrapRequestHandler(getAllAccountsController)
+)
+
+// Admin cập nhật account user
+accountRouter.patch(
+  '/:accountId',
+  accessTokenValidator,
+  verifiedAccountValidator,
+  adminRoleValidator,
+  accountIdValidator,
+  adminUpdateAccountUserValidator,
+  filterReqBodyMiddleware<AdminUpdateAccountUserReqBody>(['tick', 'role', 'status']),
+  wrapRequestHandler(adminUpdateAccountUserController)
+)
 
 export default accountRouter

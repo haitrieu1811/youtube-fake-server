@@ -1,3 +1,8 @@
+export const COMMON_MESSAGES = {
+  PAGE_MUST_BE_A_INTEGER_AND_POSITIVE: 'Page phải là một số nguyên dương khác 0',
+  LIMIT_MUST_BE_A_INTEGER_AND_POSITIVE: 'Limit phải là một số nguyên dương'
+}
+
 export const ACCOUNT_MESSAGES = {
   VALIDATION_ERROR: 'Lỗi xác thực',
   REGISTER_SUCCEED: 'Đăng ký tài khoản thành công',
@@ -44,5 +49,11 @@ export const ACCOUNT_MESSAGES = {
   ACCOUNT_IS_UNVERIFIED: 'Tài khoản chưa được xác thực',
   GET_PROFILE_PAGE_SUCCEED: 'Lấy thông tin trang cá nhân thành công',
   USERNAME_IS_REQUIRED: 'Username là bắt buộc',
-  USERNAME_MUST_WITHOUT_SPACES: 'Username phải viết liền không được chứa khoảng trắng'
+  USERNAME_MUST_WITHOUT_SPACES: 'Username phải viết liền không được chứa khoảng trắng',
+  PERMISSION_DENIED: 'Không được phép truy cập tài nguyên',
+  GET_ALL_ACCOUNTS_SUCCEED: 'Lấy toàn bộ thông tin tài khoản thành công',
+  UPDATE_ACCOUNT_SUCCEED: 'Cập nhật tài khoản thành công',
+  TICK_MUST_BE_A_BOOLEAN: 'Tick phải là true hoặc false',
+  ROLE_IS_INVALID: 'Role không hợp lệ',
+  STATUS_IS_INVALID: 'Status không hợp lệ'
 } as const

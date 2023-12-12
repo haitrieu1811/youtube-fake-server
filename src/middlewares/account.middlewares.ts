@@ -5,14 +5,18 @@ import capitalize from 'lodash/capitalize'
 import { ObjectId } from 'mongodb'
 
 import { ENV_CONFIG } from '~/constants/config'
-import { AccountVerifyStatus, HttpStatusCode } from '~/constants/enum'
+import { AccountRole, AccountStatus, AccountVerifyStatus, HttpStatusCode } from '~/constants/enum'
 import { ACCOUNT_MESSAGES } from '~/constants/messages'
 import { hashPassword } from '~/lib/crypto'
 import { verifyToken } from '~/lib/jwt'
+import { numberEnumToArray } from '~/lib/utils'
 import { validate } from '~/lib/validation'
 import { ErrorWithStatus } from '~/models/Errors'
 import { TokenPayload } from '~/models/requests/Account.requests'
 import databaseService from '~/services/database.services'
+
+const roles = numberEnumToArray(AccountRole)
+const status = numberEnumToArray(AccountStatus)
 
 const emailSchema: ParamSchema = {
   trim: true,
@@ -346,7 +350,7 @@ export const accountIdValidator = validate(
         trim: true,
         custom: {
           options: async (value: string) => {
-            if (value) {
+            if (!value) {
               throw new ErrorWithStatus({
                 message: ACCOUNT_MESSAGES.ACCOUNT_ID_IS_REQUIRED,
                 status: HttpStatusCode.BadRequest
@@ -539,5 +543,53 @@ export const usernameValidator = validate(
       }
     },
     ['params']
+  )
+)
+
+// Validate: Quyền admin
+export const adminRoleValidator = (req: Request, res: Response, next: NextFunction) => {
+  const { role } = req.decodedAuthorization as TokenPayload
+  if (role !== AccountRole.Admin) {
+    next(
+      new ErrorWithStatus({
+        message: ACCOUNT_MESSAGES.PERMISSION_DENIED,
+        status: HttpStatusCode.Forbidden
+      })
+    )
+  }
+  next()
+}
+
+// Admin cập nhật account user
+export const adminUpdateAccountUserValidator = validate(
+  checkSchema(
+    {
+      tick: {
+        optional: true,
+        custom: {
+          options: (value: string) => {
+            if (typeof value !== 'boolean') {
+              throw new Error(ACCOUNT_MESSAGES.TICK_MUST_BE_A_BOOLEAN)
+            }
+            return true
+          }
+        }
+      },
+      role: {
+        optional: true,
+        isIn: {
+          options: [roles],
+          errorMessage: ACCOUNT_MESSAGES.ROLE_IS_INVALID
+        }
+      },
+      status: {
+        optional: true,
+        isIn: {
+          options: [status],
+          errorMessage: ACCOUNT_MESSAGES.STATUS_IS_INVALID
+        }
+      }
+    },
+    ['body']
   )
 )
