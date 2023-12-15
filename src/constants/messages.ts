@@ -66,3 +66,8 @@ export const MEDIA_MESSAGES = {
   IMAGE_FIELD_IS_REQUIRED: 'Field image là bắt buộc',
   UPLOAD_IMAGE_SUCCEED: 'Tải lên hình ảnh thành công'
 } as const
+
+export const SUBSCRIPTION_MESSAGES = {
+  SUBSCRIBE_SUCCEED: 'Đăng ký kênh thành công',
+  ALREADY_SUBSCRIBE: 'Đã đăng ký kênh trước đó'
+} as const

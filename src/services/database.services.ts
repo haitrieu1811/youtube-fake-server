@@ -4,6 +4,7 @@ import { ENV_CONFIG } from '~/constants/config'
 import Account from '~/models/schemas/Account.schema'
 import Image from '~/models/schemas/Image.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
+import Subscription from '~/models/schemas/Subscription.schema'
 
 const uri = `mongodb+srv://${ENV_CONFIG.DB_USERNAME}:${ENV_CONFIG.DB_PASSWORD}@youtube-fake-cluster.zodfbyg.mongodb.net/?retryWrites=true&w=majority`
 
@@ -37,6 +38,10 @@ class DatabaseService {
 
   get images(): Collection<Image> {
     return this.db.collection(ENV_CONFIG.DB_IMAGES_COLLECTION_NAME)
+  }
+
+  get subscriptions(): Collection<Subscription> {
+    return this.db.collection(ENV_CONFIG.DB_SUBSCRIPTIONS_COLLECTION_NAME)
   }
 }
 
