@@ -28,6 +28,13 @@ class DatabaseService {
     }
   }
 
+  async indexSubscriptions() {
+    const isExist = await this.subscriptions.indexExists(['fromAccountId_1_toAccountId_1'])
+    if (!isExist) {
+      await Promise.all([this.subscriptions.createIndex({ fromAccountId: 1, toAccountId: 1 })])
+    }
+  }
+
   get accounts(): Collection<Account> {
     return this.db.collection(ENV_CONFIG.DB_ACCOUNTS_COLLECTION_NAME)
   }

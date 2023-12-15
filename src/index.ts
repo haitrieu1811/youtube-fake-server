@@ -9,7 +9,9 @@ import subscriptionRouter from './routes/subscription.routes'
 import databaseService from './services/database.services'
 
 initFolders()
-databaseService.connect()
+databaseService.connect().then(() => {
+  databaseService.indexSubscriptions()
+})
 
 const app = express()
 const port = ENV_CONFIG.PORT ?? 4000
