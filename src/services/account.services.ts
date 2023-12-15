@@ -473,7 +473,7 @@ class AccountService {
     }
   }
 
-  // Admin cập nhật account user
+  // Admin cập nhật account user (chỉ admin)
   async adminUpdateAccountUser({ body, accountId }: { body: AdminUpdateAccountUserReqBody; accountId: string }) {
     const _body = omitBy(body, isUndefined)
     const updatedAccount = (await databaseService.accounts.findOneAndUpdate(
@@ -501,6 +501,16 @@ class AccountService {
     return {
       account: updatedAccount
     }
+  }
+
+  // Xóa vĩnh viễn tài khoản (chỉ admin)
+  async deleteAccounts(accountIds: string[]) {
+    const { deletedCount } = await databaseService.accounts.deleteMany({
+      _id: {
+        $in: accountIds.map((accountId) => new ObjectId(accountId))
+      }
+    })
+    return { deletedCount }
   }
 }
 

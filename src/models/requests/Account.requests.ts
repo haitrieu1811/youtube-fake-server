@@ -78,3 +78,8 @@ export type AdminUpdateAccountUserReqBody = {
   role?: AccountRole
   status?: AccountStatus
 }
+
+// Body: Xóa vĩnh viễn tài khoản
+export type DeleteAccountsReqBody = {
+  accountIds: string[]
+}

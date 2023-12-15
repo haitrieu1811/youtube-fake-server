@@ -3,6 +3,7 @@ import { Router } from 'express'
 import {
   adminUpdateAccountUserController,
   changePasswordController,
+  deleteAccountsController,
   forgotPasswordController,
   getAllAccountsController,
   getMeController,
@@ -24,6 +25,7 @@ import {
   adminRoleValidator,
   adminUpdateAccountUserValidator,
   changePasswordValidator,
+  deleteAccountsValidator,
   forgotPasswordTokenValidator,
   forgotPasswordValidator,
   loginValidator,
@@ -121,7 +123,7 @@ accountRouter.get(
   wrapRequestHandler(getAllAccountsController)
 )
 
-// Admin cập nhật account user
+// Admin cập nhật account user (chỉ admin)
 accountRouter.patch(
   '/:accountId',
   accessTokenValidator,
@@ -131,6 +133,16 @@ accountRouter.patch(
   adminUpdateAccountUserValidator,
   filterReqBodyMiddleware<AdminUpdateAccountUserReqBody>(['tick', 'role', 'status']),
   wrapRequestHandler(adminUpdateAccountUserController)
+)
+
+// Xóa vĩnh viễn tài khoản (chỉ admin)
+accountRouter.delete(
+  '/',
+  accessTokenValidator,
+  verifiedAccountValidator,
+  adminRoleValidator,
+  deleteAccountsValidator,
+  wrapRequestHandler(deleteAccountsController)
 )
 
 export default accountRouter

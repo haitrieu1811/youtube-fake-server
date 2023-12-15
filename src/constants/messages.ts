@@ -55,5 +55,8 @@ export const ACCOUNT_MESSAGES = {
   UPDATE_ACCOUNT_SUCCEED: 'Cập nhật tài khoản thành công',
   TICK_MUST_BE_A_BOOLEAN: 'Tick phải là true hoặc false',
   ROLE_IS_INVALID: 'Role không hợp lệ',
-  STATUS_IS_INVALID: 'Status không hợp lệ'
+  STATUS_IS_INVALID: 'Status không hợp lệ',
+  ACCOUNT_IDS_IS_REQUIRED: 'Account ids là bắt buộc',
+  ACCOUNT_IDS_MUST_BE_AN_ARRAY: 'Account ids phải là một mảng',
+  ACCOUNT_IDS_CAN_NOT_BE_EMPTY: 'Account ids không được rỗng'
 } as const

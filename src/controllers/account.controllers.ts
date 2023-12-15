@@ -9,6 +9,7 @@ import {
   AccountIdReqParams,
   AdminUpdateAccountUserReqBody,
   ChangePasswordReqBody,
+  DeleteAccountsReqBody,
   GetAllAccountsReqQuery,
   LogoutReqBody,
   RefreshTokenReqBody,
@@ -190,5 +191,16 @@ export const adminUpdateAccountUserController = async (
   return res.json({
     message: ACCOUNT_MESSAGES.UPDATE_ACCOUNT_SUCCEED,
     data: result
+  })
+}
+
+// Xóa vĩnh viễn tài khoản (chỉ admin)
+export const deleteAccountsController = async (
+  req: Request<ParamsDictionary, any, DeleteAccountsReqBody>,
+  res: Response
+) => {
+  const { deletedCount } = await accountService.deleteAccounts(req.body.accountIds)
+  return res.json({
+    message: `Xóa ${deletedCount} tài khoản thành công`
   })
 }

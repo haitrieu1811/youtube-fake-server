@@ -1,5 +1,5 @@
-import { Request, NextFunction, Response } from 'express'
-import { ParamSchema, check, checkSchema } from 'express-validator'
+import { NextFunction, Request, Response } from 'express'
+import { ParamSchema, checkSchema } from 'express-validator'
 import { JsonWebTokenError } from 'jsonwebtoken'
 import capitalize from 'lodash/capitalize'
 import { ObjectId } from 'mongodb'
@@ -560,7 +560,7 @@ export const adminRoleValidator = (req: Request, res: Response, next: NextFuncti
   next()
 }
 
-// Admin cập nhật account user
+// Admin cập nhật account user (chỉ admin)
 export const adminUpdateAccountUserValidator = validate(
   checkSchema(
     {
@@ -587,6 +587,48 @@ export const adminUpdateAccountUserValidator = validate(
         isIn: {
           options: [status],
           errorMessage: ACCOUNT_MESSAGES.STATUS_IS_INVALID
+        }
+      }
+    },
+    ['body']
+  )
+)
+
+// Xóa vĩnh viễn tài khoản (chỉ admin)
+export const deleteAccountsValidator = validate(
+  checkSchema(
+    {
+      accountIds: {
+        custom: {
+          options: (value: string[]) => {
+            if (!value) {
+              throw new ErrorWithStatus({
+                message: ACCOUNT_MESSAGES.ACCOUNT_IDS_IS_REQUIRED,
+                status: HttpStatusCode.BadRequest
+              })
+            }
+            if (!Array.isArray(value)) {
+              throw new ErrorWithStatus({
+                message: ACCOUNT_MESSAGES.ACCOUNT_IDS_MUST_BE_AN_ARRAY,
+                status: HttpStatusCode.BadRequest
+              })
+            }
+            if (value.length === 0) {
+              throw new ErrorWithStatus({
+                message: ACCOUNT_MESSAGES.ACCOUNT_IDS_CAN_NOT_BE_EMPTY,
+                status: HttpStatusCode.BadRequest
+              })
+            }
+            return true
+          }
+        },
+        customSanitizer: {
+          options: (value: string[]) => {
+            if (value && Array.isArray(value)) {
+              const isValidValues = value.filter((item) => ObjectId.isValid(item))
+              return isValidValues
+            }
+          }
         }
       }
     },
