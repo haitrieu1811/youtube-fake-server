@@ -1,9 +1,9 @@
 import { Router } from 'express'
 
-import { subscribeController } from '~/controllers/subscription.controllers'
+import { subscribeController, unsubscribeController } from '~/controllers/subscription.controllers'
 import { wrapRequestHandler } from '~/lib/handlers'
 import { accessTokenValidator, accountIdValidator, verifiedAccountValidator } from '~/middlewares/account.middlewares'
-import { subscribeValidator } from '~/middlewares/subscription.middlewares'
+import { subscribeValidator, unsubscribeValidator } from '~/middlewares/subscription.middlewares'
 
 const subscriptionRouter = Router()
 
@@ -11,10 +11,20 @@ const subscriptionRouter = Router()
 subscriptionRouter.post(
   '/subscribe/account/:accountId',
   accessTokenValidator,
-  accountIdValidator,
   verifiedAccountValidator,
+  accountIdValidator,
   subscribeValidator,
   wrapRequestHandler(subscribeController)
+)
+
+// Hủy đăng ký kênh
+subscriptionRouter.delete(
+  '/unsubscribe/account/:accountId',
+  accessTokenValidator,
+  verifiedAccountValidator,
+  accountIdValidator,
+  unsubscribeValidator,
+  wrapRequestHandler(unsubscribeController)
 )
 
 export default subscriptionRouter

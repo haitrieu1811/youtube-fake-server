@@ -69,5 +69,7 @@ export const MEDIA_MESSAGES = {
 
 export const SUBSCRIPTION_MESSAGES = {
   SUBSCRIBE_SUCCEED: 'Đăng ký kênh thành công',
-  ALREADY_SUBSCRIBE: 'Đã đăng ký kênh trước đó'
+  ALREADY_SUBSCRIBE: 'Đã đăng ký kênh trước đó',
+  UNSUBSCRIBE_SUCCEED: 'Hủy đăng ký kênh thành công',
+  NOT_SUBSCRIBED: 'Chưa đăng ký kênh này'
 } as const

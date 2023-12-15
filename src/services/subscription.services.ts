@@ -14,6 +14,15 @@ class SubscriptionService {
     )
     return true
   }
+
+  // Hủy đăng ký kênh
+  async unsubscribe({ fromAccountId, toAccountId }: { fromAccountId: string; toAccountId: string }) {
+    await databaseService.subscriptions.deleteOne({
+      fromAccountId: new ObjectId(fromAccountId),
+      toAccountId: new ObjectId(toAccountId)
+    })
+    return true
+  }
 }
 
 const subscriptionService = new SubscriptionService()
