@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb'
 
-interface SubscriptionConstructor {
+type SubscriptionConstructor = {
   _id?: ObjectId
   fromAccountId: ObjectId
   toAccountId: ObjectId

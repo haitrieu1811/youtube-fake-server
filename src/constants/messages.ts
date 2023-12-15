@@ -73,3 +73,16 @@ export const SUBSCRIPTION_MESSAGES = {
   UNSUBSCRIBE_SUCCEED: 'Hủy đăng ký kênh thành công',
   NOT_SUBSCRIBED: 'Chưa đăng ký kênh này'
 } as const
+
+export const VIDEO_MESSAGES = {
+  CREATE_VIDEO_CATEGORY_SUCCEED: 'Tạo danh mục video thành công',
+  CATEGORY_NAME_IS_REQUIRED: 'Tên danh mục video là bắt buộc',
+  CATEGORY_NAME_LENGTH_IS_INVALID: 'Tên danh mục video phải dài từ 6 đến 50 ký tự',
+  CATEGORY_DESCRIPTION_LENGTH_IS_INVALID: 'Mô tả danh mục video phải dài từ 6 đến 255 ký tự',
+  UPDATE_VIDEO_CATEGORY_SUCCEED: 'Cập nhật danh mục video thành công',
+  VIDEO_CATEGORY_ID_IS_REQUIRED: 'Id danh mục video là bắt buộc',
+  VIDEO_CATEGORY_ID_INVALID: 'Id danh mục video không hợp lệ',
+  VIDEO_CATEGORY_NOT_FOUND: 'Không tìm thấy danh mục video',
+  VIDEO_CATEGORY_AUTHOR_IS_INVALID: 'Bạn không phải là tác giả của danh mục video này',
+  DELETE_VIDEO_CATEGORY_SUCCEED: 'Xóa danh mục video thành công'
+} as const

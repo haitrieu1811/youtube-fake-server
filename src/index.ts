@@ -6,6 +6,7 @@ import { defaultErrorHandler } from './middlewares/error.middlewares'
 import accountRouter from './routes/account.routes'
 import mediaRouter from './routes/media.routes'
 import subscriptionRouter from './routes/subscription.routes'
+import videoRouter from './routes/video.routes'
 import databaseService from './services/database.services'
 
 initFolders()
@@ -20,6 +21,7 @@ app.use(express.json())
 app.use('/accounts', accountRouter)
 app.use('/medias', mediaRouter)
 app.use('/subscriptions', subscriptionRouter)
+app.use('/videos', videoRouter)
 app.use(defaultErrorHandler)
 
 app.listen(port, () => {

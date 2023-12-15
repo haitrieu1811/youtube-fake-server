@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb'
 
-interface ImageConstructor {
+type ImageConstructor = {
   _id?: ObjectId
   name: string
   createdAt?: Date
