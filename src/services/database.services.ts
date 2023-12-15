@@ -2,6 +2,7 @@ import { Collection, Db, MongoClient } from 'mongodb'
 
 import { ENV_CONFIG } from '~/constants/config'
 import Account from '~/models/schemas/Account.schema'
+import Image from '~/models/schemas/Image.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 
 const uri = `mongodb+srv://${ENV_CONFIG.DB_USERNAME}:${ENV_CONFIG.DB_PASSWORD}@youtube-fake-cluster.zodfbyg.mongodb.net/?retryWrites=true&w=majority`
@@ -32,6 +33,10 @@ class DatabaseService {
 
   get refreshTokens(): Collection<RefreshToken> {
     return this.db.collection(ENV_CONFIG.DB_REFRESH_TOKENS_COLLECTION_NAME)
+  }
+
+  get images(): Collection<Image> {
+    return this.db.collection(ENV_CONFIG.DB_IMAGES_COLLECTION_NAME)
   }
 }
 

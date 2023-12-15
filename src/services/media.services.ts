@@ -5,6 +5,8 @@ import sharp from 'sharp'
 
 import { UPLOAD_IMAGE_DIR } from '~/constants/dir'
 import { getExtensionFromFullname, getNameFromFullname, handleUploadImage } from '~/lib/file'
+import Image from '~/models/schemas/Image.schema'
+import databaseService from './database.services'
 
 class MediaService {
   // Xử lý upload ảnh
@@ -27,6 +29,14 @@ class MediaService {
         return newFullName
       })
     )
+    // Lưu thông tin ảnh vào DB
+    const imagesInsert = result.map(
+      (imageName) =>
+        new Image({
+          name: imageName
+        })
+    )
+    await databaseService.images.insertMany(imagesInsert)
     return {
       imageNames: result
     }
