@@ -121,3 +121,9 @@ export enum AccountVerifyStatus {
   Verified,
   Unverified
 }
+
+export enum MediaType {
+  Image,
+  Video,
+  Hls
+}

@@ -60,3 +60,9 @@ export const ACCOUNT_MESSAGES = {
   ACCOUNT_IDS_MUST_BE_AN_ARRAY: 'Account ids phải là một mảng',
   ACCOUNT_IDS_CAN_NOT_BE_EMPTY: 'Account ids không được rỗng'
 } as const
+
+export const MEDIA_MESSAGES = {
+  FILE_TYPE_INVALID: 'Loại file không hợp lệ',
+  IMAGE_FIELD_IS_REQUIRED: 'Field image là bắt buộc',
+  UPLOAD_IMAGE_SUCCEED: 'Tải lên hình ảnh thành công'
+} as const

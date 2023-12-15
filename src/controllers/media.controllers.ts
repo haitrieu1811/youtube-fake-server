@@ -1,0 +1,13 @@
+import { Request, Response } from 'express'
+
+import { MEDIA_MESSAGES } from '~/constants/messages'
+import mediaService from '~/services/media.services'
+
+// Tải lên hình ảnh
+export const uploadImagesController = async (req: Request, res: Response) => {
+  const result = await mediaService.handleUploadImages(req)
+  return res.json({
+    message: MEDIA_MESSAGES.UPLOAD_IMAGE_SUCCEED,
+    data: result
+  })
+}
