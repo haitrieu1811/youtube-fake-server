@@ -64,7 +64,8 @@ export const ACCOUNT_MESSAGES = {
 export const MEDIA_MESSAGES = {
   FILE_TYPE_INVALID: 'Loại file không hợp lệ',
   IMAGE_FIELD_IS_REQUIRED: 'Field image là bắt buộc',
-  UPLOAD_IMAGE_SUCCEED: 'Tải lên hình ảnh thành công'
+  UPLOAD_IMAGE_SUCCEED: 'Tải lên hình ảnh thành công',
+  UPLOAD_VIDEO_HLS_SUCCEED: 'Tải lên video HLS thành công'
 } as const
 
 export const SUBSCRIPTION_MESSAGES = {

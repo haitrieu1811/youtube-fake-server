@@ -5,13 +5,14 @@ import path from 'path'
 import sharp from 'sharp'
 
 import { UPLOAD_IMAGE_DIR } from '~/constants/dir'
-import { getExtensionFromFullname, getNameFromFullname, handleUploadImage } from '~/lib/file'
+import { getExtensionFromFullname, getNameFromFullname, handleUploadImage, handleUploadVideo } from '~/lib/file'
 import { uploadFileToS3 } from '~/lib/s3'
+import { encodeHLSWithMultipleVideoStreams } from '~/lib/video'
 import Image from '~/models/schemas/Image.schema'
 import databaseService from './database.services'
 
 class MediaService {
-  // Xử lý upload ảnh
+  // Upload ảnh
   async handleUploadImages(req: Request) {
     const images = await handleUploadImage(req)
     const result: string[] = await Promise.all(
@@ -47,6 +48,20 @@ class MediaService {
     return {
       imageNames: result
     }
+  }
+
+  // Upload video HLS
+  async handleUploadVideoHLS(req: Request) {
+    const videos = await handleUploadVideo(req)
+    const result: string[] = await Promise.all(
+      videos.map(async (video) => {
+        const fileName = getNameFromFullname(video.newFilename)
+        await encodeHLSWithMultipleVideoStreams(video.filepath)
+        await fsPromise.unlink(video.filepath)
+        return fileName
+      })
+    )
+    return result
   }
 }
 
