@@ -1,10 +1,12 @@
 import express from 'express'
+import cors from 'cors'
 
 import { ENV_CONFIG } from './constants/config'
 import { initFolders } from './lib/file'
 import { defaultErrorHandler } from './middlewares/error.middlewares'
 import accountRouter from './routes/account.routes'
 import mediaRouter from './routes/media.routes'
+import staticRouter from './routes/static.routes'
 import subscriptionRouter from './routes/subscription.routes'
 import videoRouter from './routes/video.routes'
 import databaseService from './services/database.services'
@@ -17,11 +19,13 @@ databaseService.connect().then(() => {
 const app = express()
 const port = ENV_CONFIG.PORT ?? 4000
 
+app.use(cors())
 app.use(express.json())
 app.use('/accounts', accountRouter)
 app.use('/medias', mediaRouter)
 app.use('/subscriptions', subscriptionRouter)
 app.use('/videos', videoRouter)
+app.use('/statics', staticRouter)
 app.use(defaultErrorHandler)
 
 app.listen(port, () => {

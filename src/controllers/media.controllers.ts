@@ -1,4 +1,6 @@
 import { Request, Response } from 'express'
+import path from 'path'
+import { UPLOAD_VIDEO_DIR } from '~/constants/dir'
 
 import { MEDIA_MESSAGES } from '~/constants/messages'
 import mediaService from '~/services/media.services'
@@ -18,5 +20,25 @@ export const uploadVideoHLSController = async (req: Request, res: Response) => {
   return res.json({
     message: MEDIA_MESSAGES.UPLOAD_VIDEO_HLS_SUCCEED,
     data: result
+  })
+}
+
+// Serve m3u8
+export const serveM3u8Controller = (req: Request, res: Response) => {
+  const { id } = req.params
+  return res.sendFile(path.resolve(UPLOAD_VIDEO_DIR, id, 'master.m3u8'), (error) => {
+    if (error) {
+      res.status((error as any).status).send('Not found')
+    }
+  })
+}
+
+// Serve
+export const serveSegmentHLSController = (req: Request, res: Response) => {
+  const { id, v, segment } = req.params
+  return res.sendFile(path.resolve(UPLOAD_VIDEO_DIR, id, v, segment), (error) => {
+    if (error) {
+      res.status((error as any).status).send('Not found')
+    }
   })
 }
