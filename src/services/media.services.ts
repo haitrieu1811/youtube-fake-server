@@ -11,6 +11,44 @@ import { encodeHLSWithMultipleVideoStreams } from '~/lib/video'
 import Image from '~/models/schemas/Image.schema'
 import databaseService from './database.services'
 
+class Queue {
+  items: string[]
+  encoding: boolean
+
+  constructor() {
+    this.items = []
+    this.encoding = false
+  }
+
+  enqueue(item: string) {
+    this.items.push(item)
+    this.processEncode()
+  }
+
+  async processEncode() {
+    if (this.encoding) return
+    if (this.items.length > 0) {
+      this.encoding = true
+      const videoPath = this.items[0]
+      try {
+        await encodeHLSWithMultipleVideoStreams(videoPath)
+        await fsPromise.unlink(videoPath)
+        this.items.shift()
+        console.log(`Encode video ${videoPath} success`)
+      } catch (error) {
+        console.error(`Encode ${videoPath} error`)
+        console.error(error)
+      }
+      this.encoding = false
+      this.processEncode()
+    } else {
+      console.log('Encode video queue is empty')
+    }
+  }
+}
+
+const queue = new Queue()
+
 class MediaService {
   // Upload ảnh
   async handleUploadImages(req: Request) {
@@ -56,8 +94,7 @@ class MediaService {
     const result: string[] = await Promise.all(
       videos.map(async (video) => {
         const fileName = getNameFromFullname(video.newFilename)
-        await encodeHLSWithMultipleVideoStreams(video.filepath)
-        await fsPromise.unlink(video.filepath)
+        queue.enqueue(video.filepath)
         return fileName
       })
     )
