@@ -101,5 +101,9 @@ export const VIDEO_MESSAGES = {
   VIDEO_ID_IS_REQUIRED: 'Video id là bắt buộc',
   VIDEO_ID_INVALID: 'Video id không hợp lệ',
   VIDEO_NOT_FOUND: 'Không tìm thấy video',
-  VIDEO_AUTHOR_IS_INVALID: 'Bạn không phải là tác giả của video này'
+  VIDEO_AUTHOR_IS_INVALID: 'Bạn không phải là tác giả của video này',
+  VIDEO_IDS_IS_REQUIRED: 'Video ids là bắt buộc',
+  VIDEO_IDS_MUST_BE_AN_ARRAY: 'Video ids phải là một mảng',
+  VIDEO_IDS_HAVE_NOT_EMPTY: 'Video ids không được để trống',
+  VIDEO_IDS_IS_INVALID: 'Video ids không hợp lệ'
 } as const

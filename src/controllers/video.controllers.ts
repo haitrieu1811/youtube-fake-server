@@ -7,6 +7,7 @@ import { TokenPayload } from '~/models/requests/Account.requests'
 import {
   CreateVideoCategoryReqBody,
   CreateVideoReqBody,
+  DeleteVideosReqBody,
   UpdateVideoCategoryReqBody,
   UpdateVideoReqBody,
   VideoCategoryIdReqParams,
@@ -63,5 +64,16 @@ export const updateVideoController = async (req: Request<VideoIdReqParams, any, 
   return res.json({
     message: VIDEO_MESSAGES.UPDATE_VIDEO_SUCCEED,
     data: result
+  })
+}
+
+// Xóa videos
+export const deleteVideosController = async (
+  req: Request<ParamsDictionary, any, DeleteVideosReqBody>,
+  res: Response
+) => {
+  const { deletedCount } = await videoService.deleteVideos(req.body.videoIds)
+  return res.json({
+    message: `Xóa ${deletedCount} video thành công`
   })
 }

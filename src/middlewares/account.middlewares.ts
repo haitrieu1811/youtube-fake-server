@@ -625,8 +625,8 @@ export const deleteAccountsValidator = validate(
         customSanitizer: {
           options: (value: string[]) => {
             if (value && Array.isArray(value)) {
-              const isValidValues = value.filter((item) => ObjectId.isValid(item))
-              return isValidValues
+              const isValidValue = value.filter((item) => ObjectId.isValid(item))
+              return isValidValue
             }
           }
         }

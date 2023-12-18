@@ -4,6 +4,7 @@ import {
   createVideoCategoryController,
   createVideoController,
   deleteVideoCategoryController,
+  deleteVideosController,
   updateVideoCategoryController,
   updateVideoController
 } from '~/controllers/video.controllers'
@@ -15,6 +16,7 @@ import {
   authorOfVideoValidator,
   createVideoCategoryValidator,
   createVideoValidator,
+  deleteVideosValidator,
   updateVideoCategoryValidator,
   updateVideoValidator,
   videoCategoryIdValidator,
@@ -77,6 +79,15 @@ videoRouter.patch(
   updateVideoValidator,
   filterReqBodyMiddleware<UpdateVideoReqBody>(['title', 'description', 'thumbnail', 'category', 'audience']),
   wrapRequestHandler(updateVideoController)
+)
+
+// Xóa video
+videoRouter.delete(
+  '/',
+  accessTokenValidator,
+  verifiedAccountValidator,
+  deleteVideosValidator,
+  wrapRequestHandler(deleteVideosController)
 )
 
 export default videoRouter

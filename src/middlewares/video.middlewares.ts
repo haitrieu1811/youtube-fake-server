@@ -286,3 +286,44 @@ export const authorOfVideoValidator = async (req: Request<VideoIdReqParams>, _: 
   }
   next()
 }
+
+// Xóa videos
+export const deleteVideosValidator = validate(
+  checkSchema(
+    {
+      videoIds: {
+        custom: {
+          options: (value: string[]) => {
+            if (!value) {
+              throw new ErrorWithStatus({
+                message: VIDEO_MESSAGES.VIDEO_IDS_IS_REQUIRED,
+                status: HttpStatusCode.BadRequest
+              })
+            }
+            if (!Array.isArray(value)) {
+              throw new ErrorWithStatus({
+                message: VIDEO_MESSAGES.VIDEO_IDS_MUST_BE_AN_ARRAY,
+                status: HttpStatusCode.BadRequest
+              })
+            }
+            if (value.length === 0) {
+              throw new ErrorWithStatus({
+                message: VIDEO_MESSAGES.VIDEO_IDS_HAVE_NOT_EMPTY,
+                status: HttpStatusCode.BadRequest
+              })
+            }
+            const isValid = value.every((item) => ObjectId.isValid(item))
+            if (!isValid) {
+              throw new ErrorWithStatus({
+                message: VIDEO_MESSAGES.VIDEO_IDS_IS_INVALID,
+                status: HttpStatusCode.BadRequest
+              })
+            }
+            return true
+          }
+        }
+      }
+    },
+    ['body']
+  )
+)

@@ -93,6 +93,18 @@ class VideoService {
       video: updatedVideo
     }
   }
+
+  // Xóa video
+  async deleteVideos(videoIds: string[]) {
+    const { deletedCount } = await databaseService.videos.deleteMany({
+      _id: {
+        $in: videoIds.map((videoId) => new ObjectId(videoId))
+      }
+    })
+    return {
+      deletedCount
+    }
+  }
 }
 
 const videoService = new VideoService()

@@ -46,3 +46,8 @@ export type UpdateVideoReqBody = {
 export type VideoIdReqParams = ParamsDictionary & {
   videoId: string
 }
+
+// Body: Xóa video
+export type DeleteVideosReqBody = {
+  videoIds: string[]
+}
