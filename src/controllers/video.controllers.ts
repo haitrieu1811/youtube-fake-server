@@ -8,7 +8,9 @@ import {
   CreateVideoCategoryReqBody,
   CreateVideoReqBody,
   UpdateVideoCategoryReqBody,
-  VideoCategoryIdReqParams
+  UpdateVideoReqBody,
+  VideoCategoryIdReqParams,
+  VideoIdReqParams
 } from '~/models/requests/Video.requests'
 import videoService from '~/services/video.services'
 
@@ -51,6 +53,15 @@ export const createVideoController = async (req: Request<ParamsDictionary, any, 
   const result = await videoService.createVideo({ body: req.body, accountId })
   return res.status(HttpStatusCode.Created).json({
     message: VIDEO_MESSAGES.CREATE_VIDEO_SUCCEED,
+    data: result
+  })
+}
+
+// Cập nhật video
+export const updateVideoController = async (req: Request<VideoIdReqParams, any, UpdateVideoReqBody>, res: Response) => {
+  const result = await videoService.updateVideo({ body: req.body, videoId: req.params.videoId })
+  return res.json({
+    message: VIDEO_MESSAGES.UPDATE_VIDEO_SUCCEED,
     data: result
   })
 }

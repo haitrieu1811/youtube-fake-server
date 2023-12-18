@@ -4,19 +4,23 @@ import {
   createVideoCategoryController,
   createVideoController,
   deleteVideoCategoryController,
-  updateVideoCategoryController
+  updateVideoCategoryController,
+  updateVideoController
 } from '~/controllers/video.controllers'
 import { wrapRequestHandler } from '~/lib/handlers'
 import { accessTokenValidator, adminRoleValidator, verifiedAccountValidator } from '~/middlewares/account.middlewares'
 import { filterReqBodyMiddleware } from '~/middlewares/common.middlewares'
 import {
   authorOfVideoCategoryValidator,
+  authorOfVideoValidator,
   createVideoCategoryValidator,
   createVideoValidator,
   updateVideoCategoryValidator,
-  videoCategoryIdValidator
+  updateVideoValidator,
+  videoCategoryIdValidator,
+  videoIdValidator
 } from '~/middlewares/video.middlewares'
-import { UpdateVideoCategoryReqBody } from '~/models/requests/Video.requests'
+import { UpdateVideoCategoryReqBody, UpdateVideoReqBody } from '~/models/requests/Video.requests'
 
 const videoRouter = Router()
 
@@ -61,6 +65,18 @@ videoRouter.post(
   verifiedAccountValidator,
   createVideoValidator,
   wrapRequestHandler(createVideoController)
+)
+
+// Cập nhật video
+videoRouter.patch(
+  '/:videoId',
+  accessTokenValidator,
+  verifiedAccountValidator,
+  videoIdValidator,
+  authorOfVideoValidator,
+  updateVideoValidator,
+  filterReqBodyMiddleware<UpdateVideoReqBody>(['title', 'description', 'thumbnail', 'category', 'audience']),
+  wrapRequestHandler(updateVideoController)
 )
 
 export default videoRouter

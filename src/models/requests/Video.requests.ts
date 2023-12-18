@@ -32,3 +32,17 @@ export type CreateVideoReqBody = {
   description?: string
   audience?: VideoAudience
 }
+
+// Body: Cập nhật video
+export type UpdateVideoReqBody = {
+  thumbnail?: string
+  title?: string
+  category?: string
+  description?: string
+  audience?: VideoAudience
+}
+
+// Params: Video id
+export type VideoIdReqParams = ParamsDictionary & {
+  videoId: string
+}

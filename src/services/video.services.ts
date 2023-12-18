@@ -5,7 +5,8 @@ import isUndefined from 'lodash/isUndefined'
 import {
   CreateVideoCategoryReqBody,
   CreateVideoReqBody,
-  UpdateVideoCategoryReqBody
+  UpdateVideoCategoryReqBody,
+  UpdateVideoReqBody
 } from '~/models/requests/Video.requests'
 import VideoCategory from '~/models/schemas/VideoCategory.schema'
 import databaseService from './database.services'
@@ -68,6 +69,28 @@ class VideoService {
     const newVideo = await databaseService.videos.findOne({ _id: insertedId })
     return {
       newVideo
+    }
+  }
+
+  // Cập nhật video
+  async updateVideo({ body, videoId }: { body: UpdateVideoReqBody; videoId: string }) {
+    const _body = omitBy(body, isUndefined)
+    const updatedVideo = await databaseService.videos.findOneAndUpdate(
+      {
+        _id: new ObjectId(videoId)
+      },
+      {
+        $set: _body,
+        $currentDate: {
+          updatedAt: true
+        }
+      },
+      {
+        returnDocument: 'after'
+      }
+    )
+    return {
+      video: updatedVideo
     }
   }
 }

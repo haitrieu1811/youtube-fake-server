@@ -8,7 +8,7 @@ import { numberEnumToArray } from '~/lib/utils'
 import { validate } from '~/lib/validation'
 import { ErrorWithStatus } from '~/models/Errors'
 import { TokenPayload } from '~/models/requests/Account.requests'
-import { VideoCategoryIdReqParams } from '~/models/requests/Video.requests'
+import { VideoCategoryIdReqParams, VideoIdReqParams } from '~/models/requests/Video.requests'
 import databaseService from '~/services/database.services'
 
 const audiences = numberEnumToArray(VideoAudience)
@@ -39,6 +39,62 @@ const descriptionSchema: ParamSchema = {
   }
 }
 
+const videoTitleSchema: ParamSchema = {
+  trim: true,
+  notEmpty: {
+    errorMessage: VIDEO_MESSAGES.TITLE_IS_REQUIRED
+  },
+  isLength: {
+    options: {
+      min: 6,
+      max: 500
+    },
+    errorMessage: VIDEO_MESSAGES.TITLE_LENGTH_IS_INVALID
+  }
+}
+
+const videoCategorySchema: ParamSchema = {
+  trim: true,
+  notEmpty: {
+    errorMessage: VIDEO_MESSAGES.CATEGORY_IS_REQUIRED
+  },
+  isMongoId: {
+    errorMessage: VIDEO_MESSAGES.CATEGORY_IS_INVALID
+  },
+  custom: {
+    options: async (value: string) => {
+      const videoCategory = await databaseService.videoCategories.findOne({ _id: new ObjectId(value) })
+      if (!videoCategory) {
+        throw new Error(VIDEO_MESSAGES.CATEGORY_NOT_FOUND)
+      }
+      return true
+    }
+  }
+}
+
+const videoDescriptionSchema: ParamSchema = {
+  trim: true,
+  optional: true
+}
+
+const videoAudienceSchema: ParamSchema = {
+  optional: true,
+  isIn: {
+    options: [audiences],
+    errorMessage: VIDEO_MESSAGES.AUDIENCE_IS_INVALID
+  }
+}
+
+const videoThumbnailSchema: ParamSchema = {
+  trim: true,
+  notEmpty: {
+    errorMessage: VIDEO_MESSAGES.THUMBNAIL_IS_REQUIRED
+  },
+  isMongoId: {
+    errorMessage: VIDEO_MESSAGES.THUMBNAIL_IS_INVALID
+  }
+}
+
 // Tạo danh mục video
 export const createVideoCategoryValidator = validate(
   checkSchema(
@@ -50,7 +106,7 @@ export const createVideoCategoryValidator = validate(
   )
 )
 
-// Video category id
+// Kiểm tra video category id
 export const videoCategoryIdValidator = validate(
   checkSchema(
     {
@@ -141,55 +197,92 @@ export const createVideoValidator = validate(
           }
         }
       },
-      thumbnail: {
-        trim: true,
-        isMongoId: {
-          errorMessage: VIDEO_MESSAGES.THUMBNAIL_IS_INVALID
-        }
-      },
-      title: {
-        trim: true,
-        notEmpty: {
-          errorMessage: VIDEO_MESSAGES.TITLE_IS_REQUIRED
-        },
-        isLength: {
-          options: {
-            min: 6,
-            max: 500
-          },
-          errorMessage: VIDEO_MESSAGES.TITLE_LENGTH_IS_INVALID
-        }
-      },
-      category: {
-        trim: true,
-        notEmpty: {
-          errorMessage: VIDEO_MESSAGES.CATEGORY_IS_REQUIRED
-        },
-        isMongoId: {
-          errorMessage: VIDEO_MESSAGES.CATEGORY_IS_INVALID
-        },
-        custom: {
-          options: async (value: string) => {
-            const videoCategory = await databaseService.videoCategories.findOne({ _id: new ObjectId(value) })
-            if (!videoCategory) {
-              throw new Error(VIDEO_MESSAGES.CATEGORY_NOT_FOUND)
-            }
-            return true
-          }
-        }
-      },
-      description: {
-        trim: true,
-        optional: true
-      },
-      audience: {
-        optional: true,
-        isIn: {
-          options: [audiences],
-          errorMessage: VIDEO_MESSAGES.AUDIENCE_IS_INVALID
-        }
-      }
+      thumbnail: videoThumbnailSchema,
+      title: videoTitleSchema,
+      category: videoCategorySchema,
+      description: videoDescriptionSchema,
+      audience: videoAudienceSchema
     },
     ['body']
   )
 )
+
+// Cập nhật video
+export const updateVideoValidator = validate(
+  checkSchema(
+    {
+      thumbnail: {
+        ...videoThumbnailSchema,
+        notEmpty: undefined,
+        optional: true
+      },
+      title: {
+        ...videoTitleSchema,
+        notEmpty: undefined,
+        optional: true
+      },
+      category: {
+        ...videoCategorySchema,
+        notEmpty: undefined,
+        optional: true
+      },
+      description: videoDescriptionSchema,
+      audience: videoAudienceSchema
+    },
+    ['body']
+  )
+)
+
+// Kiểm tra video id
+export const videoIdValidator = validate(
+  checkSchema(
+    {
+      videoId: {
+        trim: true,
+        custom: {
+          options: async (value: string) => {
+            if (!value) {
+              throw new ErrorWithStatus({
+                message: VIDEO_MESSAGES.VIDEO_ID_IS_REQUIRED,
+                status: HttpStatusCode.BadRequest
+              })
+            }
+            if (!ObjectId.isValid(value)) {
+              throw new ErrorWithStatus({
+                message: VIDEO_MESSAGES.VIDEO_ID_INVALID,
+                status: HttpStatusCode.BadRequest
+              })
+            }
+            const video = await databaseService.videos.findOne({ _id: new ObjectId(value) })
+            if (!video) {
+              throw new ErrorWithStatus({
+                message: VIDEO_MESSAGES.VIDEO_NOT_FOUND,
+                status: HttpStatusCode.NotFound
+              })
+            }
+            return true
+          }
+        }
+      }
+    },
+    ['params']
+  )
+)
+
+// Kiểm tra tác giả của video
+export const authorOfVideoValidator = async (req: Request<VideoIdReqParams>, _: Response, next: NextFunction) => {
+  const { accountId } = req.decodedAuthorization as TokenPayload
+  const video = await databaseService.videos.findOne({
+    _id: new ObjectId(req.params.videoId),
+    accountId: new ObjectId(accountId)
+  })
+  if (!video) {
+    next(
+      new ErrorWithStatus({
+        message: VIDEO_MESSAGES.VIDEO_AUTHOR_IS_INVALID,
+        status: HttpStatusCode.Forbidden
+      })
+    )
+  }
+  next()
+}
