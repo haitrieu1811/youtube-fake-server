@@ -6,6 +6,7 @@ import Image from '~/models/schemas/Image.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import Subscription from '~/models/schemas/Subscription.schema'
 import VideoCategory from '~/models/schemas/VideoCategory.schema'
+import VideoStatus from '~/models/schemas/VideoStatus.schema'
 
 const uri = `mongodb+srv://${ENV_CONFIG.DB_USERNAME}:${ENV_CONFIG.DB_PASSWORD}@youtube-fake-cluster.zodfbyg.mongodb.net/?retryWrites=true&w=majority`
 
@@ -54,6 +55,10 @@ class DatabaseService {
 
   get videoCategories(): Collection<VideoCategory> {
     return this.db.collection(ENV_CONFIG.DB_VIDEO_CATEGORIES_COLLECTION_NAME)
+  }
+
+  get videoStatus(): Collection<VideoStatus> {
+    return this.db.collection(ENV_CONFIG.DB_VIDEO_STATUS_COLLECTION_NAME)
   }
 }
 

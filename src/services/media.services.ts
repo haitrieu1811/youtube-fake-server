@@ -5,11 +5,14 @@ import path from 'path'
 import sharp from 'sharp'
 
 import { UPLOAD_IMAGE_DIR } from '~/constants/dir'
+import { EncodingStatus } from '~/constants/enum'
 import { getExtensionFromFullname, getNameFromFullname, handleUploadImage, handleUploadVideo } from '~/lib/file'
 import { uploadFileToS3 } from '~/lib/s3'
 import { encodeHLSWithMultipleVideoStreams } from '~/lib/video'
 import Image from '~/models/schemas/Image.schema'
+import VideoStatus from '~/models/schemas/VideoStatus.schema'
 import databaseService from './database.services'
+import { updateVideoStatus } from '~/lib/utils'
 
 class Queue {
   items: string[]
@@ -20,8 +23,9 @@ class Queue {
     this.encoding = false
   }
 
-  enqueue(item: string) {
+  async enqueue(item: string) {
     this.items.push(item)
+    await updateVideoStatus({ filePath: item, status: EncodingStatus.Pending })
     this.processEncode()
   }
 
@@ -30,12 +34,17 @@ class Queue {
     if (this.items.length > 0) {
       this.encoding = true
       const videoPath = this.items[0]
+      await updateVideoStatus({ filePath: videoPath, status: EncodingStatus.Processing })
       try {
         await encodeHLSWithMultipleVideoStreams(videoPath)
         await fsPromise.unlink(videoPath)
         this.items.shift()
+        await updateVideoStatus({ filePath: videoPath, status: EncodingStatus.Succeed })
         console.log(`Encode video ${videoPath} success`)
       } catch (error) {
+        await updateVideoStatus({ filePath: videoPath, status: EncodingStatus.Failed }).then((err) => {
+          console.log('Update video status error: ', err)
+        })
         console.error(`Encode ${videoPath} error`)
         console.error(error)
       }
@@ -99,6 +108,14 @@ class MediaService {
       })
     )
     return result
+  }
+
+  // Get video status
+  async getVideoStatus(idName: string) {
+    const videoStatus = await databaseService.videoStatus.findOne({ name: idName })
+    return {
+      videoStatus
+    }
   }
 }
 

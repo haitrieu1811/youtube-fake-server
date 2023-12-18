@@ -16,3 +16,8 @@ export type UpdateVideoCategoryReqBody = {
 export type VideoCategoryIdReqParams = ParamsDictionary & {
   videoCategoryId: string
 }
+
+// Params: Get video status
+export type GetVideoStatusReqParams = ParamsDictionary & {
+  id: string
+}

@@ -1,8 +1,9 @@
 import { Request, Response } from 'express'
 import path from 'path'
-import { UPLOAD_VIDEO_DIR } from '~/constants/dir'
 
+import { UPLOAD_VIDEO_DIR } from '~/constants/dir'
 import { MEDIA_MESSAGES } from '~/constants/messages'
+import { GetVideoStatusReqParams } from '~/models/requests/Video.requests'
 import mediaService from '~/services/media.services'
 
 // Upload hình ảnh
@@ -33,12 +34,22 @@ export const serveM3u8Controller = (req: Request, res: Response) => {
   })
 }
 
-// Serve
+// Serve segment
 export const serveSegmentHLSController = (req: Request, res: Response) => {
   const { id, v, segment } = req.params
   return res.sendFile(path.resolve(UPLOAD_VIDEO_DIR, id, v, segment), (error) => {
     if (error) {
       res.status((error as any).status).send('Not found')
     }
+  })
+}
+
+// Get video status
+export const getVideoStatusController = async (req: Request<GetVideoStatusReqParams>, res: Response) => {
+  const { id } = req.params
+  const result = await mediaService.getVideoStatus(id)
+  return res.json({
+    message: MEDIA_MESSAGES.GET_VIDEO_STATUS_SUCCEED,
+    data: result
   })
 }
