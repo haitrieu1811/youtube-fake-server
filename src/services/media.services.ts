@@ -161,7 +161,9 @@ class MediaService {
         return fileName
       })
     )
-    return result
+    return {
+      videoIdName: result[0]
+    }
   }
 
   // Get video status
