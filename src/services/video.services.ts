@@ -14,6 +14,8 @@ import {
 import Video from '~/models/schemas/Video.schema'
 import VideoCategory from '~/models/schemas/VideoCategory.schema'
 import databaseService from './database.services'
+import { generateVideosListAggregate } from '~/lib/aggregate'
+import { PaginationReqQuery } from '~/models/requests/Common.requests'
 
 class VideoService {
   // Tạo danh mục video
@@ -109,7 +111,7 @@ class VideoService {
     }
   }
 
-  // Lấy danh sách video
+  // Lấy danh sách video công khai
   async getPublicVideos(query: GetPublicVideosReqQuery) {
     const { page, limit, category } = query
     const _page = Number(page) || 1
@@ -121,114 +123,31 @@ class VideoService {
       },
       isUndefined
     )
+    const aggregate = generateVideosListAggregate({ match, skip: (_page - 1) * _limit, limit: _limit })
     const [videos, totalRows] = await Promise.all([
-      databaseService.videos
-        .aggregate([
-          {
-            $match: match
-          },
-          {
-            $lookup: {
-              from: 'accounts',
-              localField: 'accountId',
-              foreignField: '_id',
-              as: 'author'
-            }
-          },
-          {
-            $unwind: {
-              path: '$author'
-            }
-          },
-          {
-            $lookup: {
-              from: 'images',
-              localField: 'thumbnail',
-              foreignField: '_id',
-              as: 'thumbnail'
-            }
-          },
-          {
-            $unwind: {
-              path: '$thumbnail'
-            }
-          },
-          {
-            $lookup: {
-              from: 'images',
-              localField: 'author.avatar',
-              foreignField: '_id',
-              as: 'authorAvatar'
-            }
-          },
-          {
-            $unwind: {
-              path: '$authorAvatar',
-              preserveNullAndEmptyArrays: true
-            }
-          },
-          {
-            $addFields: {
-              thumbnailUrl: {
-                $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$thumbnail.name']
-              },
-              'author.avatar': {
-                $cond: {
-                  if: '$authorAvatar',
-                  then: {
-                    $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$authorAvatar.name']
-                  },
-                  else: ''
-                }
-              }
-            }
-          },
-          {
-            $group: {
-              _id: '$_id',
-              idName: {
-                $first: '$idName'
-              },
-              thumbnail: {
-                $first: '$thumbnailUrl'
-              },
-              title: {
-                $first: '$title'
-              },
-              author: {
-                $first: '$author'
-              },
-              viewCount: {
-                $first: '$views'
-              },
-              createdAt: {
-                $first: '$createdAt'
-              },
-              updatedAt: {
-                $first: '$updatedAt'
-              }
-            }
-          },
-          {
-            $project: {
-              'author.password': 0,
-              'author.role': 0,
-              'author.status': 0,
-              'author.verify': 0,
-              'author.forgotPasswordToken': 0,
-              'author.verifyEmailToken': 0,
-              'author.cover': 0,
-              'author.bio': 0
-            }
-          },
-          {
-            $skip: (_page - 1) * _limit
-          },
-          {
-            $limit: _limit
-          }
-        ])
-        .toArray(),
+      databaseService.videos.aggregate(aggregate).toArray(),
+      databaseService.videos.countDocuments(match)
+    ])
+    return {
+      videos,
+      page: _page,
+      limit: _limit,
+      totalRows,
+      totalPages: Math.ceil(totalRows / _limit)
+    }
+  }
+
+  // Lấy danh sách video của tài khoản đăng nhập
+  async getVideosOfMe({ accountId, query }: { accountId: string; query: PaginationReqQuery }) {
+    const { page, limit } = query
+    const _page = Number(page) || 1
+    const _limit = Number(limit) || 20
+    const match = {
+      accountId: new ObjectId(accountId)
+    }
+    const aggregate = generateVideosListAggregate({ match, skip: (_page - 1) * _limit, limit: _limit })
+    const [videos, totalRows] = await Promise.all([
+      databaseService.videos.aggregate(aggregate).toArray(),
       databaseService.videos.countDocuments(match)
     ])
     return {

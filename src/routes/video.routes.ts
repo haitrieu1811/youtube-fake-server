@@ -6,6 +6,7 @@ import {
   deleteVideoCategoryController,
   deleteVideosController,
   getPublicVideosController,
+  getVideosOfMeController,
   updateVideoCategoryController,
   updateVideoController
 } from '~/controllers/video.controllers'
@@ -94,5 +95,14 @@ videoRouter.delete(
 
 // Lấy danh sách video công khai
 videoRouter.get('/public', paginationValidator, getPublicVideosValidator, wrapRequestHandler(getPublicVideosController))
+
+// Lấy danh sách video tài khoản đăng nhập
+videoRouter.get(
+  '/me',
+  accessTokenValidator,
+  verifiedAccountValidator,
+  paginationValidator,
+  wrapRequestHandler(getVideosOfMeController)
+)
 
 export default videoRouter

@@ -106,5 +106,6 @@ export const VIDEO_MESSAGES = {
   VIDEO_IDS_MUST_BE_AN_ARRAY: 'Video ids phải là một mảng',
   VIDEO_IDS_HAVE_NOT_EMPTY: 'Video ids không được để trống',
   VIDEO_IDS_IS_INVALID: 'Video ids không hợp lệ',
-  GET_PUBLIC_VIDEOS_SUCCEED: 'Lấy danh sách video công khai thành công'
+  GET_PUBLIC_VIDEOS_SUCCEED: 'Lấy danh sách video công khai thành công',
+  GET_VIDEOS_OF_ME_SUCCEED: 'Lấy danh sách video của tôi thành công'
 } as const

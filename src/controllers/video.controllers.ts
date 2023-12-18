@@ -4,6 +4,7 @@ import { ParamsDictionary } from 'express-serve-static-core'
 import { HttpStatusCode } from '~/constants/enum'
 import { VIDEO_MESSAGES } from '~/constants/messages'
 import { TokenPayload } from '~/models/requests/Account.requests'
+import { PaginationReqQuery } from '~/models/requests/Common.requests'
 import {
   CreateVideoCategoryReqBody,
   CreateVideoReqBody,
@@ -87,6 +88,22 @@ export const getPublicVideosController = async (
   const { videos, ...pagination } = await videoService.getPublicVideos(req.query)
   return res.json({
     message: VIDEO_MESSAGES.GET_PUBLIC_VIDEOS_SUCCEED,
+    data: {
+      videos,
+      pagination
+    }
+  })
+}
+
+// Lấy danh sách video tài khoản đăng nhập
+export const getVideosOfMeController = async (
+  req: Request<ParamsDictionary, any, any, PaginationReqQuery>,
+  res: Response
+) => {
+  const { accountId } = req.decodedAuthorization as TokenPayload
+  const { videos, ...pagination } = await videoService.getVideosOfMe({ accountId, query: req.query })
+  return res.json({
+    message: VIDEO_MESSAGES.GET_VIDEOS_OF_ME_SUCCEED,
     data: {
       videos,
       pagination
