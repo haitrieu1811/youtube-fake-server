@@ -65,7 +65,10 @@ const videoCategorySchema: ParamSchema = {
     options: async (value: string) => {
       const videoCategory = await databaseService.videoCategories.findOne({ _id: new ObjectId(value) })
       if (!videoCategory) {
-        throw new Error(VIDEO_MESSAGES.CATEGORY_NOT_FOUND)
+        throw new ErrorWithStatus({
+          message: VIDEO_MESSAGES.CATEGORY_NOT_FOUND,
+          status: HttpStatusCode.NotFound
+        })
       }
       return true
     }
@@ -325,5 +328,19 @@ export const deleteVideosValidator = validate(
       }
     },
     ['body']
+  )
+)
+
+// Lấy danh sách video công khai
+export const getPublicVideosValidator = validate(
+  checkSchema(
+    {
+      category: {
+        ...videoCategorySchema,
+        notEmpty: undefined,
+        optional: true
+      }
+    },
+    ['query']
   )
 )

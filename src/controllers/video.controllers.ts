@@ -8,6 +8,7 @@ import {
   CreateVideoCategoryReqBody,
   CreateVideoReqBody,
   DeleteVideosReqBody,
+  GetPublicVideosReqQuery,
   UpdateVideoCategoryReqBody,
   UpdateVideoReqBody,
   VideoCategoryIdReqParams,
@@ -75,5 +76,20 @@ export const deleteVideosController = async (
   const { deletedCount } = await videoService.deleteVideos(req.body.videoIds)
   return res.json({
     message: `Xóa ${deletedCount} video thành công`
+  })
+}
+
+// Lấy danh sách video công khai
+export const getPublicVideosController = async (
+  req: Request<ParamsDictionary, any, any, GetPublicVideosReqQuery>,
+  res: Response
+) => {
+  const { videos, ...pagination } = await videoService.getPublicVideos(req.query)
+  return res.json({
+    message: VIDEO_MESSAGES.GET_PUBLIC_VIDEOS_SUCCEED,
+    data: {
+      videos,
+      pagination
+    }
   })
 }

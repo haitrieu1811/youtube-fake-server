@@ -23,6 +23,12 @@ export const uploadVideoHLSController = async (req: Request, res: Response) => {
   })
 }
 
+// Serve image
+export const serveImageController = (req: Request, res: Response) => {
+  const { name } = req.params
+  sendFileFromS3(res, `images/${name}`)
+}
+
 // Serve m3u8
 export const serveM3u8Controller = (req: Request, res: Response) => {
   const { id } = req.params

@@ -3,6 +3,8 @@ config()
 
 export const ENV_CONFIG = {
   PORT: process.env.PORT as string,
+  HOST: process.env.HOST as string,
+  PUBLIC_IMAGES_PATH: process.env.PUBLIC_IMAGES_PATH as string,
   PASSWORD_SECRET: process.env.PASSWORD_SECRET as string,
 
   DB_USERNAME: process.env.DB_USERNAME as string,

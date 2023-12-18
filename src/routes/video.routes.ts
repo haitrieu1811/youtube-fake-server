@@ -5,18 +5,20 @@ import {
   createVideoController,
   deleteVideoCategoryController,
   deleteVideosController,
+  getPublicVideosController,
   updateVideoCategoryController,
   updateVideoController
 } from '~/controllers/video.controllers'
 import { wrapRequestHandler } from '~/lib/handlers'
 import { accessTokenValidator, adminRoleValidator, verifiedAccountValidator } from '~/middlewares/account.middlewares'
-import { filterReqBodyMiddleware } from '~/middlewares/common.middlewares'
+import { filterReqBodyMiddleware, paginationValidator } from '~/middlewares/common.middlewares'
 import {
   authorOfVideoCategoryValidator,
   authorOfVideoValidator,
   createVideoCategoryValidator,
   createVideoValidator,
   deleteVideosValidator,
+  getPublicVideosValidator,
   updateVideoCategoryValidator,
   updateVideoValidator,
   videoCategoryIdValidator,
@@ -89,5 +91,8 @@ videoRouter.delete(
   deleteVideosValidator,
   wrapRequestHandler(deleteVideosController)
 )
+
+// Lấy danh sách video công khai
+videoRouter.get('/public', paginationValidator, getPublicVideosValidator, wrapRequestHandler(getPublicVideosController))
 
 export default videoRouter

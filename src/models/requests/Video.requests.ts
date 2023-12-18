@@ -1,5 +1,7 @@
-import { ParamsDictionary } from 'express-serve-static-core'
+import { ParamsDictionary, Query } from 'express-serve-static-core'
+
 import { VideoAudience } from '~/constants/enum'
+import { PaginationReqQuery } from './Common.requests'
 
 // Body: Tạo danh mục video
 export type CreateVideoCategoryReqBody = {
@@ -51,3 +53,9 @@ export type VideoIdReqParams = ParamsDictionary & {
 export type DeleteVideosReqBody = {
   videoIds: string[]
 }
+
+// Lấy danh sách các video công khai
+export type GetPublicVideosReqQuery = Query &
+  PaginationReqQuery & {
+    category?: string
+  }

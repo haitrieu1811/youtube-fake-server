@@ -25,7 +25,7 @@ app.use('/accounts', accountRouter)
 app.use('/medias', mediaRouter)
 app.use('/subscriptions', subscriptionRouter)
 app.use('/videos', videoRouter)
-app.use('/statics', staticRouter)
+app.use('/static', staticRouter)
 app.use(defaultErrorHandler)
 
 app.listen(port, () => {
