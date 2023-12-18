@@ -1,4 +1,5 @@
 import { ParamsDictionary } from 'express-serve-static-core'
+import { VideoAudience } from '~/constants/enum'
 
 // Body: Tạo danh mục video
 export type CreateVideoCategoryReqBody = {
@@ -20,4 +21,14 @@ export type VideoCategoryIdReqParams = ParamsDictionary & {
 // Params: Get video status
 export type GetVideoStatusReqParams = ParamsDictionary & {
   id: string
+}
+
+// Body: Tạo mới video
+export type CreateVideoReqBody = {
+  idName: string
+  thumbnail: string
+  title: string
+  category: string
+  description?: string
+  audience?: VideoAudience
 }

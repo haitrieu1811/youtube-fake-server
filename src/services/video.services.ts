@@ -2,9 +2,14 @@ import { ObjectId, WithId } from 'mongodb'
 import omitBy from 'lodash/omitBy'
 import isUndefined from 'lodash/isUndefined'
 
-import { CreateVideoCategoryReqBody, UpdateVideoCategoryReqBody } from '~/models/requests/Video.requests'
+import {
+  CreateVideoCategoryReqBody,
+  CreateVideoReqBody,
+  UpdateVideoCategoryReqBody
+} from '~/models/requests/Video.requests'
 import VideoCategory from '~/models/schemas/VideoCategory.schema'
 import databaseService from './database.services'
+import Video from '~/models/schemas/Video.schema'
 
 class VideoService {
   // Tạo danh mục video
@@ -48,6 +53,22 @@ class VideoService {
   async deleteVideoCategory(videoCategoryId: string) {
     await databaseService.videoCategories.deleteOne({ _id: new ObjectId(videoCategoryId) })
     return true
+  }
+
+  // Tạo video mới
+  async createVideo({ body, accountId }: { body: CreateVideoReqBody; accountId: string }) {
+    const { insertedId } = await databaseService.videos.insertOne(
+      new Video({
+        ...body,
+        accountId: new ObjectId(accountId),
+        thumbnail: new ObjectId(body.thumbnail),
+        category: new ObjectId(body.category)
+      })
+    )
+    const newVideo = await databaseService.videos.findOne({ _id: insertedId })
+    return {
+      newVideo
+    }
   }
 }
 

@@ -86,5 +86,14 @@ export const VIDEO_MESSAGES = {
   VIDEO_CATEGORY_ID_INVALID: 'Id danh mục video không hợp lệ',
   VIDEO_CATEGORY_NOT_FOUND: 'Không tìm thấy danh mục video',
   VIDEO_CATEGORY_AUTHOR_IS_INVALID: 'Bạn không phải là tác giả của danh mục video này',
-  DELETE_VIDEO_CATEGORY_SUCCEED: 'Xóa danh mục video thành công'
+  DELETE_VIDEO_CATEGORY_SUCCEED: 'Xóa danh mục video thành công',
+  CREATE_VIDEO_SUCCEED: 'Tạo video thành công',
+  ID_NAME_IS_REQUIRED: 'Id name video là bắt buộc',
+  THUMBNAIL_IS_INVALID: 'Hình thu nhỏ là bắt buộc',
+  TITLE_IS_REQUIRED: 'Tiêu đề là bắt buộc',
+  TITLE_LENGTH_IS_INVALID: 'Tiêu đề phải dài từ 6 đến 500 ký tự',
+  CATEGORY_IS_REQUIRED: 'Danh mục video là bắt buộc',
+  CATEGORY_IS_INVALID: 'Danh mục video không hợp lệ',
+  CATEGORY_NOT_FOUND: 'Không tim thấy danh mục video',
+  AUDIENCE_IS_INVALID: 'Tùy chọn người xem không hợp lệ'
 } as const

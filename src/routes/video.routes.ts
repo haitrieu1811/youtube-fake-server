@@ -2,6 +2,7 @@ import { Router } from 'express'
 
 import {
   createVideoCategoryController,
+  createVideoController,
   deleteVideoCategoryController,
   updateVideoCategoryController
 } from '~/controllers/video.controllers'
@@ -11,6 +12,7 @@ import { filterReqBodyMiddleware } from '~/middlewares/common.middlewares'
 import {
   authorOfVideoCategoryValidator,
   createVideoCategoryValidator,
+  createVideoValidator,
   updateVideoCategoryValidator,
   videoCategoryIdValidator
 } from '~/middlewares/video.middlewares'
@@ -50,6 +52,15 @@ videoRouter.delete(
   videoCategoryIdValidator,
   authorOfVideoCategoryValidator,
   wrapRequestHandler(deleteVideoCategoryController)
+)
+
+// Tạo video
+videoRouter.post(
+  '/',
+  accessTokenValidator,
+  verifiedAccountValidator,
+  createVideoValidator,
+  wrapRequestHandler(createVideoController)
 )
 
 export default videoRouter

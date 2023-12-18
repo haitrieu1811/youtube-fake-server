@@ -2,13 +2,16 @@ import { NextFunction, Request, Response } from 'express'
 import { ParamSchema, checkSchema } from 'express-validator'
 import { ObjectId } from 'mongodb'
 
-import { HttpStatusCode } from '~/constants/enum'
+import { HttpStatusCode, VideoAudience } from '~/constants/enum'
 import { VIDEO_MESSAGES } from '~/constants/messages'
+import { numberEnumToArray } from '~/lib/utils'
 import { validate } from '~/lib/validation'
 import { ErrorWithStatus } from '~/models/Errors'
 import { TokenPayload } from '~/models/requests/Account.requests'
 import { VideoCategoryIdReqParams } from '~/models/requests/Video.requests'
 import databaseService from '~/services/database.services'
+
+const audiences = numberEnumToArray(VideoAudience)
 
 const nameSchema: ParamSchema = {
   trim: true,
@@ -119,3 +122,74 @@ export const authorOfVideoCategoryValidator = async (
   }
   next()
 }
+
+// Tạo video
+export const createVideoValidator = validate(
+  checkSchema(
+    {
+      idName: {
+        trim: true,
+        custom: {
+          options: (value: string) => {
+            if (!value) {
+              throw new ErrorWithStatus({
+                message: VIDEO_MESSAGES.ID_NAME_IS_REQUIRED,
+                status: HttpStatusCode.BadRequest
+              })
+            }
+            return true
+          }
+        }
+      },
+      thumbnail: {
+        trim: true,
+        isMongoId: {
+          errorMessage: VIDEO_MESSAGES.THUMBNAIL_IS_INVALID
+        }
+      },
+      title: {
+        trim: true,
+        notEmpty: {
+          errorMessage: VIDEO_MESSAGES.TITLE_IS_REQUIRED
+        },
+        isLength: {
+          options: {
+            min: 6,
+            max: 500
+          },
+          errorMessage: VIDEO_MESSAGES.TITLE_LENGTH_IS_INVALID
+        }
+      },
+      category: {
+        trim: true,
+        notEmpty: {
+          errorMessage: VIDEO_MESSAGES.CATEGORY_IS_REQUIRED
+        },
+        isMongoId: {
+          errorMessage: VIDEO_MESSAGES.CATEGORY_IS_INVALID
+        },
+        custom: {
+          options: async (value: string) => {
+            const videoCategory = await databaseService.videoCategories.findOne({ _id: new ObjectId(value) })
+            if (!videoCategory) {
+              throw new Error(VIDEO_MESSAGES.CATEGORY_NOT_FOUND)
+            }
+            return true
+          }
+        }
+      },
+      description: {
+        trim: true,
+        optional: true
+      },
+      audience: {
+        optional: true,
+        isIn: {
+          options: [audiences],
+          errorMessage: VIDEO_MESSAGES.AUDIENCE_IS_INVALID
+        }
+      }
+    },
+    ['body']
+  )
+)

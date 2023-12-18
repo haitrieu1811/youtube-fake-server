@@ -5,6 +5,7 @@ import Account from '~/models/schemas/Account.schema'
 import Image from '~/models/schemas/Image.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import Subscription from '~/models/schemas/Subscription.schema'
+import Video from '~/models/schemas/Video.schema'
 import VideoCategory from '~/models/schemas/VideoCategory.schema'
 import VideoStatus from '~/models/schemas/VideoStatus.schema'
 
@@ -59,6 +60,10 @@ class DatabaseService {
 
   get videoStatus(): Collection<VideoStatus> {
     return this.db.collection(ENV_CONFIG.DB_VIDEO_STATUS_COLLECTION_NAME)
+  }
+
+  get videos(): Collection<Video> {
+    return this.db.collection(ENV_CONFIG.DB_VIDEOS_COLLECTION_NAME)
   }
 }
 
