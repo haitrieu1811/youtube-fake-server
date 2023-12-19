@@ -1,7 +1,7 @@
 export const COMMON_MESSAGES = {
   PAGE_MUST_BE_A_INTEGER_AND_POSITIVE: 'Page phải là một số nguyên dương khác 0',
   LIMIT_MUST_BE_A_INTEGER_AND_POSITIVE: 'Limit phải là một số nguyên dương'
-}
+} as const
 
 export const ACCOUNT_MESSAGES = {
   VALIDATION_ERROR: 'Lỗi xác thực',
@@ -108,4 +108,23 @@ export const VIDEO_MESSAGES = {
   VIDEO_IDS_IS_INVALID: 'Video ids không hợp lệ',
   GET_PUBLIC_VIDEOS_SUCCEED: 'Lấy danh sách video công khai thành công',
   GET_VIDEOS_OF_ME_SUCCEED: 'Lấy danh sách video của tôi thành công'
+} as const
+
+export const REACTION_MESSAGES = {
+  CREATE_REACTION_SUCCEED: 'Thêm reaction thành công',
+  REACTION_TYPE_IS_REQUIRED: 'Reaction type là bắt buộc',
+  REACTION_TYPE_IS_INVALID: 'Reaction type không hợp lệ',
+  REACTION_BEFORE: 'Đã reaction nội dung này trước đó',
+  REACTION_ID_IS_REQUIRED: 'Reaction id là bắt buộc',
+  REACTION_ID_IS_INVALID: 'Reaction id không hợp lệ',
+  REACTION_NOT_FOUND: 'Không tìm thấy lượt reaction trùng khớp với reaction id',
+  REACTION_AUTHOR_IS_INVALID: 'Bạn không phải người reaction nội dung này',
+  HAVE_REACTION_BEFORE: 'Bạn đã reaction nội dung này trước đó',
+  UPDATE_REACTION_SUCCEED: 'Cập nhật reaction thành công',
+  DELETE_REACTION_SUCCEED: 'Xóa reaction thành công',
+  CONTENT_ID_IS_REQUIRED: 'Content id là bắt buộc',
+  CONTENT_ID_IS_INVALID: 'Content id không hợp lệ',
+  CONTENT_ID_NOT_FOUND: 'Không tìm thấy content id',
+  CONTENT_TYPE_IS_REQUIRED: 'Content type là bắt buộc',
+  CONTENT_TYPE_IS_INVALID: 'Content type không hợp lệ'
 } as const

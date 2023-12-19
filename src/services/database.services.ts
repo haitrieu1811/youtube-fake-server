@@ -3,6 +3,7 @@ import { Collection, Db, MongoClient } from 'mongodb'
 import { ENV_CONFIG } from '~/constants/config'
 import Account from '~/models/schemas/Account.schema'
 import Image from '~/models/schemas/Image.schema'
+import Reaction from '~/models/schemas/Reaction.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import Subscription from '~/models/schemas/Subscription.schema'
 import Video from '~/models/schemas/Video.schema'
@@ -64,6 +65,10 @@ class DatabaseService {
 
   get videos(): Collection<Video> {
     return this.db.collection(ENV_CONFIG.DB_VIDEOS_COLLECTION_NAME)
+  }
+
+  get reactions(): Collection<Reaction> {
+    return this.db.collection(ENV_CONFIG.DB_REACTIONS_COLLECTION_NAME)
   }
 }
 

@@ -87,7 +87,12 @@ export enum CommentType {
   Post
 }
 
-export enum LikeType {
+export enum ReactionType {
+  Like,
+  Dislike
+}
+
+export enum ReactionContentType {
   Video,
   Post,
   Comment
