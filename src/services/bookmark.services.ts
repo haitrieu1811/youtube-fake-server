@@ -17,6 +17,12 @@ class BookmarkService {
       bookmark
     }
   }
+
+  // Xóa một bookmark video
+  async deleteBookmark(bookmarkId: string) {
+    await databaseService.bookmarks.deleteOne({ _id: new ObjectId(bookmarkId) })
+    return true
+  }
 }
 
 const bookmarkService = new BookmarkService()

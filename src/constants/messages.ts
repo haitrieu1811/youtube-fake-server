@@ -131,5 +131,10 @@ export const REACTION_MESSAGES = {
 } as const
 
 export const BOOKMARK_MESSAGES = {
-  CREATE_BOOKMARK_SUCCEED: 'Tạo bookmark thành công'
+  CREATE_BOOKMARK_SUCCEED: 'Tạo bookmark thành công',
+  BOOKMARK_ID_IS_REQUIRED: 'Bookmark id là bắt buộc',
+  BOOKMARK_ID_IS_INVALID: 'Bookmark id không hợp lệ',
+  BOOKMARK_NOT_FOUND: 'Không tìm thấy bookmark',
+  BOOKMARK_AUTHOR_IS_INVALID: 'Bạn không phải là tác giả của bookmark này',
+  DELETE_BOOKMARK_SUCCEED: 'Xóa bookmark thành công'
 } as const
