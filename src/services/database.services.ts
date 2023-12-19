@@ -2,6 +2,7 @@ import { Collection, Db, MongoClient } from 'mongodb'
 
 import { ENV_CONFIG } from '~/constants/config'
 import Account from '~/models/schemas/Account.schema'
+import Bookmark from '~/models/schemas/Bookmark.schema'
 import Image from '~/models/schemas/Image.schema'
 import Reaction from '~/models/schemas/Reaction.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
@@ -69,6 +70,10 @@ class DatabaseService {
 
   get reactions(): Collection<Reaction> {
     return this.db.collection(ENV_CONFIG.DB_REACTIONS_COLLECTION_NAME)
+  }
+
+  get bookmarks(): Collection<Bookmark> {
+    return this.db.collection(ENV_CONFIG.DB_BOOKMARKS_COLLECTION_NAME)
   }
 }
 

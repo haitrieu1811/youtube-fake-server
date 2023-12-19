@@ -5,6 +5,7 @@ import { ENV_CONFIG } from './constants/config'
 import { initFolders } from './lib/file'
 import { defaultErrorHandler } from './middlewares/error.middlewares'
 import accountRouter from './routes/account.routes'
+import bookmarkRouter from './routes/bookmark.routes'
 import mediaRouter from './routes/media.routes'
 import reactionRouter from './routes/reaction.routes'
 import staticRouter from './routes/static.routes'
@@ -28,6 +29,7 @@ app.use('/subscriptions', subscriptionRouter)
 app.use('/videos', videoRouter)
 app.use('/static', staticRouter)
 app.use('/reactions', reactionRouter)
+app.use('/bookmarks', bookmarkRouter)
 app.use(defaultErrorHandler)
 
 app.listen(port, () => {

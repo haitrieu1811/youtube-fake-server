@@ -129,3 +129,7 @@ export const REACTION_MESSAGES = {
   CONTENT_TYPE_IS_REQUIRED: 'Content type là bắt buộc',
   CONTENT_TYPE_IS_INVALID: 'Content type không hợp lệ'
 } as const
+
+export const BOOKMARK_MESSAGES = {
+  CREATE_BOOKMARK_SUCCEED: 'Tạo bookmark thành công'
+} as const
