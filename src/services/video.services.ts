@@ -3,7 +3,9 @@ import omitBy from 'lodash/omitBy'
 import { ObjectId, WithId } from 'mongodb'
 
 import { ENV_CONFIG } from '~/constants/config'
-import { VideoAudience } from '~/constants/enum'
+import { ReactionType, VideoAudience } from '~/constants/enum'
+import { generateVideosListAggregate } from '~/lib/aggregate'
+import { PaginationReqQuery } from '~/models/requests/Common.requests'
 import {
   CreateVideoCategoryReqBody,
   CreateVideoReqBody,
@@ -14,8 +16,6 @@ import {
 import Video from '~/models/schemas/Video.schema'
 import VideoCategory from '~/models/schemas/VideoCategory.schema'
 import databaseService from './database.services'
-import { generateVideosListAggregate } from '~/lib/aggregate'
-import { PaginationReqQuery } from '~/models/requests/Common.requests'
 
 class VideoService {
   // Tạo danh mục video
@@ -156,6 +156,302 @@ class VideoService {
       limit: _limit,
       totalRows,
       totalPages: Math.ceil(totalRows / _limit)
+    }
+  }
+
+  // Xem thông tin chi tiết video khi chưa đã đăng nhập
+  async getVideoDetailWhenLogged({ videoId, accountId }: { videoId: string; accountId: string }) {
+    const videos = await databaseService.videos
+      .aggregate([
+        {
+          $match: {
+            _id: new ObjectId(videoId)
+          }
+        },
+        {
+          $lookup: {
+            from: 'accounts',
+            localField: 'accountId',
+            foreignField: '_id',
+            as: 'channel'
+          }
+        },
+        {
+          $unwind: {
+            path: '$channel'
+          }
+        },
+        {
+          $lookup: {
+            from: 'reactions',
+            localField: '_id',
+            foreignField: 'contentId',
+            as: 'reactions'
+          }
+        },
+        {
+          $addFields: {
+            reactions: {
+              $filter: {
+                input: '$reactions',
+                cond: {
+                  $eq: ['$$reaction.accountId', new ObjectId(accountId)]
+                },
+                as: 'reaction'
+              }
+            }
+          }
+        },
+        {
+          $unwind: {
+            path: '$reactions',
+            preserveNullAndEmptyArrays: true
+          }
+        },
+        {
+          $addFields: {
+            isLiked: {
+              $cond: {
+                if: {
+                  $eq: ['$reactions.type', ReactionType.Like]
+                },
+                then: true,
+                else: false
+              }
+            },
+            isDisliked: {
+              $cond: {
+                if: {
+                  $eq: ['$reactions.type', ReactionType.Dislike]
+                },
+                then: true,
+                else: false
+              }
+            }
+          }
+        },
+        {
+          $lookup: {
+            from: 'subscriptions',
+            localField: 'accountId',
+            foreignField: 'toAccountId',
+            as: 'subscriptions'
+          }
+        },
+        {
+          $addFields: {
+            subscriptionCount: {
+              $size: '$subscriptions'
+            },
+            subscriptions: {
+              $filter: {
+                input: '$subscriptions',
+                as: 'subscription',
+                cond: {
+                  $eq: ['$$subscription.fromAccountId', new ObjectId(accountId)]
+                }
+              }
+            }
+          }
+        },
+        {
+          $lookup: {
+            from: 'images',
+            localField: 'channel.avatar',
+            foreignField: '_id',
+            as: 'channelAvatar'
+          }
+        },
+        {
+          $unwind: {
+            path: '$channelAvatar',
+            preserveNullAndEmptyArrays: true
+          }
+        },
+        {
+          $addFields: {
+            'channel.isSubscribed': {
+              $cond: {
+                if: '$subscriptions',
+                then: true,
+                else: false
+              }
+            },
+            'channel.avatar': {
+              $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$channelAvatar.name']
+            }
+          }
+        },
+        {
+          $group: {
+            _id: '$_id',
+            idName: {
+              $first: '$idName'
+            },
+            title: {
+              $first: '$title'
+            },
+            description: {
+              $first: '$description'
+            },
+            viewCount: {
+              $first: '$views'
+            },
+            isLiked: {
+              $first: '$isLiked'
+            },
+            isDisliked: {
+              $first: '$isDisliked'
+            },
+            channel: {
+              $first: '$channel'
+            },
+            createdAt: {
+              $first: '$createdAt'
+            },
+            updatedAt: {
+              $first: '$updatedAt'
+            }
+          }
+        },
+        {
+          $project: {
+            'channel.email': 0,
+            'channel.password': 0,
+            'channel.bio': 0,
+            'channel.cover': 0,
+            'channel.role': 0,
+            'channel.status': 0,
+            'channel.verify': 0,
+            'channel.forgotPasswordToken': 0,
+            'channel.verifyEmailToken': 0,
+            'channel.createdAt': 0,
+            'channel.updatedAt': 0
+          }
+        }
+      ])
+      .toArray()
+    return {
+      video: videos[0]
+    }
+  }
+
+  // Xem thông tin chi tiết video khi chưa đã đăng nhập
+  async getVideoDetailWhenNotLogged(videoId: string) {
+    const videos = await databaseService.videos
+      .aggregate([
+        {
+          $match: {
+            _id: new ObjectId(videoId)
+          }
+        },
+        {
+          $lookup: {
+            from: 'accounts',
+            localField: 'accountId',
+            foreignField: '_id',
+            as: 'channel'
+          }
+        },
+        {
+          $unwind: {
+            path: '$channel'
+          }
+        },
+        {
+          $addFields: {
+            isLiked: false,
+            isDisliked: false
+          }
+        },
+        {
+          $lookup: {
+            from: 'subscriptions',
+            localField: 'accountId',
+            foreignField: 'toAccountId',
+            as: 'subscriptions'
+          }
+        },
+        {
+          $addFields: {
+            subscriptionCount: {
+              $size: '$subscriptions'
+            }
+          }
+        },
+        {
+          $lookup: {
+            from: 'images',
+            localField: 'channel.avatar',
+            foreignField: '_id',
+            as: 'channelAvatar'
+          }
+        },
+        {
+          $unwind: {
+            path: '$channelAvatar',
+            preserveNullAndEmptyArrays: true
+          }
+        },
+        {
+          $addFields: {
+            'channel.isSubscribed': false,
+            'channel.avatar': {
+              $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$channelAvatar.name']
+            }
+          }
+        },
+        {
+          $group: {
+            _id: '$_id',
+            idName: {
+              $first: '$idName'
+            },
+            title: {
+              $first: '$title'
+            },
+            description: {
+              $first: '$description'
+            },
+            viewCount: {
+              $first: '$views'
+            },
+            isLiked: {
+              $first: '$isLiked'
+            },
+            isDisliked: {
+              $first: '$isDisliked'
+            },
+            channel: {
+              $first: '$channel'
+            },
+            createdAt: {
+              $first: '$createdAt'
+            },
+            updatedAt: {
+              $first: '$updatedAt'
+            }
+          }
+        },
+        {
+          $project: {
+            'channel.email': 0,
+            'channel.password': 0,
+            'channel.bio': 0,
+            'channel.cover': 0,
+            'channel.role': 0,
+            'channel.status': 0,
+            'channel.verify': 0,
+            'channel.forgotPasswordToken': 0,
+            'channel.verifyEmailToken': 0,
+            'channel.createdAt': 0,
+            'channel.updatedAt': 0
+          }
+        }
+      ])
+      .toArray()
+    return {
+      video: videos[0]
     }
   }
 }
