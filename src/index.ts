@@ -11,6 +11,7 @@ import reactionRouter from './routes/reaction.routes'
 import staticRouter from './routes/static.routes'
 import subscriptionRouter from './routes/subscription.routes'
 import videoRouter from './routes/video.routes'
+import watchHistoryRouter from './routes/watchHistory.routes'
 import databaseService from './services/database.services'
 
 initFolders()
@@ -30,6 +31,7 @@ app.use('/videos', videoRouter)
 app.use('/static', staticRouter)
 app.use('/reactions', reactionRouter)
 app.use('/bookmarks', bookmarkRouter)
+app.use('/watch-histories', watchHistoryRouter)
 app.use(defaultErrorHandler)
 
 app.listen(port, () => {

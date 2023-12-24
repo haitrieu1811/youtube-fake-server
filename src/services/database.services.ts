@@ -10,6 +10,7 @@ import Subscription from '~/models/schemas/Subscription.schema'
 import Video from '~/models/schemas/Video.schema'
 import VideoCategory from '~/models/schemas/VideoCategory.schema'
 import VideoStatus from '~/models/schemas/VideoStatus.schema'
+import WatchHistory from '~/models/schemas/WatchHistory.schema'
 
 const uri = `mongodb+srv://${ENV_CONFIG.DB_USERNAME}:${ENV_CONFIG.DB_PASSWORD}@youtube-fake-cluster.zodfbyg.mongodb.net/?retryWrites=true&w=majority`
 
@@ -74,6 +75,10 @@ class DatabaseService {
 
   get bookmarks(): Collection<Bookmark> {
     return this.db.collection(ENV_CONFIG.DB_BOOKMARKS_COLLECTION_NAME)
+  }
+
+  get watchHistories(): Collection<WatchHistory> {
+    return this.db.collection(ENV_CONFIG.DB_WATCH_HISTORIES_COLLECTION_NAME)
   }
 }
 

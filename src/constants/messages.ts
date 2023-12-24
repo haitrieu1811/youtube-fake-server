@@ -138,3 +138,7 @@ export const BOOKMARK_MESSAGES = {
   BOOKMARK_AUTHOR_IS_INVALID: 'Bạn không phải là tác giả của bookmark này',
   DELETE_BOOKMARK_SUCCEED: 'Xóa bookmark thành công'
 } as const
+
+export const WATCH_HISTORY_MESSAGES = {
+  CREATE_WATCH_HISTORY_SUCCEED: 'Tạo lịch sử xem thành công'
+} as const
