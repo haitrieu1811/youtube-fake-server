@@ -37,6 +37,12 @@ class CommentService {
       comment: updatedComment
     }
   }
+
+  // Xóa bình luận
+  async deleteComment(commentId: string) {
+    await databaseService.comments.deleteOne({ _id: new ObjectId(commentId) })
+    return true
+  }
 }
 
 const commentService = new CommentService()

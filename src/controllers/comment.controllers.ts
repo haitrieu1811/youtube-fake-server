@@ -30,3 +30,11 @@ export const updateCommentController = async (
     data: result
   })
 }
+
+// Xóa bình luận
+export const deleteCommentController = async (req: Request<CommentIdReqParams>, res: Response) => {
+  await commentService.deleteComment(req.params.commentId)
+  return res.json({
+    message: COMMENT_MESSAGES.DELETE_COMMENT_SUCCEED
+  })
+}
