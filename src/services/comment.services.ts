@@ -43,7 +43,16 @@ class CommentService {
 
   // Xóa bình luận
   async deleteComment(commentId: string) {
-    await databaseService.comments.deleteOne({ _id: new ObjectId(commentId) })
+    const comment = (await databaseService.comments.findOne({ _id: new ObjectId(commentId) })) as WithId<Comment>
+    // Khi xóa bình luận gốc thì xóa luôn các trả lời bình luận
+    if (!comment.parentId) {
+      await Promise.all([
+        databaseService.comments.deleteOne({ _id: new ObjectId(commentId) }),
+        databaseService.comments.deleteMany({ parentId: new ObjectId(commentId) })
+      ])
+    } else {
+      await databaseService.comments.deleteOne({ _id: new ObjectId(commentId) })
+    }
     return true
   }
 
