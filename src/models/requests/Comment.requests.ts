@@ -18,3 +18,9 @@ export type CommentIdReqParams = ParamsDictionary & {
 export type UpdateCommentReqBody = {
   content: string
 }
+
+// Body: Trả lời bình luận
+export type ReplyCommentReqBody = {
+  content: string
+  replyAccountId?: string
+}

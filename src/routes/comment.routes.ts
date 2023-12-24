@@ -3,11 +3,18 @@ import { Router } from 'express'
 import {
   createCommentController,
   deleteCommentController,
+  replyCommentController,
   updateCommentController
 } from '~/controllers/comment.controllers'
 import { wrapRequestHandler } from '~/lib/handlers'
 import { accessTokenValidator } from '~/middlewares/account.middlewares'
-import { commentIdValidator, createCommentValidator, updateCommentValidator } from '~/middlewares/comment.middlewares'
+import {
+  authorOfCommentValidator,
+  commentIdValidator,
+  createCommentValidator,
+  replyCommentValidator,
+  updateCommentValidator
+} from '~/middlewares/comment.middlewares'
 
 const commentRouter = Router()
 
@@ -19,6 +26,7 @@ commentRouter.patch(
   '/:commentId',
   accessTokenValidator,
   commentIdValidator,
+  authorOfCommentValidator,
   updateCommentValidator,
   wrapRequestHandler(updateCommentController)
 )
@@ -28,7 +36,17 @@ commentRouter.delete(
   '/:commentId',
   accessTokenValidator,
   commentIdValidator,
+  authorOfCommentValidator,
   wrapRequestHandler(deleteCommentController)
+)
+
+// Trả lời bình luận
+commentRouter.post(
+  '/:commentId/reply',
+  accessTokenValidator,
+  commentIdValidator,
+  replyCommentValidator,
+  wrapRequestHandler(replyCommentController)
 )
 
 export default commentRouter

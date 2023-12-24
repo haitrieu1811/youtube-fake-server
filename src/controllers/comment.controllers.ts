@@ -3,7 +3,12 @@ import { ParamsDictionary } from 'express-serve-static-core'
 
 import { COMMENT_MESSAGES } from '~/constants/messages'
 import { TokenPayload } from '~/models/requests/Account.requests'
-import { CommentIdReqParams, CreateCommentReqBody, UpdateCommentReqBody } from '~/models/requests/Comment.requests'
+import {
+  CommentIdReqParams,
+  CreateCommentReqBody,
+  ReplyCommentReqBody,
+  UpdateCommentReqBody
+} from '~/models/requests/Comment.requests'
 import commentService from '~/services/comment.services'
 
 // Thêm một bình luận
@@ -36,5 +41,18 @@ export const deleteCommentController = async (req: Request<CommentIdReqParams>, 
   await commentService.deleteComment(req.params.commentId)
   return res.json({
     message: COMMENT_MESSAGES.DELETE_COMMENT_SUCCEED
+  })
+}
+
+// Trả lời bình luận
+export const replyCommentController = async (
+  req: Request<CommentIdReqParams, any, ReplyCommentReqBody>,
+  res: Response
+) => {
+  const { accountId } = req.decodedAuthorization as TokenPayload
+  const result = await commentService.replyComment({ commentId: req.params.commentId, accountId, body: req.body })
+  return res.json({
+    message: COMMENT_MESSAGES.REPLY_COMMENT_SUCCEED,
+    data: result
   })
 }
