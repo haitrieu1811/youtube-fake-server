@@ -87,7 +87,15 @@ class CommentService {
   }
 
   // Lấy danh sách bình luận
-  async getComments({ contentId, query }: { contentId: string; query: GetCommentsReqQuery }) {
+  async getComments({
+    contentId,
+    query,
+    accountId
+  }: {
+    contentId: string
+    query: GetCommentsReqQuery
+    accountId?: string
+  }) {
     const { page, limit, orderBy } = query
     const _page = Number(page) || 1
     const _limit = Number(limit) || 20
@@ -168,6 +176,15 @@ class CommentService {
                   }
                 }
               },
+              reactionOfUser: {
+                $filter: {
+                  input: '$reactions',
+                  as: 'reaction',
+                  cond: {
+                    $eq: ['$$reaction.accountId', new ObjectId(accountId)]
+                  }
+                }
+              },
               'author.avatar': {
                 $cond: {
                   if: '$authorAvatar',
@@ -186,6 +203,24 @@ class CommentService {
               },
               dislikeCount: {
                 $size: '$dislikes'
+              },
+              isLiked: {
+                $cond: {
+                  if: {
+                    $eq: ['$reactionOfUser.type', ReactionType.Like]
+                  },
+                  then: true,
+                  else: false
+                }
+              },
+              isDisiked: {
+                $cond: {
+                  if: {
+                    $eq: ['$reactionOfUser.type', ReactionType.Dislike]
+                  },
+                  then: true,
+                  else: false
+                }
               }
             }
           },

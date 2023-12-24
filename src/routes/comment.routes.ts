@@ -8,7 +8,11 @@ import {
   updateCommentController
 } from '~/controllers/comment.controllers'
 import { wrapRequestHandler } from '~/lib/handlers'
-import { accessTokenValidator } from '~/middlewares/account.middlewares'
+import {
+  accessTokenValidator,
+  isLoggedAccountValidator,
+  verifiedAccountValidator
+} from '~/middlewares/account.middlewares'
 import {
   authorOfCommentValidator,
   commentIdValidator,
@@ -51,6 +55,11 @@ commentRouter.post(
 )
 
 // Lấy danh sách bình luận
-commentRouter.get('/content/:contentId', wrapRequestHandler(getCommentsController))
+commentRouter.get(
+  '/content/:contentId',
+  isLoggedAccountValidator(accessTokenValidator),
+  isLoggedAccountValidator(verifiedAccountValidator),
+  wrapRequestHandler(getCommentsController)
+)
 
 export default commentRouter
