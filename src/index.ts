@@ -6,6 +6,7 @@ import { initFolders } from './lib/file'
 import { defaultErrorHandler } from './middlewares/error.middlewares'
 import accountRouter from './routes/account.routes'
 import bookmarkRouter from './routes/bookmark.routes'
+import commentRouter from './routes/comment.routes'
 import mediaRouter from './routes/media.routes'
 import reactionRouter from './routes/reaction.routes'
 import staticRouter from './routes/static.routes'
@@ -32,6 +33,7 @@ app.use('/static', staticRouter)
 app.use('/reactions', reactionRouter)
 app.use('/bookmarks', bookmarkRouter)
 app.use('/watch-histories', watchHistoryRouter)
+app.use('/comments', commentRouter)
 app.use(defaultErrorHandler)
 
 app.listen(port, () => {

@@ -3,6 +3,7 @@ import { Collection, Db, MongoClient } from 'mongodb'
 import { ENV_CONFIG } from '~/constants/config'
 import Account from '~/models/schemas/Account.schema'
 import Bookmark from '~/models/schemas/Bookmark.schema'
+import Comment from '~/models/schemas/Comment.schema'
 import Image from '~/models/schemas/Image.schema'
 import Reaction from '~/models/schemas/Reaction.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
@@ -79,6 +80,10 @@ class DatabaseService {
 
   get watchHistories(): Collection<WatchHistory> {
     return this.db.collection(ENV_CONFIG.DB_WATCH_HISTORIES_COLLECTION_NAME)
+  }
+
+  get comments(): Collection<Comment> {
+    return this.db.collection(ENV_CONFIG.DB_COMMENTS_COLLECTION_NAME)
   }
 }
 

@@ -143,3 +143,13 @@ export const WATCH_HISTORY_MESSAGES = {
   CREATE_WATCH_HISTORY_SUCCEED: 'Tạo lịch sử xem thành công',
   GET_WATCH_HISTORIES_SUCCEED: 'Lấy lịch sử xem thành công'
 } as const
+
+export const COMMENT_MESSAGES = {
+  CREATE_COMMENT_SUCCEED: 'Thêm bình luận thành công',
+  COMMENT_CONTENT_IS_REQUIRED: 'Nội dung bình luận là bắt buộc',
+  COMMENT_TYPE_IS_REQUIRED: 'Loại bình luận là bắt buộc',
+  COMMENT_TYPE_IS_INVALID: 'Loại bình luận không hợp lệ',
+  COMMENT_CONTENT_ID_IS_REQUIRED: 'Content id là bắt buộc',
+  COMMENT_CONTENT_ID_IS_INVALID: 'Content id không hợp lệ',
+  COMMENT_CONTENT_ID_NOT_FOUND: 'Không tìm thấy nội dung khớp với content id'
+} as const
