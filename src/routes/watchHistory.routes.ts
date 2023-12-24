@@ -1,8 +1,9 @@
 import { Router } from 'express'
 
-import { createWatchHistoryController } from '~/controllers/watchHistory.controllers'
+import { createWatchHistoryController, getWatchHistoriesController } from '~/controllers/watchHistory.controllers'
 import { wrapRequestHandler } from '~/lib/handlers'
 import { accessTokenValidator } from '~/middlewares/account.middlewares'
+import { paginationValidator } from '~/middlewares/common.middlewares'
 import { videoIdValidator } from '~/middlewares/video.middlewares'
 
 const watchHistoryRouter = Router()
@@ -14,5 +15,8 @@ watchHistoryRouter.post(
   videoIdValidator,
   wrapRequestHandler(createWatchHistoryController)
 )
+
+// Lấy lịch sử video đã xem
+watchHistoryRouter.get('/', accessTokenValidator, paginationValidator, wrapRequestHandler(getWatchHistoriesController))
 
 export default watchHistoryRouter

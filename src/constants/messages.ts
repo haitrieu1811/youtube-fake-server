@@ -140,5 +140,6 @@ export const BOOKMARK_MESSAGES = {
 } as const
 
 export const WATCH_HISTORY_MESSAGES = {
-  CREATE_WATCH_HISTORY_SUCCEED: 'Tạo lịch sử xem thành công'
+  CREATE_WATCH_HISTORY_SUCCEED: 'Tạo lịch sử xem thành công',
+  GET_WATCH_HISTORIES_SUCCEED: 'Lấy lịch sử xem thành công'
 } as const
