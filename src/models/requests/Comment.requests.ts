@@ -1,6 +1,7 @@
-import { ParamsDictionary } from 'express-serve-static-core'
+import { ParamsDictionary, Query } from 'express-serve-static-core'
 
 import { CommentType } from '~/constants/enum'
+import { PaginationReqQuery } from './Common.requests'
 
 // Body: Thêm một bình luận
 export type CreateCommentReqBody = {
@@ -23,4 +24,15 @@ export type UpdateCommentReqBody = {
 export type ReplyCommentReqBody = {
   content: string
   replyAccountId?: string
+}
+
+// Query: Lấy danh sách bình luận
+export type GetCommentsReqQuery = Query &
+  PaginationReqQuery & {
+    orderBy?: 'asc' | 'desc'
+  }
+
+// Params: Content id
+export type ContentIdReqParams = ParamsDictionary & {
+  contentId: string
 }

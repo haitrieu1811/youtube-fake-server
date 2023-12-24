@@ -5,7 +5,9 @@ import { COMMENT_MESSAGES } from '~/constants/messages'
 import { TokenPayload } from '~/models/requests/Account.requests'
 import {
   CommentIdReqParams,
+  ContentIdReqParams,
   CreateCommentReqBody,
+  GetCommentsReqQuery,
   ReplyCommentReqBody,
   UpdateCommentReqBody
 } from '~/models/requests/Comment.requests'
@@ -54,5 +56,23 @@ export const replyCommentController = async (
   return res.json({
     message: COMMENT_MESSAGES.REPLY_COMMENT_SUCCEED,
     data: result
+  })
+}
+
+// Lấy danh sách bình luận bình luận
+export const getCommentsController = async (
+  req: Request<ContentIdReqParams, any, any, GetCommentsReqQuery>,
+  res: Response
+) => {
+  const { comments, ...pagination } = await commentService.getComments({
+    contentId: req.params.contentId,
+    query: req.query
+  })
+  return res.json({
+    message: COMMENT_MESSAGES.GET_COMMENTS_SUCCEED,
+    data: {
+      comments,
+      pagination
+    }
   })
 }

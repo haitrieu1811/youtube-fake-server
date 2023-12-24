@@ -158,5 +158,6 @@ export const COMMENT_MESSAGES = {
   COMMENT_AUTHOR_IS_INVALID: 'Bạn không phải là tác giả của bình luận này',
   UPDATE_COMMENT_SUCCEED: 'Cập nhật bình luận thành công',
   DELETE_COMMENT_SUCCEED: 'Xóa bình luận thành công',
-  REPLY_COMMENT_SUCCEED: 'Trả lời bình luận thành công'
+  REPLY_COMMENT_SUCCEED: 'Trả lời bình luận thành công',
+  GET_COMMENTS_SUCCEED: 'Lấy danh sách bình luận thành công'
 } as const

@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import { ParamSchema, checkSchema } from 'express-validator'
+import { ParamSchema, check, checkSchema } from 'express-validator'
 import { ObjectId } from 'mongodb'
 
 import { CommentType, HttpStatusCode } from '~/constants/enum'

@@ -1,6 +1,8 @@
 import { ObjectId, WithId } from 'mongodb'
 
-import { CreateCommentReqBody, ReplyCommentReqBody } from '~/models/requests/Comment.requests'
+import { ENV_CONFIG } from '~/constants/config'
+import { ReactionType } from '~/constants/enum'
+import { CreateCommentReqBody, GetCommentsReqQuery, ReplyCommentReqBody } from '~/models/requests/Comment.requests'
 import Comment from '~/models/schemas/Comment.schema'
 import databaseService from './database.services'
 
@@ -81,6 +83,176 @@ class CommentService {
     const newReplyComment = await databaseService.comments.findOne({ _id: insertedId })
     return {
       reply: newReplyComment
+    }
+  }
+
+  // Lấy danh sách bình luận
+  async getComments({ contentId, query }: { contentId: string; query: GetCommentsReqQuery }) {
+    const { page, limit, orderBy } = query
+    const _page = Number(page) || 1
+    const _limit = Number(limit) || 20
+    const skip = (_page - 1) * _limit
+    const _orderBy = orderBy === 'asc' ? 1 : -1
+    const [comments, totalRows] = await Promise.all([
+      databaseService.comments
+        .aggregate([
+          {
+            $match: {
+              contentId: new ObjectId(contentId),
+              parentId: null
+            }
+          },
+          {
+            $lookup: {
+              from: 'accounts',
+              localField: 'accountId',
+              foreignField: '_id',
+              as: 'author'
+            }
+          },
+          {
+            $unwind: {
+              path: '$author'
+            }
+          },
+          {
+            $lookup: {
+              from: 'images',
+              localField: 'author.avatar',
+              foreignField: '_id',
+              as: 'authorAvatar'
+            }
+          },
+          {
+            $unwind: {
+              path: '$authorAvatar',
+              preserveNullAndEmptyArrays: true
+            }
+          },
+          {
+            $lookup: {
+              from: 'comments',
+              localField: '_id',
+              foreignField: 'parentId',
+              as: 'replies'
+            }
+          },
+          {
+            $lookup: {
+              from: 'reactions',
+              localField: '_id',
+              foreignField: 'contentId',
+              as: 'reactions'
+            }
+          },
+          {
+            $addFields: {
+              replyCount: {
+                $size: '$replies'
+              },
+              likes: {
+                $filter: {
+                  input: '$reactions',
+                  as: 'reaction',
+                  cond: {
+                    $eq: ['$$reaction.type', ReactionType.Like]
+                  }
+                }
+              },
+              dislikes: {
+                $filter: {
+                  input: '$reactions',
+                  as: 'reaction',
+                  cond: {
+                    $eq: ['$$reaction.type', ReactionType.Dislike]
+                  }
+                }
+              },
+              'author.avatar': {
+                $cond: {
+                  if: '$authorAvatar',
+                  then: {
+                    $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$authorAvatar.name']
+                  },
+                  else: ''
+                }
+              }
+            }
+          },
+          {
+            $addFields: {
+              likeCount: {
+                $size: '$likes'
+              },
+              dislikeCount: {
+                $size: '$dislikes'
+              }
+            }
+          },
+          {
+            $group: {
+              _id: '$_id',
+              content: {
+                $first: '$content'
+              },
+              replyCount: {
+                $first: '$replyCount'
+              },
+              likeCount: {
+                $first: '$likeCount'
+              },
+              dislikeCount: {
+                $first: '$dislikeCount'
+              },
+              author: {
+                $first: '$author'
+              },
+              createdAt: {
+                $first: '$createdAt'
+              },
+              updatedAt: {
+                $first: '$updatedAt'
+              }
+            }
+          },
+          {
+            $project: {
+              'author.email': 0,
+              'author.password': 0,
+              'author.bio': 0,
+              'author.cover': 0,
+              'author.role': 0,
+              'author.status': 0,
+              'author.verify': 0,
+              'author.forgotPasswordToken': 0,
+              'author.resetPasswordToken': 0,
+              'author.verifyEmailToken': 0
+            }
+          },
+          {
+            $sort: {
+              createdAt: _orderBy
+            }
+          },
+          {
+            $skip: skip
+          },
+          {
+            $limit: _limit
+          }
+        ])
+        .toArray(),
+      databaseService.comments.countDocuments({
+        contentId: new ObjectId(contentId),
+        parentId: null
+      })
+    ])
+    return {
+      comments,
+      page: _page,
+      limit: _limit,
+      totalRows,
+      totalPages: Math.ceil(totalRows / _limit)
     }
   }
 }

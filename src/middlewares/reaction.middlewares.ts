@@ -72,8 +72,11 @@ export const createReactionValidator = validate(
                 status: HttpStatusCode.BadRequest
               })
             }
-            const video = await databaseService.videos.findOne({ _id: new ObjectId(value) })
-            if (!video) {
+            const [video, comment] = await Promise.all([
+              databaseService.videos.findOne({ _id: new ObjectId(value) }),
+              databaseService.comments.findOne({ _id: new ObjectId(value) })
+            ])
+            if (!video && !comment) {
               throw new ErrorWithStatus({
                 message: REACTION_MESSAGES.CONTENT_ID_NOT_FOUND,
                 status: HttpStatusCode.NotFound
