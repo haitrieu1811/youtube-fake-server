@@ -20,6 +20,23 @@ class CommentService {
       comment: newComment
     }
   }
+
+  // Cập nhật bình luận
+  async updateComment({ commentId, content }: { commentId: string; content: string }) {
+    const updatedComment = await databaseService.comments.findOneAndUpdate(
+      { _id: new ObjectId(commentId) },
+      {
+        $set: { content },
+        $currentDate: { updatedAt: true }
+      },
+      {
+        returnDocument: 'after'
+      }
+    )
+    return {
+      comment: updatedComment
+    }
+  }
 }
 
 const commentService = new CommentService()

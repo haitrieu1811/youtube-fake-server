@@ -151,5 +151,10 @@ export const COMMENT_MESSAGES = {
   COMMENT_TYPE_IS_INVALID: 'Loại bình luận không hợp lệ',
   COMMENT_CONTENT_ID_IS_REQUIRED: 'Content id là bắt buộc',
   COMMENT_CONTENT_ID_IS_INVALID: 'Content id không hợp lệ',
-  COMMENT_CONTENT_ID_NOT_FOUND: 'Không tìm thấy nội dung khớp với content id'
+  COMMENT_CONTENT_ID_NOT_FOUND: 'Không tìm thấy nội dung khớp với content id',
+  COMMENT_ID_IS_REQUIRED: 'Comment id là bắt buộc',
+  COMMENT_ID_IS_INVALID: 'Comment id không hợp lệ',
+  COMMENT_NOT_FOUND: 'Không tìm thấy bình luận',
+  COMMENT_AUTHOR_IS_INVALID: 'Bạn không phải là tác giả của bình luận này',
+  UPDATE_COMMENT_SUCCEED: 'Cập nhật bình luận thành công'
 } as const
