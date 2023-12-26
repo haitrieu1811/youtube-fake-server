@@ -197,6 +197,12 @@ class CommentService {
             }
           },
           {
+            $unwind: {
+              path: '$reactionOfUser',
+              preserveNullAndEmptyArrays: true
+            }
+          },
+          {
             $addFields: {
               likeCount: {
                 $size: '$likes'
@@ -207,16 +213,26 @@ class CommentService {
               isLiked: {
                 $cond: {
                   if: {
-                    $eq: ['$reactionOfUser.type', ReactionType.Like]
+                    $and: [
+                      '$reactionOfUser',
+                      {
+                        $eq: ['$reactionOfUser.type', ReactionType.Like]
+                      }
+                    ]
                   },
                   then: true,
                   else: false
                 }
               },
-              isDisiked: {
+              isDisliked: {
                 $cond: {
                   if: {
-                    $eq: ['$reactionOfUser.type', ReactionType.Dislike]
+                    $and: [
+                      '$reactionOfUser',
+                      {
+                        $eq: ['$reactionOfUser.type', ReactionType.Dislike]
+                      }
+                    ]
                   },
                   then: true,
                   else: false
@@ -227,6 +243,9 @@ class CommentService {
           {
             $group: {
               _id: '$_id',
+              author: {
+                $first: '$author'
+              },
               content: {
                 $first: '$content'
               },
@@ -239,8 +258,11 @@ class CommentService {
               dislikeCount: {
                 $first: '$dislikeCount'
               },
-              author: {
-                $first: '$author'
+              isLiked: {
+                $first: '$isLiked'
+              },
+              isDisliked: {
+                $first: '$isDisliked'
               },
               createdAt: {
                 $first: '$createdAt'

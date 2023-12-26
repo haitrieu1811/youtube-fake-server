@@ -64,7 +64,7 @@ export const getCommentsController = async (
   req: Request<ContentIdReqParams, any, any, GetCommentsReqQuery>,
   res: Response
 ) => {
-  const { accountId } = req.decodedAuthorization as TokenPayload
+  const accountId = req.decodedAuthorization?.accountId
   const { comments, ...pagination } = await commentService.getComments({
     contentId: req.params.contentId,
     query: req.query,
