@@ -162,3 +162,24 @@ export const COMMENT_MESSAGES = {
   GET_COMMENTS_SUCCEED: 'Lấy danh sách bình luận thành công',
   GET_REPLIES_OF_COMMENT_SUCCEED: 'Lấy danh sách trả lời bình luận thành công'
 } as const
+
+export const REPORT_MESSAGES = {
+  SEND_REPORT_SUCCEED: 'Gửi báo cáo thành công',
+  CONTENT_IS_REQUIRED: 'Nội dung báo cáo là bắt buộc',
+  CONTENT_ID_IS_REQUIRED: 'Content id là bắt buộc',
+  CONTENT_ID_IS_INVALID: 'Content id không hợp lệ',
+  CONTENT_ID_IS_NOT_FOUND: 'Không tìm thấy nội dung trùng với content id',
+  CONTENT_TYPE_IS_REQUIRED: 'Content type là bắt buộc',
+  CONTENT_TYPE_IS_INVALID: 'Content type không hợp lệ',
+  UPDATE_REPORT_SUCCEED: 'Cập nhật trạng thái báo cáo thành công',
+  REPORT_ID_IS_REQUIRED: 'Report id là bắt buộc',
+  REPORT_ID_IS_INVALID: 'Report id không hợp lệ',
+  REPORT_NOT_FOUND: 'Không tìm thấy báo cáo',
+  STATUS_IS_REQUIRED: 'Report status là bắt buộc',
+  STATUS_IS_INVALID: 'Report status không hợp lệ',
+  REPORT_IDS_IS_REQUIRED: 'Report ids là bắt buộc',
+  REPORT_IDS_MUST_BE_AN_ARRAY: 'Report ids phải là một mảng',
+  REPORT_IDS_CANNOT_BE_EMPTY: 'Report ids không được rỗng',
+  REPORT_IDS_IS_INVALID: 'Report ids không hợp lệ',
+  GET_REPORTS_SUCCEED: 'Lấy danh sách báo cáo thành công'
+} as const

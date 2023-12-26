@@ -7,6 +7,7 @@ import Comment from '~/models/schemas/Comment.schema'
 import Image from '~/models/schemas/Image.schema'
 import Reaction from '~/models/schemas/Reaction.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
+import Report from '~/models/schemas/Report.schema'
 import Subscription from '~/models/schemas/Subscription.schema'
 import Video from '~/models/schemas/Video.schema'
 import VideoCategory from '~/models/schemas/VideoCategory.schema'
@@ -84,6 +85,10 @@ class DatabaseService {
 
   get comments(): Collection<Comment> {
     return this.db.collection(ENV_CONFIG.DB_COMMENTS_COLLECTION_NAME)
+  }
+
+  get reports(): Collection<Report> {
+    return this.db.collection(ENV_CONFIG.DB_REPORTS_COLLECTION_NAME)
   }
 }
 

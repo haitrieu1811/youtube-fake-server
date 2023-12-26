@@ -132,3 +132,14 @@ export enum MediaType {
   Video,
   Hls
 }
+
+export enum ReportContentType {
+  Video,
+  Post,
+  Comment
+}
+
+export enum ReportStatus {
+  Resolved,
+  Unresolved
+}

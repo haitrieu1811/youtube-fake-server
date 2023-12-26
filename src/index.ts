@@ -9,6 +9,7 @@ import bookmarkRouter from './routes/bookmark.routes'
 import commentRouter from './routes/comment.routes'
 import mediaRouter from './routes/media.routes'
 import reactionRouter from './routes/reaction.routes'
+import reportRouter from './routes/report.routes'
 import staticRouter from './routes/static.routes'
 import subscriptionRouter from './routes/subscription.routes'
 import videoRouter from './routes/video.routes'
@@ -34,6 +35,7 @@ app.use('/reactions', reactionRouter)
 app.use('/bookmarks', bookmarkRouter)
 app.use('/watch-histories', watchHistoryRouter)
 app.use('/comments', commentRouter)
+app.use('/reports', reportRouter)
 app.use(defaultErrorHandler)
 
 app.listen(port, () => {
