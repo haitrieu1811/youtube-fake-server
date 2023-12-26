@@ -5,6 +5,7 @@ import Account from '~/models/schemas/Account.schema'
 import Bookmark from '~/models/schemas/Bookmark.schema'
 import Comment from '~/models/schemas/Comment.schema'
 import Image from '~/models/schemas/Image.schema'
+import Post from '~/models/schemas/Post.schema'
 import Reaction from '~/models/schemas/Reaction.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import Report from '~/models/schemas/Report.schema'
@@ -89,6 +90,10 @@ class DatabaseService {
 
   get reports(): Collection<Report> {
     return this.db.collection(ENV_CONFIG.DB_REPORTS_COLLECTION_NAME)
+  }
+
+  get posts(): Collection<Post> {
+    return this.db.collection(ENV_CONFIG.DB_POSTS_COLLECTION_NAME)
   }
 }
 

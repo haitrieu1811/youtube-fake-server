@@ -183,3 +183,12 @@ export const REPORT_MESSAGES = {
   REPORT_IDS_IS_INVALID: 'Report ids không hợp lệ',
   GET_REPORTS_SUCCEED: 'Lấy danh sách báo cáo thành công'
 } as const
+
+export const POST_MESSAGES = {
+  CREATE_POST_SUCCEED: 'Tạo bài viết thành công',
+  IMAGES_MUST_BE_AN_ARRAY: 'Images phải là một mảng',
+  IMAGES_CANNOT_BE_EMPTY: 'Images không được rỗng',
+  IMAGES_IS_INVALID: 'Images không hợp lệ',
+  CONTENT_IS_REQUIRED: 'Nội dung bài viết là bắt buộc',
+  AUDIENCE_IS_INVALID: 'Post audience không hợp lệ'
+} as const
