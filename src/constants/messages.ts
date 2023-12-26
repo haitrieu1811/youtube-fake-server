@@ -159,5 +159,6 @@ export const COMMENT_MESSAGES = {
   UPDATE_COMMENT_SUCCEED: 'Cập nhật bình luận thành công',
   DELETE_COMMENT_SUCCEED: 'Xóa bình luận thành công',
   REPLY_COMMENT_SUCCEED: 'Trả lời bình luận thành công',
-  GET_COMMENTS_SUCCEED: 'Lấy danh sách bình luận thành công'
+  GET_COMMENTS_SUCCEED: 'Lấy danh sách bình luận thành công',
+  GET_REPLIES_OF_COMMENT_SUCCEED: 'Lấy danh sách trả lời bình luận thành công'
 } as const

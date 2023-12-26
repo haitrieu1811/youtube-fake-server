@@ -4,6 +4,7 @@ import {
   createCommentController,
   deleteCommentController,
   getCommentsController,
+  getRepliesOfCommentController,
   replyCommentController,
   updateCommentController
 } from '~/controllers/comment.controllers'
@@ -60,6 +61,15 @@ commentRouter.get(
   isLoggedAccountValidator(accessTokenValidator),
   isLoggedAccountValidator(verifiedAccountValidator),
   wrapRequestHandler(getCommentsController)
+)
+
+// Lấy danh sách trả lời của bình luận
+commentRouter.get(
+  '/:commentId/replies',
+  isLoggedAccountValidator(accessTokenValidator),
+  isLoggedAccountValidator(verifiedAccountValidator),
+  commentIdValidator,
+  wrapRequestHandler(getRepliesOfCommentController)
 )
 
 export default commentRouter

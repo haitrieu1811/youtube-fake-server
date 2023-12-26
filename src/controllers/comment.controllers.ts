@@ -59,7 +59,7 @@ export const replyCommentController = async (
   })
 }
 
-// Lấy danh sách bình luận bình luận
+// Lấy danh sách bình luận
 export const getCommentsController = async (
   req: Request<ContentIdReqParams, any, any, GetCommentsReqQuery>,
   res: Response
@@ -72,6 +72,26 @@ export const getCommentsController = async (
   })
   return res.json({
     message: COMMENT_MESSAGES.GET_COMMENTS_SUCCEED,
+    data: {
+      comments,
+      pagination
+    }
+  })
+}
+
+// Lấy danh sách trả lời của bình luận
+export const getRepliesOfCommentController = async (
+  req: Request<CommentIdReqParams, any, any, GetCommentsReqQuery>,
+  res: Response
+) => {
+  const accountId = req.decodedAuthorization?.accountId
+  const { comments, ...pagination } = await commentService.getRepliesOfComments({
+    commentId: req.params.commentId,
+    query: req.query,
+    accountId
+  })
+  return res.json({
+    message: COMMENT_MESSAGES.GET_REPLIES_OF_COMMENT_SUCCEED,
     data: {
       comments,
       pagination
