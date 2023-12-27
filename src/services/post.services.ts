@@ -1,6 +1,9 @@
+import isUndefined from 'lodash/isUndefined'
+import omit from 'lodash/omit'
+import omitBy from 'lodash/omitBy'
 import { ObjectId } from 'mongodb'
 
-import { CreatePostReqBody } from '~/models/requests/Post.requests'
+import { CreatePostReqBody, UpdatePostReqBody } from '~/models/requests/Post.requests'
 import Post from '~/models/schemas/Post.schema'
 import databaseService from './database.services'
 
@@ -18,6 +21,35 @@ class PostService {
     const newPost = await databaseService.posts.findOne({ _id: insertedId })
     return {
       post: newPost
+    }
+  }
+
+  // Cập nhật bài viết
+  async updatePost({ body, postId }: { body: UpdatePostReqBody; postId: string }) {
+    let bodyConfig = omitBy(body, isUndefined)
+    bodyConfig = omit(bodyConfig, ['images'])
+    const imagesConfig = body.images ? body.images.map((image) => new ObjectId(image)) : []
+    const updatedPost = await databaseService.posts.findOneAndUpdate(
+      {
+        _id: new ObjectId(postId)
+      },
+      {
+        $set: bodyConfig,
+        $push: {
+          images: {
+            $each: imagesConfig
+          }
+        },
+        $currentDate: {
+          updatedAt: true
+        }
+      },
+      {
+        returnDocument: 'after'
+      }
+    )
+    return {
+      post: updatedPost
     }
   }
 }

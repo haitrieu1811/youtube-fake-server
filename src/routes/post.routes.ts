@@ -1,9 +1,14 @@
 import { Router } from 'express'
 
-import { createPostController } from '~/controllers/post.controllers'
+import { createPostController, updatePostController } from '~/controllers/post.controllers'
 import { wrapRequestHandler } from '~/lib/handlers'
 import { accessTokenValidator, verifiedAccountValidator } from '~/middlewares/account.middlewares'
-import { createPostValidator } from '~/middlewares/post.middlewares'
+import {
+  authorOfPostValidator,
+  createPostValidator,
+  postIdValidator,
+  updatePostValidator
+} from '~/middlewares/post.middlewares'
 
 const postRouter = Router()
 
@@ -14,6 +19,17 @@ postRouter.post(
   verifiedAccountValidator,
   createPostValidator,
   wrapRequestHandler(createPostController)
+)
+
+// Cập nhật bài viết
+postRouter.patch(
+  '/:postId',
+  accessTokenValidator,
+  verifiedAccountValidator,
+  postIdValidator,
+  authorOfPostValidator,
+  updatePostValidator,
+  wrapRequestHandler(updatePostController)
 )
 
 export default postRouter

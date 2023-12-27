@@ -190,5 +190,10 @@ export const POST_MESSAGES = {
   IMAGES_CANNOT_BE_EMPTY: 'Images không được rỗng',
   IMAGES_IS_INVALID: 'Images không hợp lệ',
   CONTENT_IS_REQUIRED: 'Nội dung bài viết là bắt buộc',
-  AUDIENCE_IS_INVALID: 'Post audience không hợp lệ'
+  AUDIENCE_IS_INVALID: 'Post audience không hợp lệ',
+  POST_ID_IS_REQUIRED: 'Post id là bắt buộc',
+  POST_ID_IS_INVALID: 'Post id không hợp lệ',
+  POST_NOT_FOUND: 'Không tìm thấy bài viết',
+  AUTHOR_IS_INVALID: 'Bạn không phải là tác giả của bài viết',
+  UPDATE_POST_SUCCEED: 'Cập nhật bài viết thành công'
 } as const
