@@ -1,11 +1,11 @@
 import { ObjectId } from 'mongodb'
 
+import { ENV_CONFIG } from '~/constants/config'
+import { PaginationReqQuery } from '~/models/requests/Common.requests'
 import { CreatePlaylistReqBody, UpdatePlaylistReqBody } from '~/models/requests/Playlist.requests'
 import Playlist from '~/models/schemas/Playlist.schema'
 import PlaylistVideo from '~/models/schemas/PlaylistVideo.schema'
 import databaseService from './database.services'
-import { ENV_CONFIG } from '~/constants/config'
-import { PaginationReqQuery } from '~/models/requests/Common.requests'
 
 class PlaylistService {
   // Tạo playlist
@@ -230,6 +230,43 @@ class PlaylistService {
     ])
     return {
       videos,
+      page: _page,
+      limit: _limit,
+      totalRows,
+      totalPages: Math.ceil(totalRows / _limit)
+    }
+  }
+
+  // Lấy danh sách playlist của tôi
+  async getPlaylistsOfMe({ accountId, query }: { accountId: string; query: PaginationReqQuery }) {
+    const { page, limit } = query
+    const _page = Number(page) || 1
+    const _limit = Number(limit) || 20
+    const skip = (_page - 1) * _limit
+    const [playlists, totalRows] = await Promise.all([
+      databaseService.playlists
+        .find(
+          {
+            accountId: new ObjectId(accountId)
+          },
+          {
+            projection: {
+              _id: 1,
+              name: 1,
+              createdAt: 1,
+              updatedAt: 1
+            }
+          }
+        )
+        .skip(skip)
+        .limit(_limit)
+        .toArray(),
+      databaseService.playlists.countDocuments({
+        accountId: new ObjectId(accountId)
+      })
+    ])
+    return {
+      playlists,
       page: _page,
       limit: _limit,
       totalRows,

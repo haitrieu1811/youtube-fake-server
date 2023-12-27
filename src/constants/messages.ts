@@ -220,5 +220,6 @@ export const PLAYLIST_MESSAGES = {
   VIDEO_ALREADY_IN_PLAYLIST: 'Video đã được thêm vào playlist trước đó',
   REMOVE_VIDEO_FROM_PLAYLIST_SUCCEED: 'Xóa video khỏi playlist thành công',
   VIDEO_NOT_ALREADY_IN_PLAYLIST: 'Video chưa được thêm vào playlist',
-  GET_VIDEOS_FROM_PLAYLIST_SUCCEED: 'Lấy danh sách video từ playlist thành công'
+  GET_VIDEOS_FROM_PLAYLIST_SUCCEED: 'Lấy danh sách video từ playlist thành công',
+  GET_PLAYLISTS_SUCCEED: 'Lấy danh sách playlist thành công'
 } as const

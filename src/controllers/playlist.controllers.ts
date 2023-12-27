@@ -85,3 +85,22 @@ export const getVideosFromPlaylistController = async (
     }
   })
 }
+
+// Lấy danh sách playlist của tôi
+export const getPlaylistsOfMeController = async (
+  req: Request<ParamsDictionary, any, any, PaginationReqQuery>,
+  res: Response
+) => {
+  const { accountId } = req.decodedAuthorization as TokenPayload
+  const { playlists, ...pagination } = await playlistService.getPlaylistsOfMe({
+    accountId,
+    query: req.query
+  })
+  return res.json({
+    message: PLAYLIST_MESSAGES.GET_PLAYLISTS_SUCCEED,
+    data: {
+      playlists,
+      pagination
+    }
+  })
+}

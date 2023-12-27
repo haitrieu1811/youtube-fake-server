@@ -4,6 +4,7 @@ import {
   addVideoToPlaylistController,
   createPlaylistController,
   deletePlaylistController,
+  getPlaylistsOfMeController,
   getVideosFromPlaylistController,
   removeVideoFromPlaylistController,
   updatePlaylistController
@@ -85,6 +86,15 @@ playlistRouter.get(
   playlistIdValidator,
   paginationValidator,
   wrapRequestHandler(getVideosFromPlaylistController)
+)
+
+// Lấy danh sách playlist của tôi
+playlistRouter.get(
+  '/me',
+  accessTokenValidator,
+  verifiedAccountValidator,
+  paginationValidator,
+  wrapRequestHandler(getPlaylistsOfMeController)
 )
 
 export default playlistRouter
