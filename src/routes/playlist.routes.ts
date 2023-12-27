@@ -4,13 +4,15 @@ import {
   addVideoToPlaylistController,
   createPlaylistController,
   deletePlaylistController,
+  getVideosFromPlaylistController,
   removeVideoFromPlaylistController,
   updatePlaylistController
 } from '~/controllers/playlist.controllers'
 import { wrapRequestHandler } from '~/lib/handlers'
 import { accessTokenValidator, verifiedAccountValidator } from '~/middlewares/account.middlewares'
-import { filterReqBodyMiddleware } from '~/middlewares/common.middlewares'
+import { filterReqBodyMiddleware, paginationValidator } from '~/middlewares/common.middlewares'
 import {
+  authorOfPlaylistValidator,
   createPlaylistValidator,
   playlistIdValidator,
   updatePlaylistValidator,
@@ -37,6 +39,7 @@ playlistRouter.patch(
   accessTokenValidator,
   verifiedAccountValidator,
   playlistIdValidator,
+  authorOfPlaylistValidator,
   updatePlaylistValidator,
   filterReqBodyMiddleware<UpdatePlaylistReqBody>(['name', 'description', 'audience']),
   wrapRequestHandler(updatePlaylistController)
@@ -48,6 +51,7 @@ playlistRouter.delete(
   accessTokenValidator,
   verifiedAccountValidator,
   playlistIdValidator,
+  authorOfPlaylistValidator,
   wrapRequestHandler(deletePlaylistController)
 )
 
@@ -58,6 +62,7 @@ playlistRouter.post(
   verifiedAccountValidator,
   playlistIdValidator,
   videoIdValidator,
+  authorOfPlaylistValidator,
   videoNotAlreadyInPlaylistValidator,
   wrapRequestHandler(addVideoToPlaylistController)
 )
@@ -69,8 +74,17 @@ playlistRouter.delete(
   verifiedAccountValidator,
   playlistIdValidator,
   videoIdValidator,
+  authorOfPlaylistValidator,
   videoAlreadyInPlaylistValidator,
   wrapRequestHandler(removeVideoFromPlaylistController)
+)
+
+// Lấy danh sách video từ playlist
+playlistRouter.get(
+  '/:playlistId/videos',
+  playlistIdValidator,
+  paginationValidator,
+  wrapRequestHandler(getVideosFromPlaylistController)
 )
 
 export default playlistRouter

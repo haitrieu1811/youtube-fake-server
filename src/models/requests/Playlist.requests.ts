@@ -1,6 +1,7 @@
-import { ParamsDictionary } from 'express-serve-static-core'
+import { ParamsDictionary, Query } from 'express-serve-static-core'
 
 import { PlaylistAudience } from '~/constants/enum'
+import { PaginationReqQuery } from './Common.requests'
 
 // Body: Tạo playlist
 export type CreatePlaylistReqBody = {

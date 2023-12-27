@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { ParamSchema, checkSchema } from 'express-validator'
-import { ObjectId } from 'mongodb'
+import { ObjectId, WithId } from 'mongodb'
 
 import { HttpStatusCode, PlaylistAudience } from '~/constants/enum'
 import { PLAYLIST_MESSAGES } from '~/constants/messages'
@@ -13,6 +13,7 @@ import {
   PlaylistIdReqParams,
   RemoveVideoFromPlaylistReqParams
 } from '~/models/requests/Playlist.requests'
+import Playlist from '~/models/schemas/Playlist.schema'
 import databaseService from '~/services/database.services'
 
 const playlistAudiences = numberEnumToArray(PlaylistAudience)
@@ -79,7 +80,7 @@ export const playlistIdValidator = validate(
       playlistId: {
         trim: true,
         custom: {
-          options: async (value: string, { req }) => {
+          options: async (value: string) => {
             if (!value) {
               throw new ErrorWithStatus({
                 message: PLAYLIST_MESSAGES.PLAYLIST_ID_IS_REQUIRED,
@@ -99,13 +100,6 @@ export const playlistIdValidator = validate(
                 status: HttpStatusCode.NotFound
               })
             }
-            const { accountId } = (req as Request).decodedAuthorization as TokenPayload
-            if (playlist.accountId.toString() !== accountId) {
-              throw new ErrorWithStatus({
-                message: PLAYLIST_MESSAGES.PLAYLIST_AUTHOR_IS_INVALID,
-                status: HttpStatusCode.Forbidden
-              })
-            }
             return true
           }
         }
@@ -114,6 +108,22 @@ export const playlistIdValidator = validate(
     ['params']
   )
 )
+
+// Kiểm tra tác giả của playlist
+export const authorOfPlaylistValidator = async (req: Request<PlaylistIdReqParams>, _: Response, next: NextFunction) => {
+  const { accountId } = req.decodedAuthorization as TokenPayload
+  const { playlistId } = req.params
+  const playlist = (await databaseService.playlists.findOne({ _id: new ObjectId(playlistId) })) as WithId<Playlist>
+  if (playlist.accountId.toString() !== accountId) {
+    return next(
+      new ErrorWithStatus({
+        message: PLAYLIST_MESSAGES.PLAYLIST_AUTHOR_IS_INVALID,
+        status: HttpStatusCode.Forbidden
+      })
+    )
+  }
+  return next()
+}
 
 // Kiểm tra đã thêm video vào playlist trước đó hay chưa
 export const videoNotAlreadyInPlaylistValidator = async (

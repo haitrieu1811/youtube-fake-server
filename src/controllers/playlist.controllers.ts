@@ -3,6 +3,7 @@ import { ParamsDictionary } from 'express-serve-static-core'
 
 import { PLAYLIST_MESSAGES } from '~/constants/messages'
 import { TokenPayload } from '~/models/requests/Account.requests'
+import { PaginationReqQuery } from '~/models/requests/Common.requests'
 import {
   AddVideoToPlaylistReqParams,
   CreatePlaylistReqBody,
@@ -64,5 +65,23 @@ export const removeVideoFromPlaylistController = async (
   await playlistService.removeVideoFromPlaylist({ videoId, playlistId })
   return res.json({
     message: PLAYLIST_MESSAGES.REMOVE_VIDEO_FROM_PLAYLIST_SUCCEED
+  })
+}
+
+// Lấy danh sách video của playlist
+export const getVideosFromPlaylistController = async (
+  req: Request<PlaylistIdReqParams, any, any, PaginationReqQuery>,
+  res: Response
+) => {
+  const { videos, ...pagination } = await playlistService.getVideosFromPlaylist({
+    playlistId: req.params.playlistId,
+    query: req.query
+  })
+  return res.json({
+    message: PLAYLIST_MESSAGES.GET_VIDEOS_FROM_PLAYLIST_SUCCEED,
+    data: {
+      videos,
+      pagination
+    }
   })
 }
