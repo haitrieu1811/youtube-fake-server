@@ -214,5 +214,6 @@ export const PLAYLIST_MESSAGES = {
   PLAYLIST_ID_IS_REQUIRED: 'Playlist id is required',
   PLAYLIST_ID_IS_INVALID: 'Playlist id không hợp lệ',
   PLAYLIST_NOT_FOUND: 'Không tìm thấy playlist',
-  PLAYLIST_AUTHOR_IS_INVALID: 'Bạn không phải là tác giả của playlist'
+  PLAYLIST_AUTHOR_IS_INVALID: 'Bạn không phải là tác giả của playlist',
+  DELETE_PLAYLIST_SUCCEED: 'Xóa playlist thành công'
 } as const

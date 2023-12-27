@@ -42,6 +42,12 @@ class PlaylistService {
       playlist: updatedPlaylist
     }
   }
+
+  // Xóa playlist
+  async deletePlaylist(playlistId: string) {
+    await databaseService.playlists.deleteOne({ _id: new ObjectId(playlistId) })
+    return true
+  }
 }
 
 const playlistService = new PlaylistService()

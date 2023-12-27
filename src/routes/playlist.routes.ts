@@ -1,6 +1,10 @@
 import { Router } from 'express'
 
-import { createPlaylistController, updatePlaylistController } from '~/controllers/playlist.controllers'
+import {
+  createPlaylistController,
+  deletePlaylistController,
+  updatePlaylistController
+} from '~/controllers/playlist.controllers'
 import { wrapRequestHandler } from '~/lib/handlers'
 import { accessTokenValidator, verifiedAccountValidator } from '~/middlewares/account.middlewares'
 import { filterReqBodyMiddleware } from '~/middlewares/common.middlewares'
@@ -31,6 +35,15 @@ playlistRouter.patch(
   updatePlaylistValidator,
   filterReqBodyMiddleware<UpdatePlaylistReqBody>(['name', 'description', 'audience']),
   wrapRequestHandler(updatePlaylistController)
+)
+
+// Xóa playlist
+playlistRouter.delete(
+  '/:playlistId',
+  accessTokenValidator,
+  verifiedAccountValidator,
+  playlistIdValidator,
+  wrapRequestHandler(deletePlaylistController)
 )
 
 export default playlistRouter
