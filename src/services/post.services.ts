@@ -52,6 +52,19 @@ class PostService {
       post: updatedPost
     }
   }
+
+  // Xóa bài viết
+  async deletePosts(postIds: string[]) {
+    const _postIds = postIds.map((id) => new ObjectId(id))
+    const { deletedCount } = await databaseService.posts.deleteMany({
+      _id: {
+        $in: _postIds
+      }
+    })
+    return {
+      deletedCount
+    }
+  }
 }
 
 const postService = new PostService()

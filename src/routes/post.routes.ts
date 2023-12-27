@@ -1,11 +1,12 @@
 import { Router } from 'express'
 
-import { createPostController, updatePostController } from '~/controllers/post.controllers'
+import { createPostController, deletePostsController, updatePostController } from '~/controllers/post.controllers'
 import { wrapRequestHandler } from '~/lib/handlers'
 import { accessTokenValidator, verifiedAccountValidator } from '~/middlewares/account.middlewares'
 import {
   authorOfPostValidator,
   createPostValidator,
+  deletePostsValidator,
   postIdValidator,
   updatePostValidator
 } from '~/middlewares/post.middlewares'
@@ -30,6 +31,15 @@ postRouter.patch(
   authorOfPostValidator,
   updatePostValidator,
   wrapRequestHandler(updatePostController)
+)
+
+// Xóa bài viết
+postRouter.delete(
+  '/',
+  accessTokenValidator,
+  verifiedAccountValidator,
+  deletePostsValidator,
+  wrapRequestHandler(deletePostsController)
 )
 
 export default postRouter

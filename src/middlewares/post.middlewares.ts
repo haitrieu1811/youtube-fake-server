@@ -135,3 +135,59 @@ export const updatePostValidator = validate(
     ['body']
   )
 )
+
+// Xóa bài viết
+export const deletePostsValidator = validate(
+  checkSchema(
+    {
+      postIds: {
+        custom: {
+          options: async (value, { req }) => {
+            if (!value) {
+              throw new ErrorWithStatus({
+                message: POST_MESSAGES.POST_IDS_IS_REQUIRED,
+                status: HttpStatusCode.BadRequest
+              })
+            }
+            if (!Array.isArray(value)) {
+              throw new ErrorWithStatus({
+                message: POST_MESSAGES.POST_IDS_MUST_BE_AN_ARRAY,
+                status: HttpStatusCode.BadRequest
+              })
+            }
+            if (value.length === 0) {
+              throw new ErrorWithStatus({
+                message: POST_MESSAGES.POST_IDS_CANNOT_BE_EMPTY,
+                status: HttpStatusCode.BadRequest
+              })
+            }
+            const isValid = value.every((item) => ObjectId.isValid(item))
+            if (!isValid) {
+              throw new ErrorWithStatus({
+                message: POST_MESSAGES.POST_IDS_IS_INVALID,
+                status: HttpStatusCode.BadRequest
+              })
+            }
+            const foundPosts = await Promise.all(
+              value.map(async (postId) => {
+                const post = await databaseService.posts.findOne({ _id: new ObjectId(postId) })
+                return post
+              })
+            )
+            const foundPostsConfig = foundPosts.filter((post) => post !== null)
+            const { accountId } = (req as Request).decodedAuthorization as TokenPayload
+            const _isValid = foundPostsConfig.every((post) => post?.accountId.toString() === accountId)
+            if (!_isValid) {
+              throw new ErrorWithStatus({
+                message: POST_MESSAGES.POST_IDS_AUTHOR_IS_INVALID,
+                status: HttpStatusCode.Forbidden
+              })
+            }
+            return true
+          }
+        }
+      }
+    },
+    ['body']
+  )
+)

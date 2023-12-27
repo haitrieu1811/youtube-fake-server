@@ -3,7 +3,12 @@ import { ParamsDictionary } from 'express-serve-static-core'
 
 import { POST_MESSAGES } from '~/constants/messages'
 import { TokenPayload } from '~/models/requests/Account.requests'
-import { CreatePostReqBody, PostIdReqParams, UpdatePostReqBody } from '~/models/requests/Post.requests'
+import {
+  CreatePostReqBody,
+  DeletePostsReqBody,
+  PostIdReqParams,
+  UpdatePostReqBody
+} from '~/models/requests/Post.requests'
 import postService from '~/services/post.services'
 
 // Tạo bài viết
@@ -23,5 +28,13 @@ export const updatePostController = async (req: Request<PostIdReqParams, any, Up
   return res.json({
     message: POST_MESSAGES.UPDATE_POST_SUCCEED,
     data: result
+  })
+}
+
+// Xóa bài viết
+export const deletePostsController = async (req: Request<ParamsDictionary, any, DeletePostsReqBody>, res: Response) => {
+  const { deletedCount } = await postService.deletePosts(req.body.postIds)
+  return res.json({
+    message: `Xóa ${deletedCount} bài viết thành công`
   })
 }

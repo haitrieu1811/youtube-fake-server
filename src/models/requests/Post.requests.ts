@@ -20,3 +20,8 @@ export type UpdatePostReqBody = {
 export type PostIdReqParams = ParamsDictionary & {
   postId: string
 }
+
+// Body: Xóa bài viết
+export type DeletePostsReqBody = {
+  postIds: string[]
+}
