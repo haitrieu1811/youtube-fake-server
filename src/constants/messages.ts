@@ -204,3 +204,10 @@ export const POST_MESSAGES = {
   GET_POSTS_IN_PROFILE_PAGE_SUCCEED: 'Lấy danh sách bài viết của trang cá nhân thành công',
   GET_POST_DETAIL_SUCCEED: 'Lấy chi tiết bài viết thành công'
 } as const
+
+export const PLAYLIST_MESSAGES = {
+  CREATE_PLAYLIST_SUCCEED: 'Tạo playlist thành công',
+  NAME_IS_REQUIRED: 'Tên playlist là bắt buộc',
+  AUDIENCE_IS_INVALID: 'Playlist audience không hợp lệ',
+  NAME_LENGTH_IS_INVALID: 'Tên playlist phải dài từ 6 đến 255 ký tự'
+} as const

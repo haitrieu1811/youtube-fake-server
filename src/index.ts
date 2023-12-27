@@ -8,6 +8,7 @@ import accountRouter from './routes/account.routes'
 import bookmarkRouter from './routes/bookmark.routes'
 import commentRouter from './routes/comment.routes'
 import mediaRouter from './routes/media.routes'
+import playlistRouter from './routes/playlist.routes'
 import postRouter from './routes/post.routes'
 import reactionRouter from './routes/reaction.routes'
 import reportRouter from './routes/report.routes'
@@ -38,6 +39,7 @@ app.use('/watch-histories', watchHistoryRouter)
 app.use('/comments', commentRouter)
 app.use('/reports', reportRouter)
 app.use('/posts', postRouter)
+app.use('/playlists', playlistRouter)
 app.use(defaultErrorHandler)
 
 app.listen(port, () => {
