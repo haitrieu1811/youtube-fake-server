@@ -209,5 +209,10 @@ export const PLAYLIST_MESSAGES = {
   CREATE_PLAYLIST_SUCCEED: 'Tạo playlist thành công',
   NAME_IS_REQUIRED: 'Tên playlist là bắt buộc',
   AUDIENCE_IS_INVALID: 'Playlist audience không hợp lệ',
-  NAME_LENGTH_IS_INVALID: 'Tên playlist phải dài từ 6 đến 255 ký tự'
+  NAME_LENGTH_IS_INVALID: 'Tên playlist phải dài từ 6 đến 255 ký tự',
+  UPDATE_PLAYLIST_SUCCEED: 'Cập nhật playlist thành công',
+  PLAYLIST_ID_IS_REQUIRED: 'Playlist id is required',
+  PLAYLIST_ID_IS_INVALID: 'Playlist id không hợp lệ',
+  PLAYLIST_NOT_FOUND: 'Không tìm thấy playlist',
+  PLAYLIST_AUTHOR_IS_INVALID: 'Bạn không phải là tác giả của playlist'
 } as const

@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb'
 
-import { CreatePlaylistReqBody } from '~/models/requests/Playlist.requests'
+import { CreatePlaylistReqBody, UpdatePlaylistReqBody } from '~/models/requests/Playlist.requests'
 import Playlist from '~/models/schemas/Playlist.schema'
 import databaseService from './database.services'
 
@@ -19,6 +19,27 @@ class PlaylistService {
     const newPlaylist = await databaseService.playlists.findOne({ _id: insertedId })
     return {
       playlist: newPlaylist
+    }
+  }
+
+  // Cập nhật playlist
+  async updatePlaylist({ body, playlistId }: { body: UpdatePlaylistReqBody; playlistId: string }) {
+    const updatedPlaylist = await databaseService.playlists.findOneAndUpdate(
+      {
+        _id: new ObjectId(playlistId)
+      },
+      {
+        $set: body,
+        $currentDate: {
+          updatedAt: true
+        }
+      },
+      {
+        returnDocument: 'after'
+      }
+    )
+    return {
+      playlist: updatedPlaylist
     }
   }
 }

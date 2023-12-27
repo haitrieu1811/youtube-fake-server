@@ -3,7 +3,7 @@ import { ParamsDictionary } from 'express-serve-static-core'
 import { PLAYLIST_MESSAGES } from '~/constants/messages'
 
 import { TokenPayload } from '~/models/requests/Account.requests'
-import { CreatePlaylistReqBody } from '~/models/requests/Playlist.requests'
+import { CreatePlaylistReqBody, PlaylistIdReqParams, UpdatePlaylistReqBody } from '~/models/requests/Playlist.requests'
 import playlistService from '~/services/playlist.services'
 
 // Tạo playlist
@@ -15,6 +15,18 @@ export const createPlaylistController = async (
   const result = await playlistService.createPlaylist({ body: req.body, accountId })
   return res.json({
     message: PLAYLIST_MESSAGES.CREATE_PLAYLIST_SUCCEED,
+    data: result
+  })
+}
+
+// Cập nhật playlist
+export const updatePlaylistController = async (
+  req: Request<PlaylistIdReqParams, any, UpdatePlaylistReqBody>,
+  res: Response
+) => {
+  const result = await playlistService.updatePlaylist({ body: req.body, playlistId: req.params.playlistId })
+  return res.json({
+    message: PLAYLIST_MESSAGES.UPDATE_PLAYLIST_SUCCEED,
     data: result
   })
 }
