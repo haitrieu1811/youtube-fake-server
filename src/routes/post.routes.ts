@@ -1,8 +1,19 @@
 import { Router } from 'express'
 
-import { createPostController, deletePostsController, updatePostController } from '~/controllers/post.controllers'
+import {
+  createPostController,
+  deletePostsController,
+  getPostsInProfilePageController,
+  updatePostController
+} from '~/controllers/post.controllers'
 import { wrapRequestHandler } from '~/lib/handlers'
-import { accessTokenValidator, verifiedAccountValidator } from '~/middlewares/account.middlewares'
+import {
+  accessTokenValidator,
+  accountIdValidator,
+  isLoggedAccountValidator,
+  verifiedAccountValidator
+} from '~/middlewares/account.middlewares'
+import { paginationValidator } from '~/middlewares/common.middlewares'
 import {
   authorOfPostValidator,
   createPostValidator,
@@ -40,6 +51,16 @@ postRouter.delete(
   verifiedAccountValidator,
   deletePostsValidator,
   wrapRequestHandler(deletePostsController)
+)
+
+// Lấy danh sách bài viết ở trang cá nhân
+postRouter.get(
+  '/account/:accountId',
+  isLoggedAccountValidator(accessTokenValidator),
+  isLoggedAccountValidator(verifiedAccountValidator),
+  accountIdValidator,
+  paginationValidator,
+  wrapRequestHandler(getPostsInProfilePageController)
 )
 
 export default postRouter

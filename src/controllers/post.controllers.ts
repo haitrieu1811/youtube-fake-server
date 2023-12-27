@@ -2,7 +2,8 @@ import { Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 
 import { POST_MESSAGES } from '~/constants/messages'
-import { TokenPayload } from '~/models/requests/Account.requests'
+import { AccountIdReqParams, TokenPayload } from '~/models/requests/Account.requests'
+import { PaginationReqQuery } from '~/models/requests/Common.requests'
 import {
   CreatePostReqBody,
   DeletePostsReqBody,
@@ -36,5 +37,25 @@ export const deletePostsController = async (req: Request<ParamsDictionary, any, 
   const { deletedCount } = await postService.deletePosts(req.body.postIds)
   return res.json({
     message: `Xóa ${deletedCount} bài viết thành công`
+  })
+}
+
+// Lấy danh sách bài viết ở trang cá nhân
+export const getPostsInProfilePageController = async (
+  req: Request<AccountIdReqParams, any, any, PaginationReqQuery>,
+  res: Response
+) => {
+  const accountId = req.decodedAuthorization?.accountId
+  const { posts, ...pagination } = await postService.getPostsInProfilePage({
+    query: req.query,
+    profileId: req.params.accountId,
+    accountId
+  })
+  return res.json({
+    message: POST_MESSAGES.GET_POSTS_IN_PROFILE_PAGE_SUCCEED,
+    data: {
+      posts,
+      pagination
+    }
   })
 }
