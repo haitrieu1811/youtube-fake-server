@@ -63,6 +63,15 @@ class PlaylistService {
       playlistVideo: newPlaylistVideo
     }
   }
+
+  // Xóa video khỏi playlist
+  async removeVideoFromPlaylist({ videoId, playlistId }: { videoId: string; playlistId: string }) {
+    await databaseService.playlistVideos.deleteOne({
+      videoId: new ObjectId(videoId),
+      playlistId: new ObjectId(playlistId)
+    })
+    return true
+  }
 }
 
 const playlistService = new PlaylistService()

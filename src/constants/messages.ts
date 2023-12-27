@@ -217,5 +217,7 @@ export const PLAYLIST_MESSAGES = {
   PLAYLIST_AUTHOR_IS_INVALID: 'Bạn không phải là tác giả của playlist',
   DELETE_PLAYLIST_SUCCEED: 'Xóa playlist thành công',
   ADD_VIDEO_TO_PLAYLIST_SUCCEED: 'Thêm video vào playlist thành công',
-  VIDEO_ALREADY_IN_PLAYLIST: 'Video đã được thêm vào playlist trước đó'
+  VIDEO_ALREADY_IN_PLAYLIST: 'Video đã được thêm vào playlist trước đó',
+  REMOVE_VIDEO_FROM_PLAYLIST_SUCCEED: 'Xóa video khỏi playlist thành công',
+  VIDEO_NOT_ALREADY_IN_PLAYLIST: 'Video chưa được thêm vào playlist'
 } as const

@@ -8,7 +8,11 @@ import { numberEnumToArray } from '~/lib/utils'
 import { validate } from '~/lib/validation'
 import { ErrorWithStatus } from '~/models/Errors'
 import { TokenPayload } from '~/models/requests/Account.requests'
-import { AddVideoToPlaylistReqParams, PlaylistIdReqParams } from '~/models/requests/Playlist.requests'
+import {
+  AddVideoToPlaylistReqParams,
+  PlaylistIdReqParams,
+  RemoveVideoFromPlaylistReqParams
+} from '~/models/requests/Playlist.requests'
 import databaseService from '~/services/database.services'
 
 const playlistAudiences = numberEnumToArray(PlaylistAudience)
@@ -112,7 +116,7 @@ export const playlistIdValidator = validate(
 )
 
 // Kiểm tra đã thêm video vào playlist trước đó hay chưa
-export const videoAlreadyInPlaylistValidator = async (
+export const videoNotAlreadyInPlaylistValidator = async (
   req: Request<AddVideoToPlaylistReqParams>,
   res: Response,
   next: NextFunction
@@ -126,6 +130,28 @@ export const videoAlreadyInPlaylistValidator = async (
     return next(
       new ErrorWithStatus({
         message: PLAYLIST_MESSAGES.VIDEO_ALREADY_IN_PLAYLIST,
+        status: HttpStatusCode.BadRequest
+      })
+    )
+  }
+  return next()
+}
+
+// Kiểm tra video có nằm trong playlist hay chưa
+export const videoAlreadyInPlaylistValidator = async (
+  req: Request<RemoveVideoFromPlaylistReqParams>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { videoId, playlistId } = req.params
+  const playlistVideo = await databaseService.playlistVideos.findOne({
+    videoId: new ObjectId(videoId),
+    playlistId: new ObjectId(playlistId)
+  })
+  if (!playlistVideo) {
+    return next(
+      new ErrorWithStatus({
+        message: PLAYLIST_MESSAGES.VIDEO_NOT_ALREADY_IN_PLAYLIST,
         status: HttpStatusCode.BadRequest
       })
     )

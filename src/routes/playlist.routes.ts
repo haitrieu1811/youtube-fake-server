@@ -4,6 +4,7 @@ import {
   addVideoToPlaylistController,
   createPlaylistController,
   deletePlaylistController,
+  removeVideoFromPlaylistController,
   updatePlaylistController
 } from '~/controllers/playlist.controllers'
 import { wrapRequestHandler } from '~/lib/handlers'
@@ -13,7 +14,8 @@ import {
   createPlaylistValidator,
   playlistIdValidator,
   updatePlaylistValidator,
-  videoAlreadyInPlaylistValidator
+  videoAlreadyInPlaylistValidator,
+  videoNotAlreadyInPlaylistValidator
 } from '~/middlewares/playlist.middlewares'
 import { videoIdValidator } from '~/middlewares/video.middlewares'
 import { UpdatePlaylistReqBody } from '~/models/requests/Playlist.requests'
@@ -56,8 +58,19 @@ playlistRouter.post(
   verifiedAccountValidator,
   playlistIdValidator,
   videoIdValidator,
-  videoAlreadyInPlaylistValidator,
+  videoNotAlreadyInPlaylistValidator,
   wrapRequestHandler(addVideoToPlaylistController)
+)
+
+// Thêm video vào playlist
+playlistRouter.delete(
+  '/:playlistId/remove-from-playlist/video/:videoId',
+  accessTokenValidator,
+  verifiedAccountValidator,
+  playlistIdValidator,
+  videoIdValidator,
+  videoAlreadyInPlaylistValidator,
+  wrapRequestHandler(removeVideoFromPlaylistController)
 )
 
 export default playlistRouter

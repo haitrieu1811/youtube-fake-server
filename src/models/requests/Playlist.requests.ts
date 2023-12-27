@@ -26,3 +26,9 @@ export type AddVideoToPlaylistReqParams = ParamsDictionary & {
   videoId: string
   playlistId: string
 }
+
+// Params: Xóa video khỏi playlist
+export type RemoveVideoFromPlaylistReqParams = ParamsDictionary & {
+  videoId: string
+  playlistId: string
+}

@@ -7,6 +7,7 @@ import {
   AddVideoToPlaylistReqParams,
   CreatePlaylistReqBody,
   PlaylistIdReqParams,
+  RemoveVideoFromPlaylistReqParams,
   UpdatePlaylistReqBody
 } from '~/models/requests/Playlist.requests'
 import playlistService from '~/services/playlist.services'
@@ -51,5 +52,17 @@ export const addVideoToPlaylistController = async (req: Request<AddVideoToPlayli
   return res.json({
     message: PLAYLIST_MESSAGES.ADD_VIDEO_TO_PLAYLIST_SUCCEED,
     data: result
+  })
+}
+
+// Xóa video khỏi playlist
+export const removeVideoFromPlaylistController = async (
+  req: Request<RemoveVideoFromPlaylistReqParams>,
+  res: Response
+) => {
+  const { videoId, playlistId } = req.params
+  await playlistService.removeVideoFromPlaylist({ videoId, playlistId })
+  return res.json({
+    message: PLAYLIST_MESSAGES.REMOVE_VIDEO_FROM_PLAYLIST_SUCCEED
   })
 }
