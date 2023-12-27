@@ -6,6 +6,7 @@ import Bookmark from '~/models/schemas/Bookmark.schema'
 import Comment from '~/models/schemas/Comment.schema'
 import Image from '~/models/schemas/Image.schema'
 import Playlist from '~/models/schemas/Playlist.schema'
+import PlaylistVideo from '~/models/schemas/PlaylistVideo.schema'
 import Post from '~/models/schemas/Post.schema'
 import Reaction from '~/models/schemas/Reaction.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
@@ -99,6 +100,10 @@ class DatabaseService {
 
   get playlists(): Collection<Playlist> {
     return this.db.collection(ENV_CONFIG.DB_PLAYLISTS_COLLECTION_NAME)
+  }
+
+  get playlistVideos(): Collection<PlaylistVideo> {
+    return this.db.collection(ENV_CONFIG.DB_PLAYLIST_VIDEOS_COLLECTION_NAME)
   }
 }
 

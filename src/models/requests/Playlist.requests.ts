@@ -20,3 +20,9 @@ export type UpdatePlaylistReqBody = {
 export type PlaylistIdReqParams = ParamsDictionary & {
   playlistId: string
 }
+
+// Params: Thêm video vào playlist
+export type AddVideoToPlaylistReqParams = ParamsDictionary & {
+  videoId: string
+  playlistId: string
+}

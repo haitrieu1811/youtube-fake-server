@@ -3,7 +3,12 @@ import { ParamsDictionary } from 'express-serve-static-core'
 
 import { PLAYLIST_MESSAGES } from '~/constants/messages'
 import { TokenPayload } from '~/models/requests/Account.requests'
-import { CreatePlaylistReqBody, PlaylistIdReqParams, UpdatePlaylistReqBody } from '~/models/requests/Playlist.requests'
+import {
+  AddVideoToPlaylistReqParams,
+  CreatePlaylistReqBody,
+  PlaylistIdReqParams,
+  UpdatePlaylistReqBody
+} from '~/models/requests/Playlist.requests'
 import playlistService from '~/services/playlist.services'
 
 // Tạo playlist
@@ -36,5 +41,15 @@ export const deletePlaylistController = async (req: Request<PlaylistIdReqParams>
   await playlistService.deletePlaylist(req.params.playlistId)
   return res.json({
     message: PLAYLIST_MESSAGES.DELETE_PLAYLIST_SUCCEED
+  })
+}
+
+// Thêm video vào playlist
+export const addVideoToPlaylistController = async (req: Request<AddVideoToPlaylistReqParams>, res: Response) => {
+  const { videoId, playlistId } = req.params
+  const result = await playlistService.addVideoToPlaylist({ videoId, playlistId })
+  return res.json({
+    message: PLAYLIST_MESSAGES.ADD_VIDEO_TO_PLAYLIST_SUCCEED,
+    data: result
   })
 }

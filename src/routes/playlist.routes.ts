@@ -1,6 +1,7 @@
 import { Router } from 'express'
 
 import {
+  addVideoToPlaylistController,
   createPlaylistController,
   deletePlaylistController,
   updatePlaylistController
@@ -11,8 +12,10 @@ import { filterReqBodyMiddleware } from '~/middlewares/common.middlewares'
 import {
   createPlaylistValidator,
   playlistIdValidator,
-  updatePlaylistValidator
+  updatePlaylistValidator,
+  videoAlreadyInPlaylistValidator
 } from '~/middlewares/playlist.middlewares'
+import { videoIdValidator } from '~/middlewares/video.middlewares'
 import { UpdatePlaylistReqBody } from '~/models/requests/Playlist.requests'
 
 const playlistRouter = Router()
@@ -44,6 +47,17 @@ playlistRouter.delete(
   verifiedAccountValidator,
   playlistIdValidator,
   wrapRequestHandler(deletePlaylistController)
+)
+
+// Thêm video vào playlist
+playlistRouter.post(
+  '/:playlistId/add-to-playlist/video/:videoId',
+  accessTokenValidator,
+  verifiedAccountValidator,
+  playlistIdValidator,
+  videoIdValidator,
+  videoAlreadyInPlaylistValidator,
+  wrapRequestHandler(addVideoToPlaylistController)
 )
 
 export default playlistRouter

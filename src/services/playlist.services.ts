@@ -3,6 +3,7 @@ import { ObjectId } from 'mongodb'
 import { CreatePlaylistReqBody, UpdatePlaylistReqBody } from '~/models/requests/Playlist.requests'
 import Playlist from '~/models/schemas/Playlist.schema'
 import databaseService from './database.services'
+import PlaylistVideo from '~/models/schemas/PlaylistVideo.schema'
 
 class PlaylistService {
   // Tạo playlist
@@ -47,6 +48,20 @@ class PlaylistService {
   async deletePlaylist(playlistId: string) {
     await databaseService.playlists.deleteOne({ _id: new ObjectId(playlistId) })
     return true
+  }
+
+  // Thêm video vào playlist
+  async addVideoToPlaylist({ videoId, playlistId }: { videoId: string; playlistId: string }) {
+    const { insertedId } = await databaseService.playlistVideos.insertOne(
+      new PlaylistVideo({
+        videoId: new ObjectId(videoId),
+        playlistId: new ObjectId(playlistId)
+      })
+    )
+    const newPlaylistVideo = await databaseService.playlistVideos.findOne({ _id: insertedId })
+    return {
+      playlistVideo: newPlaylistVideo
+    }
   }
 }
 
