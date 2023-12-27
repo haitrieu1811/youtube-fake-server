@@ -3,6 +3,7 @@ import { Router } from 'express'
 import {
   createPostController,
   deletePostsController,
+  getPostDetailController,
   getPostsInProfilePageController,
   updatePostController
 } from '~/controllers/post.controllers'
@@ -57,10 +58,17 @@ postRouter.delete(
 postRouter.get(
   '/account/:accountId',
   isLoggedAccountValidator(accessTokenValidator),
-  isLoggedAccountValidator(verifiedAccountValidator),
   accountIdValidator,
   paginationValidator,
   wrapRequestHandler(getPostsInProfilePageController)
+)
+
+// Xem chi tiết bài viết
+postRouter.get(
+  '/:postId',
+  isLoggedAccountValidator(accessTokenValidator),
+  postIdValidator,
+  wrapRequestHandler(getPostDetailController)
 )
 
 export default postRouter

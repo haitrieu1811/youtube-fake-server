@@ -59,3 +59,13 @@ export const getPostsInProfilePageController = async (
     }
   })
 }
+
+// Xem chi tiết bài viết
+export const getPostDetailController = async (req: Request<PostIdReqParams>, res: Response) => {
+  const accountId = req.decodedAuthorization?.accountId
+  const result = await postService.getPostDetail({ postId: req.params.postId, accountId })
+  return res.json({
+    message: POST_MESSAGES.GET_POST_DETAIL_SUCCEED,
+    data: result
+  })
+}

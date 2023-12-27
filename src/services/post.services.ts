@@ -295,6 +295,203 @@ class PostService {
       totalPages: Math.ceil(totalRows / _limit)
     }
   }
+
+  // Xem chi tiết bài viết
+  async getPostDetail({ postId, accountId }: { postId: string; accountId?: string }) {
+    const post = await databaseService.posts
+      .aggregate([
+        {
+          $match: {
+            _id: new ObjectId(postId)
+          }
+        },
+        {
+          $lookup: {
+            from: 'accounts',
+            localField: 'accountId',
+            foreignField: '_id',
+            as: 'author'
+          }
+        },
+        {
+          $unwind: {
+            path: '$author'
+          }
+        },
+        {
+          $lookup: {
+            from: 'images',
+            localField: 'images',
+            foreignField: '_id',
+            as: 'images'
+          }
+        },
+        {
+          $lookup: {
+            from: 'reactions',
+            localField: '_id',
+            foreignField: 'contentId',
+            as: 'reactions'
+          }
+        },
+        {
+          $lookup: {
+            from: 'images',
+            localField: 'author.avatar',
+            foreignField: '_id',
+            as: 'authorAvatar'
+          }
+        },
+        {
+          $unwind: {
+            path: '$authorAvatar',
+            preserveNullAndEmptyArrays: true
+          }
+        },
+        {
+          $addFields: {
+            images: {
+              $map: {
+                input: '$images',
+                as: 'image',
+                in: {
+                  $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$$image.name']
+                }
+              }
+            },
+            likes: {
+              $filter: {
+                input: '$reactions',
+                as: 'reaction',
+                cond: {
+                  $eq: ['$$reaction.type', ReactionType.Like]
+                }
+              }
+            },
+            dislikes: {
+              $filter: {
+                input: '$reactions',
+                as: 'reaction',
+                cond: {
+                  $eq: ['$$reaction.type', ReactionType.Dislike]
+                }
+              }
+            },
+            reactionOfUser: {
+              $filter: {
+                input: '$reactions',
+                as: 'reaction',
+                cond: {
+                  $eq: ['$$reaction.accountId', new ObjectId(accountId)]
+                }
+              }
+            },
+            'author.avatar': {
+              $cond: {
+                if: '$authorAvatar',
+                then: {
+                  $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$authorAvatar.name']
+                },
+                else: ''
+              }
+            }
+          }
+        },
+        {
+          $unwind: {
+            path: '$reactionOfUser',
+            preserveNullAndEmptyArrays: true
+          }
+        },
+        {
+          $addFields: {
+            likeCount: {
+              $size: '$likes'
+            },
+            dislikeCount: {
+              $size: '$dislikes'
+            },
+            isLiked: {
+              $cond: {
+                if: {
+                  $and: [
+                    '$reactionOfUser',
+                    {
+                      $eq: ['$reactionOfUser.type', ReactionType.Like]
+                    }
+                  ]
+                },
+                then: true,
+                else: false
+              }
+            },
+            isDisliked: {
+              $cond: {
+                if: {
+                  $and: [
+                    '$reactionOfUser',
+                    {
+                      $eq: ['$reactionOfUser.type', ReactionType.Dislike]
+                    }
+                  ]
+                },
+                then: true,
+                else: false
+              }
+            }
+          }
+        },
+        {
+          $group: {
+            _id: '$_id',
+            author: {
+              $first: '$author'
+            },
+            images: {
+              $first: '$images'
+            },
+            content: {
+              $first: '$content'
+            },
+            likeCount: {
+              $first: '$likeCount'
+            },
+            dislikeCount: {
+              $first: '$dislikeCount'
+            },
+            isLiked: {
+              $first: '$isLiked'
+            },
+            isDisliked: {
+              $first: '$isDisliked'
+            },
+            createdAt: {
+              $first: '$createdAt'
+            },
+            updatedAt: {
+              $first: '$updatedAt'
+            }
+          }
+        },
+        {
+          $project: {
+            'author.email': 0,
+            'author.password': 0,
+            'author.bio': 0,
+            'author.cover': 0,
+            'author.role': 0,
+            'author.status': 0,
+            'author.verify': 0,
+            'author.forgotPasswordToken': 0,
+            'author.verifyEmailToken': 0
+          }
+        }
+      ])
+      .toArray()
+    return {
+      post
+    }
+  }
 }
 
 const postService = new PostService()

@@ -201,5 +201,6 @@ export const POST_MESSAGES = {
   POST_IDS_CANNOT_BE_EMPTY: 'Post ids không được rỗng',
   POST_IDS_IS_INVALID: 'Post ids không hợp lệ',
   POST_IDS_AUTHOR_IS_INVALID: 'Bạn không phải là tác giả của một trong số các bài viết',
-  GET_POSTS_IN_PROFILE_PAGE_SUCCEED: 'Lấy danh sách bài viết của trang cá nhân thành công'
+  GET_POSTS_IN_PROFILE_PAGE_SUCCEED: 'Lấy danh sách bài viết của trang cá nhân thành công',
+  GET_POST_DETAIL_SUCCEED: 'Lấy chi tiết bài viết thành công'
 } as const
