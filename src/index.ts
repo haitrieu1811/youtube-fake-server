@@ -12,6 +12,7 @@ import playlistRouter from './routes/playlist.routes'
 import postRouter from './routes/post.routes'
 import reactionRouter from './routes/reaction.routes'
 import reportRouter from './routes/report.routes'
+import searchRouter from './routes/search.routes'
 import staticRouter from './routes/static.routes'
 import subscriptionRouter from './routes/subscription.routes'
 import videoRouter from './routes/video.routes'
@@ -48,6 +49,7 @@ app.use('/comments', commentRouter)
 app.use('/reports', reportRouter)
 app.use('/posts', postRouter)
 app.use('/playlists', playlistRouter)
+app.use('/search', searchRouter)
 app.use(defaultErrorHandler)
 
 app.listen(port, () => {

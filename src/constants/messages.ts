@@ -225,3 +225,8 @@ export const PLAYLIST_MESSAGES = {
   GET_VIDEOS_FROM_PLAYLIST_SUCCEED: 'Lấy danh sách video từ playlist thành công',
   GET_PLAYLISTS_SUCCEED: 'Lấy danh sách playlist thành công'
 } as const
+
+export const SEARCH_MESSAGES = {
+  SEARCH_SUCCEED: 'Tìm kiếm thành công',
+  SEARCH_QUERY_IS_REQUIRED: 'Search query là bắt buộc'
+} as const
