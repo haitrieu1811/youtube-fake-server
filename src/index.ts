@@ -20,7 +20,15 @@ import databaseService from './services/database.services'
 
 initFolders()
 databaseService.connect().then(() => {
-  databaseService.indexSubscriptions()
+  databaseService.indexAccounts()
+  databaseService.indexRefreshTokens()
+  databaseService.indexComments()
+  databaseService.indexPlaylists()
+  databaseService.indexPosts()
+  databaseService.indexReactions()
+  databaseService.indexReports()
+  databaseService.indexVideos()
+  databaseService.indexWatchHistories()
 })
 
 const app = express()
