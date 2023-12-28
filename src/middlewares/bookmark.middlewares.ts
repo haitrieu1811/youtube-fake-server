@@ -1,4 +1,4 @@
-import { Request } from 'express'
+import { Request, Response, NextFunction } from 'express'
 import { checkSchema } from 'express-validator'
 import { ObjectId } from 'mongodb'
 
@@ -7,6 +7,7 @@ import { BOOKMARK_MESSAGES } from '~/constants/messages'
 import { validate } from '~/lib/validation'
 import { ErrorWithStatus } from '~/models/Errors'
 import { TokenPayload } from '~/models/requests/Account.requests'
+import { VideoIdReqParams } from '~/models/requests/Video.requests'
 import databaseService from '~/services/database.services'
 
 // Bookmark id validator
@@ -50,3 +51,22 @@ export const bookmarkIdValidator = validate(
     ['params']
   )
 )
+
+// Yêu cầu chưa bookmark video
+export const isUnbookmarkValidator = async (req: Request<VideoIdReqParams>, res: Response, next: NextFunction) => {
+  const { videoId } = req.params
+  const { accountId } = req.decodedAuthorization as TokenPayload
+  const bookmark = await databaseService.bookmarks.findOne({
+    accountId: new ObjectId(accountId),
+    videoId: new ObjectId(videoId)
+  })
+  if (bookmark) {
+    return next(
+      new ErrorWithStatus({
+        message: BOOKMARK_MESSAGES.ALREADY_BOOKMARK_THIS_VIDEO,
+        status: HttpStatusCode.BadRequest
+      })
+    )
+  }
+  return next()
+}

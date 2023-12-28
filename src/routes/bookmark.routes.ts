@@ -3,7 +3,7 @@ import { Router } from 'express'
 import { createBookmarkController, deleteBookmarkController } from '~/controllers/bookmark.controllers'
 import { wrapRequestHandler } from '~/lib/handlers'
 import { accessTokenValidator, verifiedAccountValidator } from '~/middlewares/account.middlewares'
-import { bookmarkIdValidator } from '~/middlewares/bookmark.middlewares'
+import { bookmarkIdValidator, isUnbookmarkValidator } from '~/middlewares/bookmark.middlewares'
 import { videoIdValidator } from '~/middlewares/video.middlewares'
 
 const bookmarkRouter = Router()
@@ -14,6 +14,7 @@ bookmarkRouter.post(
   accessTokenValidator,
   verifiedAccountValidator,
   videoIdValidator,
+  isUnbookmarkValidator,
   wrapRequestHandler(createBookmarkController)
 )
 
