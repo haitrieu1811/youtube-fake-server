@@ -7,13 +7,17 @@ import {
   deleteVideosController,
   getPublicVideosController,
   getVideoDetailWhenLoggedController,
-  getVideoDetailWhenNotLoggedController,
   getVideosOfMeController,
   updateVideoCategoryController,
   updateVideoController
 } from '~/controllers/video.controllers'
 import { wrapRequestHandler } from '~/lib/handlers'
-import { accessTokenValidator, adminRoleValidator, verifiedAccountValidator } from '~/middlewares/account.middlewares'
+import {
+  accessTokenValidator,
+  adminRoleValidator,
+  isLoggedAccountValidator,
+  verifiedAccountValidator
+} from '~/middlewares/account.middlewares'
 import { filterReqBodyMiddleware, paginationValidator } from '~/middlewares/common.middlewares'
 import {
   authorOfVideoCategoryValidator,
@@ -109,13 +113,10 @@ videoRouter.get(
 
 // Xem thông tin chi tiết video
 videoRouter.get(
-  '/:videoId/logged',
-  accessTokenValidator,
-  videoIdValidator,
+  '/:videoId',
+  isLoggedAccountValidator(accessTokenValidator),
+  isLoggedAccountValidator(videoIdValidator),
   wrapRequestHandler(getVideoDetailWhenLoggedController)
 )
-
-// Xem thông tin chi tiết video
-videoRouter.get('/:videoId/not-logged', videoIdValidator, wrapRequestHandler(getVideoDetailWhenNotLoggedController))
 
 export default videoRouter
