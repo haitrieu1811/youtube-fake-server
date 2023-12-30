@@ -4,6 +4,7 @@ import mime from 'mime'
 import path from 'path'
 import { rimrafSync } from 'rimraf'
 import sharp from 'sharp'
+import toArray from 'lodash/toArray'
 
 import { UPLOAD_IMAGE_DIR, UPLOAD_VIDEO_DIR } from '~/constants/dir'
 import { EncodingStatus } from '~/constants/enum'
@@ -145,9 +146,9 @@ class MediaService {
           name: imageName
         })
     )
-    await databaseService.images.insertMany(imagesInsert)
+    const { insertedIds } = await databaseService.images.insertMany(imagesInsert)
     return {
-      imageNames: result
+      imageIds: toArray(insertedIds)
     }
   }
 

@@ -494,13 +494,21 @@ class AccountService {
 
   // Cập nhật tài khoản đăng nhập
   async updateMe({ accountId, body }: { accountId: string; body: UpdateMeReqBody }) {
-    const _body = omitBy(body, isUndefined)
+    const { avatar, cover } = body
+    const bodyConfig = omitBy(
+      {
+        ...body,
+        avatar: avatar ? new ObjectId(avatar) : undefined,
+        cover: cover ? new ObjectId(cover) : undefined
+      },
+      isUndefined
+    )
     const updatedAccount = (await databaseService.accounts.findOneAndUpdate(
       {
         _id: new ObjectId(accountId)
       },
       {
-        $set: _body,
+        $set: bodyConfig,
         $currentDate: {
           updatedAt: true
         }

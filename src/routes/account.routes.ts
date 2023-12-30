@@ -106,7 +106,7 @@ accountRouter.patch(
   accessTokenValidator,
   verifiedAccountValidator,
   updateMeValidator,
-  filterReqBodyMiddleware<UpdateMeReqBody>(['username', 'channelName', 'bio', 'avatar', 'bio']),
+  filterReqBodyMiddleware<UpdateMeReqBody>(['username', 'channelName', 'bio', 'avatar', 'cover']),
   wrapRequestHandler(updateMeController)
 )
 
