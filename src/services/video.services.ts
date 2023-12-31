@@ -60,6 +60,29 @@ class VideoService {
     return true
   }
 
+  // Lấy danh sách danh mục video
+  async getVideoCategories(query: PaginationReqQuery) {
+    const { page, limit } = query
+    const _page = Number(page) || 1
+    const _limit = Number(limit) || 20
+    const skip = (_page - 1) * _limit
+    const [categories, totalRows] = await Promise.all([
+      databaseService.videoCategories
+        .find({}, { projection: { accountId: 0 } })
+        .skip(skip)
+        .limit(_limit)
+        .toArray(),
+      databaseService.videoCategories.countDocuments({})
+    ])
+    return {
+      categories,
+      page: _page,
+      limit: _limit,
+      totalRows,
+      totalPages: Math.ceil(totalRows / _limit)
+    }
+  }
+
   // Tạo video mới
   async createVideo({ body, accountId }: { body: CreateVideoReqBody; accountId: string }) {
     const { insertedId } = await databaseService.videos.insertOne(

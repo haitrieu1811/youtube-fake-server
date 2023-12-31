@@ -6,6 +6,7 @@ import {
   deleteVideoCategoryController,
   deleteVideosController,
   getPublicVideosController,
+  getVideoCategoriesController,
   getVideoDetailWhenLoggedController,
   getVideosOfMeController,
   updateVideoCategoryController,
@@ -68,6 +69,9 @@ videoRouter.delete(
   authorOfVideoCategoryValidator,
   wrapRequestHandler(deleteVideoCategoryController)
 )
+
+// Lấy danh sách danh mục video
+videoRouter.get('/categories', paginationValidator, wrapRequestHandler(getVideoCategoriesController))
 
 // Tạo video
 videoRouter.post(

@@ -109,7 +109,8 @@ export const VIDEO_MESSAGES = {
   VIDEO_IDS_IS_INVALID: 'Video ids không hợp lệ',
   GET_PUBLIC_VIDEOS_SUCCEED: 'Lấy danh sách video công khai thành công',
   GET_VIDEOS_OF_ME_SUCCEED: 'Lấy danh sách video của tôi thành công',
-  GET_VIDEO_DETAIL_SUCCEED: 'Lấy thông tin chi tiết video thành công'
+  GET_VIDEO_DETAIL_SUCCEED: 'Lấy thông tin chi tiết video thành công',
+  GET_VIDEO_CATEGORIES_SUCCEED: 'Lấy danh sách danh mục video thành công'
 } as const
 
 export const REACTION_MESSAGES = {

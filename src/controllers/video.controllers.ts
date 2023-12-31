@@ -50,6 +50,21 @@ export const deleteVideoCategoryController = async (req: Request<VideoCategoryId
   })
 }
 
+// Lấy danh sách danh mục video
+export const getVideoCategoriesController = async (
+  req: Request<ParamsDictionary, any, any, PaginationReqQuery>,
+  res: Response
+) => {
+  const { categories, ...pagination } = await videoService.getVideoCategories(req.query)
+  return res.json({
+    message: VIDEO_MESSAGES.GET_VIDEO_CATEGORIES_SUCCEED,
+    data: {
+      categories,
+      pagination
+    }
+  })
+}
+
 // Tạo video
 export const createVideoController = async (req: Request<ParamsDictionary, any, CreateVideoReqBody>, res: Response) => {
   const { accountId } = req.decodedAuthorization as TokenPayload
