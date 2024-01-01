@@ -24,7 +24,7 @@ export const unsubscribeController = async (req: Request<AccountIdReqParams>, re
   })
 }
 
-// Lấy danh sách kênh đã đăng ký của tôi
+// Lấy danh sách kênh tôi đã đăng ký
 export const getChannelsSubscribedOfMeController = async (
   req: Request<ParamsDictionary, any, any, PaginationReqQuery>,
   res: Response
@@ -36,6 +36,25 @@ export const getChannelsSubscribedOfMeController = async (
   })
   return res.json({
     message: SUBSCRIPTION_MESSAGES.GET_CHANNELS_SUBSCRIBED_OF_ME_SUCCEED,
+    data: {
+      channels,
+      pagination
+    }
+  })
+}
+
+// Lấy danh sách kênh đã đăng ký kênh của tôi
+export const getChannelsSubscribedForMeController = async (
+  req: Request<ParamsDictionary, any, any, PaginationReqQuery>,
+  res: Response
+) => {
+  const { accountId } = req.decodedAuthorization as TokenPayload
+  const { channels, ...pagination } = await subscriptionService.getChannelsSubscribedForMe({
+    accountId,
+    query: req.query
+  })
+  return res.json({
+    message: SUBSCRIPTION_MESSAGES.GET_CHANNELS_SUBSCRIBED_FOR_ME_SUCCEED,
     data: {
       channels,
       pagination

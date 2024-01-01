@@ -32,9 +32,18 @@ subscriptionRouter.delete(
   wrapRequestHandler(unsubscribeController)
 )
 
-// Lấy danh sách kênh đã đăng ký của tôi
+// Lấy danh sách kênh tôi đã đăng ký
 subscriptionRouter.get(
-  '/me',
+  '/of-me',
+  accessTokenValidator,
+  verifiedAccountValidator,
+  paginationValidator,
+  wrapRequestHandler(getChannelsSubscribedOfMeController)
+)
+
+// Lấy danh sách kênh đã đăng ký kênh của tôi
+subscriptionRouter.get(
+  '/for-me',
   accessTokenValidator,
   verifiedAccountValidator,
   paginationValidator,

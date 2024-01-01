@@ -74,7 +74,8 @@ export const SUBSCRIPTION_MESSAGES = {
   ALREADY_SUBSCRIBE: 'Đã đăng ký kênh trước đó',
   UNSUBSCRIBE_SUCCEED: 'Hủy đăng ký kênh thành công',
   NOT_SUBSCRIBED: 'Chưa đăng ký kênh này',
-  GET_CHANNELS_SUBSCRIBED_OF_ME_SUCCEED: 'Lấy danh sách kênh đã đăng ký thành công'
+  GET_CHANNELS_SUBSCRIBED_OF_ME_SUCCEED: 'Lấy danh sách kênh tôi đã đăng ký thành công',
+  GET_CHANNELS_SUBSCRIBED_FOR_ME_SUCCEED: 'Lấy danh sách kênh đã đăng ký kênh của tôi thành công'
 } as const
 
 export const VIDEO_MESSAGES = {
