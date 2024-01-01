@@ -85,12 +85,19 @@ class VideoService {
 
   // Tạo video mới
   async createVideo({ body, accountId }: { body: CreateVideoReqBody; accountId: string }) {
+    const { thumbnail, category } = body
+    const bodyConfig = omitBy(
+      {
+        ...body,
+        thumbnail: thumbnail ? new ObjectId(thumbnail) : undefined,
+        category: category ? new ObjectId(category) : undefined
+      },
+      isUndefined
+    )
     const { insertedId } = await databaseService.videos.insertOne(
       new Video({
-        ...body,
-        accountId: new ObjectId(accountId),
-        thumbnail: new ObjectId(body.thumbnail),
-        category: new ObjectId(body.category)
+        ...(bodyConfig as any),
+        accountId: new ObjectId(accountId)
       })
     )
     const newVideo = await databaseService.videos.findOne({ _id: insertedId })
@@ -142,6 +149,7 @@ class VideoService {
     const match = omitBy(
       {
         audience: VideoAudience.Everyone,
+        isDraft: false,
         category: category ? new ObjectId(category) : undefined
       },
       isUndefined
@@ -175,7 +183,8 @@ class VideoService {
           },
           {
             $unwind: {
-              path: '$thumbnail'
+              path: '$thumbnail',
+              preserveNullAndEmptyArrays: true
             }
           },
           {
@@ -194,8 +203,14 @@ class VideoService {
           },
           {
             $addFields: {
-              thumbnailUrl: {
-                $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$thumbnail.name']
+              thumbnail: {
+                $cond: {
+                  if: '$thumbnail',
+                  then: {
+                    $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$thumbnail.name']
+                  },
+                  else: ''
+                }
               },
               'author.avatar': {
                 $cond: {
@@ -215,7 +230,7 @@ class VideoService {
                 $first: '$idName'
               },
               thumbnail: {
-                $first: '$thumbnailUrl'
+                $first: '$thumbnail'
               },
               title: {
                 $first: '$title'
@@ -303,7 +318,8 @@ class VideoService {
           },
           {
             $unwind: {
-              path: '$thumbnail'
+              path: '$thumbnail',
+              preserveNullAndEmptyArrays: true
             }
           },
           {
@@ -322,8 +338,14 @@ class VideoService {
           },
           {
             $addFields: {
-              thumbnailUrl: {
-                $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$thumbnail.name']
+              thumbnail: {
+                $cond: {
+                  if: '$thumbnail',
+                  then: {
+                    $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$thumbnail.name']
+                  },
+                  else: ''
+                }
               },
               'author.avatar': {
                 $cond: {
@@ -343,7 +365,7 @@ class VideoService {
                 $first: '$idName'
               },
               thumbnail: {
-                $first: '$thumbnailUrl'
+                $first: '$thumbnail'
               },
               title: {
                 $first: '$title'

@@ -6,12 +6,13 @@ type VideoConstructor = {
   _id?: ObjectId
   idName: string
   accountId: ObjectId
-  thumbnail: ObjectId
+  thumbnail?: ObjectId
   title: string
-  category: ObjectId
+  category?: ObjectId
   description?: string
   views?: number
   audience?: VideoAudience
+  isDraft: boolean
   createdAt?: Date
   updatedAt?: Date
 }
@@ -20,12 +21,13 @@ export default class Video {
   _id?: ObjectId
   idName: string
   accountId: ObjectId
-  thumbnail: ObjectId
+  thumbnail: ObjectId | null
   title: string
-  category: ObjectId
+  category: ObjectId | null
   description: string
   views: number
   audience: VideoAudience
+  isDraft: boolean
   createdAt: Date
   updatedAt: Date
 
@@ -39,6 +41,7 @@ export default class Video {
     description,
     views,
     audience,
+    isDraft,
     createdAt,
     updatedAt
   }: VideoConstructor) {
@@ -46,12 +49,13 @@ export default class Video {
     this._id = _id
     this.idName = idName
     this.accountId = accountId
-    this.thumbnail = thumbnail
+    this.thumbnail = thumbnail ?? null
     this.title = title
-    this.category = category
+    this.category = category ?? null
     this.description = description ?? ''
     this.views = views ?? 0
     this.audience = audience ?? VideoAudience.Everyone
+    this.isDraft = isDraft
     this.createdAt = createdAt ?? date
     this.updatedAt = updatedAt ?? date
   }

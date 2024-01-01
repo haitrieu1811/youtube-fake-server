@@ -33,6 +33,7 @@ export type CreateVideoReqBody = {
   category: string
   description?: string
   audience?: VideoAudience
+  isDraft: boolean
 }
 
 // Body: Cập nhật video
@@ -42,6 +43,7 @@ export type UpdateVideoReqBody = {
   category?: string
   description?: string
   audience?: VideoAudience
+  isDraft?: boolean
 }
 
 // Params: Video id

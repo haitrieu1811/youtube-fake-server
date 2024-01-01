@@ -55,9 +55,7 @@ const videoTitleSchema: ParamSchema = {
 
 const videoCategorySchema: ParamSchema = {
   trim: true,
-  notEmpty: {
-    errorMessage: VIDEO_MESSAGES.CATEGORY_IS_REQUIRED
-  },
+  optional: true,
   isMongoId: {
     errorMessage: VIDEO_MESSAGES.CATEGORY_IS_INVALID
   },
@@ -90,9 +88,7 @@ const videoAudienceSchema: ParamSchema = {
 
 const videoThumbnailSchema: ParamSchema = {
   trim: true,
-  notEmpty: {
-    errorMessage: VIDEO_MESSAGES.THUMBNAIL_IS_REQUIRED
-  },
+  optional: true,
   isMongoId: {
     errorMessage: VIDEO_MESSAGES.THUMBNAIL_IS_INVALID
   }
@@ -214,21 +210,13 @@ export const createVideoValidator = validate(
 export const updateVideoValidator = validate(
   checkSchema(
     {
-      thumbnail: {
-        ...videoThumbnailSchema,
-        notEmpty: undefined,
-        optional: true
-      },
+      thumbnail: videoThumbnailSchema,
       title: {
         ...videoTitleSchema,
         notEmpty: undefined,
         optional: true
       },
-      category: {
-        ...videoCategorySchema,
-        notEmpty: undefined,
-        optional: true
-      },
+      category: videoCategorySchema,
       description: videoDescriptionSchema,
       audience: videoAudienceSchema
     },
