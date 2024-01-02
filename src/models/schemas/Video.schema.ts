@@ -6,7 +6,7 @@ type VideoConstructor = {
   _id?: ObjectId
   idName: string
   accountId: ObjectId
-  thumbnail?: ObjectId
+  thumbnail?: ObjectId | null
   title: string
   category?: ObjectId
   description?: string

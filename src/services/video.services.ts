@@ -108,13 +108,21 @@ class VideoService {
 
   // Cập nhật video
   async updateVideo({ body, videoId }: { body: UpdateVideoReqBody; videoId: string }) {
-    const _body = omitBy(body, isUndefined)
+    const { category, thumbnail } = body
+    const bodyConfig = omitBy(
+      {
+        ...body,
+        category: category ? new ObjectId(category) : undefined,
+        thumbnail: thumbnail ? new ObjectId(thumbnail) : undefined
+      },
+      isUndefined
+    )
     const updatedVideo = await databaseService.videos.findOneAndUpdate(
       {
         _id: new ObjectId(videoId)
       },
       {
-        $set: _body,
+        $set: bodyConfig,
         $currentDate: {
           updatedAt: true
         }
@@ -202,6 +210,65 @@ class VideoService {
             }
           },
           {
+            $lookup: {
+              from: 'comments',
+              localField: '_id',
+              foreignField: 'contentId',
+              as: 'comments'
+            }
+          },
+          {
+            $lookup: {
+              from: 'reactions',
+              localField: '_id',
+              foreignField: 'contentId',
+              as: 'reactions'
+            }
+          },
+          {
+            $lookup: {
+              from: 'videoCategories',
+              localField: 'category',
+              foreignField: '_id',
+              as: 'category'
+            }
+          },
+          {
+            $unwind: {
+              path: '$category',
+              preserveNullAndEmptyArrays: true
+            }
+          },
+          {
+            $addFields: {
+              likes: {
+                $filter: {
+                  input: '$reactions',
+                  as: 'item',
+                  cond: {
+                    $eq: ['$$item.type', ReactionType.Like]
+                  }
+                }
+              },
+              dislikes: {
+                $filter: {
+                  input: '$reactions',
+                  as: 'item',
+                  cond: {
+                    $eq: ['$$item.type', ReactionType.Dislike]
+                  }
+                }
+              },
+              category: {
+                $cond: {
+                  if: '$category',
+                  then: '$category',
+                  else: null
+                }
+              }
+            }
+          },
+          {
             $addFields: {
               thumbnail: {
                 $cond: {
@@ -220,6 +287,15 @@ class VideoService {
                   },
                   else: ''
                 }
+              },
+              commentCount: {
+                $size: '$comments'
+              },
+              likeCount: {
+                $size: '$likes'
+              },
+              dislikeCount: {
+                $size: '$dislikes'
               }
             }
           },
@@ -238,8 +314,26 @@ class VideoService {
               author: {
                 $first: '$author'
               },
+              isDraft: {
+                $first: '$isDraft'
+              },
+              audience: {
+                $first: '$audience'
+              },
+              category: {
+                $first: '$category'
+              },
               viewCount: {
                 $first: '$views'
+              },
+              commentCount: {
+                $first: '$commentCount'
+              },
+              likeCount: {
+                $first: '$likeCount'
+              },
+              dislikeCount: {
+                $first: '$dislikeCount'
               },
               createdAt: {
                 $first: '$createdAt'
@@ -258,7 +352,8 @@ class VideoService {
               'author.forgotPasswordToken': 0,
               'author.verifyEmailToken': 0,
               'author.cover': 0,
-              'author.bio': 0
+              'author.bio': 0,
+              'category.accountId': 0
             }
           },
           {
@@ -337,6 +432,65 @@ class VideoService {
             }
           },
           {
+            $lookup: {
+              from: 'comments',
+              localField: '_id',
+              foreignField: 'contentId',
+              as: 'comments'
+            }
+          },
+          {
+            $lookup: {
+              from: 'reactions',
+              localField: '_id',
+              foreignField: 'contentId',
+              as: 'reactions'
+            }
+          },
+          {
+            $lookup: {
+              from: 'videoCategories',
+              localField: 'category',
+              foreignField: '_id',
+              as: 'category'
+            }
+          },
+          {
+            $unwind: {
+              path: '$category',
+              preserveNullAndEmptyArrays: true
+            }
+          },
+          {
+            $addFields: {
+              likes: {
+                $filter: {
+                  input: '$reactions',
+                  as: 'item',
+                  cond: {
+                    $eq: ['$$item.type', ReactionType.Like]
+                  }
+                }
+              },
+              dislikes: {
+                $filter: {
+                  input: '$reactions',
+                  as: 'item',
+                  cond: {
+                    $eq: ['$$item.type', ReactionType.Dislike]
+                  }
+                }
+              },
+              category: {
+                $cond: {
+                  if: '$category',
+                  then: '$category',
+                  else: null
+                }
+              }
+            }
+          },
+          {
             $addFields: {
               thumbnail: {
                 $cond: {
@@ -355,6 +509,15 @@ class VideoService {
                   },
                   else: ''
                 }
+              },
+              commentCount: {
+                $size: '$comments'
+              },
+              likeCount: {
+                $size: '$likes'
+              },
+              dislikeCount: {
+                $size: '$dislikes'
               }
             }
           },
@@ -373,8 +536,26 @@ class VideoService {
               author: {
                 $first: '$author'
               },
+              isDraft: {
+                $first: '$isDraft'
+              },
+              audience: {
+                $first: '$audience'
+              },
+              category: {
+                $first: '$category'
+              },
               viewCount: {
                 $first: '$views'
+              },
+              commentCount: {
+                $first: '$commentCount'
+              },
+              likeCount: {
+                $first: '$likeCount'
+              },
+              dislikeCount: {
+                $first: '$dislikeCount'
               },
               createdAt: {
                 $first: '$createdAt'
@@ -393,7 +574,13 @@ class VideoService {
               'author.forgotPasswordToken': 0,
               'author.verifyEmailToken': 0,
               'author.cover': 0,
-              'author.bio': 0
+              'author.bio': 0,
+              'category.accountId': 0
+            }
+          },
+          {
+            $sort: {
+              createdAt: -1
             }
           },
           {
@@ -589,6 +776,103 @@ class VideoService {
       .toArray()
     return {
       video: videos[0]
+    }
+  }
+
+  // Lấy chi tiết video để cập nhật
+  async getVideoDetailToUpdate(videoId: string) {
+    const video = await databaseService.videos
+      .aggregate([
+        {
+          $match: {
+            _id: new ObjectId(videoId)
+          }
+        },
+        {
+          $lookup: {
+            from: 'images',
+            localField: 'thumbnail',
+            foreignField: '_id',
+            as: 'thumbnail'
+          }
+        },
+        {
+          $unwind: {
+            path: '$thumbnail',
+            preserveNullAndEmptyArrays: true
+          }
+        },
+        {
+          $lookup: {
+            from: 'videoCategories',
+            localField: 'category',
+            foreignField: '_id',
+            as: 'category'
+          }
+        },
+        {
+          $unwind: {
+            path: '$category',
+            preserveNullAndEmptyArrays: true
+          }
+        },
+        {
+          $addFields: {
+            thumbnail: {
+              $cond: {
+                if: '$thumbnail',
+                then: {
+                  $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$thumbnail.name']
+                },
+                else: ''
+              }
+            }
+          }
+        },
+        {
+          $group: {
+            _id: '$_id',
+            idName: {
+              $first: '$idName'
+            },
+            thumbnail: {
+              $first: '$thumbnail'
+            },
+            title: {
+              $first: '$title'
+            },
+            description: {
+              $first: '$description'
+            },
+            viewCount: {
+              $first: '$views'
+            },
+            audience: {
+              $first: '$audience'
+            },
+            isDraft: {
+              $first: '$isDraft'
+            },
+            category: {
+              $first: '$category'
+            },
+            createdAt: {
+              $first: '$createdAt'
+            },
+            updatedAt: {
+              $first: '$updatedAt'
+            }
+          }
+        },
+        {
+          $project: {
+            'category.accountId': 0
+          }
+        }
+      ])
+      .toArray()
+    return {
+      video: video[0]
     }
   }
 }

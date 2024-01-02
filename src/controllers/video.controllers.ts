@@ -126,10 +126,19 @@ export const getVideosOfMeController = async (
   })
 }
 
-// Xem chi tiết video khi đã đăng nhập
-export const getVideoDetailWhenLoggedController = async (req: Request<VideoIdReqParams>, res: Response) => {
+// Xem chi tiết video
+export const getVideoDetailController = async (req: Request<VideoIdReqParams>, res: Response) => {
   const accountId = req.decodedAuthorization?.accountId
   const result = await videoService.getVideoDetail({ accountId, videoId: req.params.videoId })
+  return res.json({
+    message: VIDEO_MESSAGES.GET_VIDEO_DETAIL_SUCCEED,
+    data: result
+  })
+}
+
+// Xem chi tiết video để cập nhật
+export const getVideoDetailToUpdateController = async (req: Request<VideoIdReqParams>, res: Response) => {
+  const result = await videoService.getVideoDetailToUpdate(req.params.videoId)
   return res.json({
     message: VIDEO_MESSAGES.GET_VIDEO_DETAIL_SUCCEED,
     data: result

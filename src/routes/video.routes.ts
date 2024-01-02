@@ -7,7 +7,8 @@ import {
   deleteVideosController,
   getPublicVideosController,
   getVideoCategoriesController,
-  getVideoDetailWhenLoggedController,
+  getVideoDetailController,
+  getVideoDetailToUpdateController,
   getVideosOfMeController,
   updateVideoCategoryController,
   updateVideoController
@@ -120,7 +121,16 @@ videoRouter.get(
   '/:videoId',
   isLoggedAccountValidator(accessTokenValidator),
   isLoggedAccountValidator(videoIdValidator),
-  wrapRequestHandler(getVideoDetailWhenLoggedController)
+  wrapRequestHandler(getVideoDetailController)
+)
+
+// Xem thông tin chi tiết video
+videoRouter.get(
+  '/:videoId/to-update',
+  accessTokenValidator,
+  videoIdValidator,
+  authorOfVideoValidator,
+  wrapRequestHandler(getVideoDetailToUpdateController)
 )
 
 export default videoRouter
