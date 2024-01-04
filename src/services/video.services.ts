@@ -875,6 +875,27 @@ class VideoService {
       video: video[0]
     }
   }
+
+  // Xóa hình thu nhỏ video
+  async deleteThumbnailImage(videoId: string) {
+    const updatedVideo = await databaseService.videos.findOneAndUpdate(
+      {
+        _id: new ObjectId(videoId)
+      },
+      {
+        $set: {
+          thumbnail: null
+        },
+        $currentDate: {
+          updatedAt: true
+        }
+      }
+    )
+    if (updatedVideo && updatedVideo.thumbnail) {
+      await databaseService.images.deleteOne({ _id: updatedVideo.thumbnail })
+    }
+    return true
+  }
 }
 
 const videoService = new VideoService()
