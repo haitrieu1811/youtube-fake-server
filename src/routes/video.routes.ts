@@ -8,11 +8,11 @@ import {
   deleteVideosController,
   getPublicVideosController,
   getVideoCategoriesController,
-  getVideoDetailController,
   getVideoDetailToUpdateController,
   getVideosOfMeController,
   updateVideoCategoryController,
-  updateVideoController
+  updateVideoController,
+  watchVideoController
 } from '~/controllers/video.controllers'
 import { wrapRequestHandler } from '~/lib/handlers'
 import {
@@ -29,6 +29,7 @@ import {
   createVideoValidator,
   deleteVideosValidator,
   getPublicVideosValidator,
+  idNameValidator,
   updateVideoCategoryValidator,
   updateVideoValidator,
   videoCategoryIdValidator,
@@ -117,12 +118,12 @@ videoRouter.get(
   wrapRequestHandler(getVideosOfMeController)
 )
 
-// Xem thông tin chi tiết video
+// Xem video
 videoRouter.get(
-  '/:videoId',
+  '/watch/idName/:idName',
   isLoggedAccountValidator(accessTokenValidator),
-  isLoggedAccountValidator(videoIdValidator),
-  wrapRequestHandler(getVideoDetailController)
+  idNameValidator,
+  wrapRequestHandler(watchVideoController)
 )
 
 // Xem thông tin chi tiết video

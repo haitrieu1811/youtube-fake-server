@@ -332,3 +332,33 @@ export const getPublicVideosValidator = validate(
     ['query']
   )
 )
+
+// Kiểm tra idName (nanoId)
+export const idNameValidator = validate(
+  checkSchema(
+    {
+      idName: {
+        trim: true,
+        custom: {
+          options: async (value: string) => {
+            if (!value) {
+              throw new ErrorWithStatus({
+                message: VIDEO_MESSAGES.ID_NAME_IS_REQUIRED,
+                status: HttpStatusCode.BadRequest
+              })
+            }
+            const video = await databaseService.videos.findOne({ idName: value })
+            if (!video) {
+              throw new ErrorWithStatus({
+                message: VIDEO_MESSAGES.VIDEO_NOT_FOUND,
+                status: HttpStatusCode.NotFound
+              })
+            }
+            return true
+          }
+        }
+      }
+    },
+    ['params']
+  )
+)

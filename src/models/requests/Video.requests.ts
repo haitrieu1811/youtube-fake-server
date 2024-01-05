@@ -51,12 +51,17 @@ export type VideoIdReqParams = ParamsDictionary & {
   videoId: string
 }
 
+// Params: idName
+export type IdNameReqParams = ParamsDictionary & {
+  idName: string
+}
+
 // Body: Xóa video
 export type DeleteVideosReqBody = {
   videoIds: string[]
 }
 
-// Lấy danh sách các video công khai
+// Query: Lấy danh sách các video công khai
 export type GetPublicVideosReqQuery = Query &
   PaginationReqQuery & {
     category?: string

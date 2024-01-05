@@ -602,13 +602,13 @@ class VideoService {
     }
   }
 
-  // Xem thông tin chi tiết video khi chưa đã đăng nhập
-  async getVideoDetail({ videoId, accountId }: { videoId: string; accountId?: string }) {
+  // Xem video
+  async watchVideo({ idName, accountId }: { idName: string; accountId?: string }) {
     const videos = await databaseService.videos
       .aggregate([
         {
           $match: {
-            _id: new ObjectId(videoId)
+            idName
           }
         },
         {
@@ -626,6 +626,20 @@ class VideoService {
         },
         {
           $lookup: {
+            from: 'images',
+            localField: 'thumbnail',
+            foreignField: '_id',
+            as: 'thumbnail'
+          }
+        },
+        {
+          $unwind: {
+            path: '$thumbnail',
+            preserveNullAndEmptyArrays: true
+          }
+        },
+        {
+          $lookup: {
             from: 'reactions',
             localField: '_id',
             foreignField: 'contentId',
@@ -633,7 +647,24 @@ class VideoService {
           }
         },
         {
+          $lookup: {
+            from: 'reactions',
+            localField: '_id',
+            foreignField: 'contentId',
+            as: 'likesAndDislikes'
+          }
+        },
+        {
           $addFields: {
+            thumbnail: {
+              $cond: {
+                if: '$thumbnail',
+                then: {
+                  $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$thumbnail.name']
+                },
+                else: ''
+              }
+            },
             reactions: {
               $filter: {
                 input: '$reactions',
@@ -641,6 +672,36 @@ class VideoService {
                   $eq: ['$$reaction.accountId', new ObjectId(accountId)]
                 },
                 as: 'reaction'
+              }
+            },
+            likes: {
+              $cond: {
+                if: '$likesAndDislikes',
+                then: {
+                  $filter: {
+                    input: '$likesAndDislikes',
+                    as: 'item',
+                    cond: {
+                      $eq: ['$$item.type', ReactionType.Like]
+                    }
+                  }
+                },
+                else: []
+              }
+            },
+            dislikes: {
+              $cond: {
+                if: '$likesAndDislikes',
+                then: {
+                  $filter: {
+                    input: '$likesAndDislikes',
+                    as: 'item',
+                    cond: {
+                      $eq: ['$$item.type', ReactionType.Dislike]
+                    }
+                  }
+                },
+                else: []
               }
             }
           }
@@ -670,6 +731,12 @@ class VideoService {
                 then: true,
                 else: false
               }
+            },
+            likeCount: {
+              $size: '$likes'
+            },
+            dislikeCount: {
+              $size: '$dislikes'
             }
           }
         },
@@ -683,7 +750,7 @@ class VideoService {
         },
         {
           $addFields: {
-            subscriptionCount: {
+            subscribeCount: {
               $size: '$subscriptions'
             },
             subscriptions: {
@@ -722,7 +789,8 @@ class VideoService {
             },
             'channel.avatar': {
               $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$channelAvatar.name']
-            }
+            },
+            'channel.subscribeCount': '$subscribeCount'
           }
         },
         {
@@ -734,11 +802,20 @@ class VideoService {
             title: {
               $first: '$title'
             },
+            thumbnail: {
+              $first: '$thumbnail'
+            },
             description: {
               $first: '$description'
             },
             viewCount: {
               $first: '$views'
+            },
+            likeCount: {
+              $first: '$likeCount'
+            },
+            dislikeCount: {
+              $first: '$dislikeCount'
             },
             isLiked: {
               $first: '$isLiked'

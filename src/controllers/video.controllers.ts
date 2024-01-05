@@ -10,6 +10,7 @@ import {
   CreateVideoReqBody,
   DeleteVideosReqBody,
   GetPublicVideosReqQuery,
+  IdNameReqParams,
   UpdateVideoCategoryReqBody,
   UpdateVideoReqBody,
   VideoCategoryIdReqParams,
@@ -127,9 +128,9 @@ export const getVideosOfMeController = async (
 }
 
 // Xem chi tiết video
-export const getVideoDetailController = async (req: Request<VideoIdReqParams>, res: Response) => {
+export const watchVideoController = async (req: Request<IdNameReqParams>, res: Response) => {
   const accountId = req.decodedAuthorization?.accountId
-  const result = await videoService.getVideoDetail({ accountId, videoId: req.params.videoId })
+  const result = await videoService.watchVideo({ accountId, idName: req.params.idName })
   return res.json({
     message: VIDEO_MESSAGES.GET_VIDEO_DETAIL_SUCCEED,
     data: result
