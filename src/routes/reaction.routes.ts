@@ -9,7 +9,7 @@ import { wrapRequestHandler } from '~/lib/handlers'
 import { accessTokenValidator, verifiedAccountValidator } from '~/middlewares/account.middlewares'
 import {
   createReactionValidator,
-  reactionIdValidator,
+  reactionContentIdValidator,
   updateReactionValidator
 } from '~/middlewares/reaction.middlewares'
 
@@ -26,20 +26,20 @@ reactionRouter.post(
 
 // Cập nhật một reaction (video, post, comment)
 reactionRouter.patch(
-  '/:reactionId',
+  '/content/:contentId',
   accessTokenValidator,
   verifiedAccountValidator,
-  reactionIdValidator,
+  reactionContentIdValidator,
   updateReactionValidator,
   wrapRequestHandler(updateReactionController)
 )
 
 // Xóa một reaction
 reactionRouter.delete(
-  '/:reactionId',
+  '/content/:contentId',
   accessTokenValidator,
   verifiedAccountValidator,
-  reactionIdValidator,
+  reactionContentIdValidator,
   wrapRequestHandler(deleteReactionController)
 )
 

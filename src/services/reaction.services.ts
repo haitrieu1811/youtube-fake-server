@@ -24,10 +24,10 @@ class ReactionService {
   }
 
   // Cập nhật một reaction
-  async updateReaction({ reactionId, type }: { reactionId: string; type: ReactionType }) {
+  async updateReaction({ contentId, type }: { contentId: string; type: ReactionType }) {
     const updatedReaction = await databaseService.reactions.findOneAndUpdate(
       {
-        _id: new ObjectId(reactionId)
+        contentId: new ObjectId(contentId)
       },
       {
         $set: {
@@ -47,9 +47,11 @@ class ReactionService {
   }
 
   // Bỏ reaction (video, post, comment)
-  async deleteReaction(reactionId: string) {
-    await databaseService.reactions.deleteOne({ _id: new ObjectId(reactionId) })
-    return true
+  async deleteReaction(contentId: string) {
+    const reaction = await databaseService.reactions.findOneAndDelete({ contentId: new ObjectId(contentId) })
+    return {
+      reaction
+    }
   }
 }
 

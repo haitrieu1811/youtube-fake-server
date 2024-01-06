@@ -3,6 +3,7 @@ import { ParamsDictionary } from 'express-serve-static-core'
 
 import { REACTION_MESSAGES } from '~/constants/messages'
 import { TokenPayload } from '~/models/requests/Account.requests'
+import { ContentIdReqParams } from '~/models/requests/Comment.requests'
 import { CreateReactionReqBody, ReactionIdReqParams, UpdateReactionReqBody } from '~/models/requests/Reaction.request'
 import reactionService from '~/services/reaction.services'
 
@@ -21,20 +22,21 @@ export const createReactionController = async (
 
 // Cập nhật một reaction (video, post, comment)
 export const updateReactionController = async (
-  req: Request<ReactionIdReqParams, any, UpdateReactionReqBody>,
+  req: Request<ContentIdReqParams, any, UpdateReactionReqBody>,
   res: Response
 ) => {
-  const result = await reactionService.updateReaction({ reactionId: req.params.reactionId, type: req.body.type })
+  const result = await reactionService.updateReaction({ contentId: req.params.contentId, type: req.body.type })
   return res.json({
     message: REACTION_MESSAGES.UPDATE_REACTION_SUCCEED,
     data: result
   })
 }
 
-// Bỏ like (video, post, comment)
-export const deleteReactionController = async (req: Request<ReactionIdReqParams>, res: Response) => {
-  await reactionService.deleteReaction(req.params.reactionId)
+// Xóa reaction (video, post, comment)
+export const deleteReactionController = async (req: Request<ContentIdReqParams>, res: Response) => {
+  const result = await reactionService.deleteReaction(req.params.contentId)
   return res.json({
-    message: REACTION_MESSAGES.DELETE_REACTION_SUCCEED
+    message: REACTION_MESSAGES.DELETE_REACTION_SUCCEED,
+    data: result
   })
 }

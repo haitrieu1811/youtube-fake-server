@@ -782,7 +782,9 @@ class VideoService {
           $addFields: {
             'channel.isSubscribed': {
               $cond: {
-                if: '$subscriptions',
+                if: {
+                  $size: '$subscriptions'
+                },
                 then: true,
                 else: false
               }

@@ -114,28 +114,28 @@ export const updateReactionValidator = validate(
 )
 
 // Kiểm tra reaction id
-export const reactionIdValidator = validate(
+export const reactionContentIdValidator = validate(
   checkSchema(
     {
-      reactionId: {
+      contentId: {
         custom: {
           options: async (value: string, { req }) => {
             if (!value) {
               throw new ErrorWithStatus({
-                message: REACTION_MESSAGES.REACTION_ID_IS_REQUIRED,
+                message: REACTION_MESSAGES.CONTENT_ID_IS_REQUIRED,
                 status: HttpStatusCode.BadRequest
               })
             }
             if (!ObjectId.isValid(value)) {
               throw new ErrorWithStatus({
-                message: REACTION_MESSAGES.REACTION_ID_IS_INVALID,
+                message: REACTION_MESSAGES.CONTENT_ID_IS_INVALID,
                 status: HttpStatusCode.BadRequest
               })
             }
-            const reaction = await databaseService.reactions.findOne({ _id: new ObjectId(value) })
+            const reaction = await databaseService.reactions.findOne({ contentId: new ObjectId(value) })
             if (!reaction) {
               throw new ErrorWithStatus({
-                message: REACTION_MESSAGES.REACTION_NOT_FOUND,
+                message: REACTION_MESSAGES.CONTENT_ID_NOT_FOUND,
                 status: HttpStatusCode.NotFound
               })
             }
