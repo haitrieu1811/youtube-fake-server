@@ -20,9 +20,193 @@ class CommentService {
         replyAccountId: null
       })
     )
-    const newComment = await databaseService.comments.findOne({ _id: insertedId })
+    const newComment = await databaseService.comments
+      .aggregate([
+        {
+          $match: {
+            _id: insertedId
+          }
+        },
+        {
+          $lookup: {
+            from: 'accounts',
+            localField: 'accountId',
+            foreignField: '_id',
+            as: 'author'
+          }
+        },
+        {
+          $unwind: {
+            path: '$author'
+          }
+        },
+        {
+          $lookup: {
+            from: 'images',
+            localField: 'author.avatar',
+            foreignField: '_id',
+            as: 'authorAvatar'
+          }
+        },
+        {
+          $unwind: {
+            path: '$authorAvatar',
+            preserveNullAndEmptyArrays: true
+          }
+        },
+        {
+          $lookup: {
+            from: 'comments',
+            localField: '_id',
+            foreignField: 'parentId',
+            as: 'replies'
+          }
+        },
+        {
+          $lookup: {
+            from: 'reactions',
+            localField: '_id',
+            foreignField: 'contentId',
+            as: 'reactions'
+          }
+        },
+        {
+          $addFields: {
+            replyCount: {
+              $size: '$replies'
+            },
+            likes: {
+              $filter: {
+                input: '$reactions',
+                as: 'reaction',
+                cond: {
+                  $eq: ['$$reaction.type', ReactionType.Like]
+                }
+              }
+            },
+            dislikes: {
+              $filter: {
+                input: '$reactions',
+                as: 'reaction',
+                cond: {
+                  $eq: ['$$reaction.type', ReactionType.Dislike]
+                }
+              }
+            },
+            reactionOfUser: {
+              $filter: {
+                input: '$reactions',
+                as: 'reaction',
+                cond: {
+                  $eq: ['$$reaction.accountId', new ObjectId(accountId)]
+                }
+              }
+            },
+            'author.avatar': {
+              $cond: {
+                if: '$authorAvatar',
+                then: {
+                  $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$authorAvatar.name']
+                },
+                else: ''
+              }
+            }
+          }
+        },
+        {
+          $unwind: {
+            path: '$reactionOfUser',
+            preserveNullAndEmptyArrays: true
+          }
+        },
+        {
+          $addFields: {
+            likeCount: {
+              $size: '$likes'
+            },
+            dislikeCount: {
+              $size: '$dislikes'
+            },
+            isLiked: {
+              $cond: {
+                if: {
+                  $and: [
+                    '$reactionOfUser',
+                    {
+                      $eq: ['$reactionOfUser.type', ReactionType.Like]
+                    }
+                  ]
+                },
+                then: true,
+                else: false
+              }
+            },
+            isDisliked: {
+              $cond: {
+                if: {
+                  $and: [
+                    '$reactionOfUser',
+                    {
+                      $eq: ['$reactionOfUser.type', ReactionType.Dislike]
+                    }
+                  ]
+                },
+                then: true,
+                else: false
+              }
+            }
+          }
+        },
+        {
+          $group: {
+            _id: '$_id',
+            author: {
+              $first: '$author'
+            },
+            content: {
+              $first: '$content'
+            },
+            replyCount: {
+              $first: '$replyCount'
+            },
+            likeCount: {
+              $first: '$likeCount'
+            },
+            dislikeCount: {
+              $first: '$dislikeCount'
+            },
+            isLiked: {
+              $first: '$isLiked'
+            },
+            isDisliked: {
+              $first: '$isDisliked'
+            },
+            createdAt: {
+              $first: '$createdAt'
+            },
+            updatedAt: {
+              $first: '$updatedAt'
+            }
+          }
+        },
+        {
+          $project: {
+            'author.email': 0,
+            'author.password': 0,
+            'author.bio': 0,
+            'author.cover': 0,
+            'author.role': 0,
+            'author.status': 0,
+            'author.verify': 0,
+            'author.forgotPasswordToken': 0,
+            'author.resetPasswordToken': 0,
+            'author.verifyEmailToken': 0
+          }
+        }
+      ])
+      .toArray()
     return {
-      comment: newComment
+      comment: newComment[0]
     }
   }
 
@@ -80,9 +264,193 @@ class CommentService {
         replyAccountId: body.replyAccountId ? new ObjectId(body.replyAccountId) : null
       })
     )
-    const newReplyComment = await databaseService.comments.findOne({ _id: insertedId })
+    const newReplyComment = await databaseService.comments
+      .aggregate([
+        {
+          $match: {
+            _id: insertedId
+          }
+        },
+        {
+          $lookup: {
+            from: 'accounts',
+            localField: 'accountId',
+            foreignField: '_id',
+            as: 'author'
+          }
+        },
+        {
+          $unwind: {
+            path: '$author'
+          }
+        },
+        {
+          $lookup: {
+            from: 'images',
+            localField: 'author.avatar',
+            foreignField: '_id',
+            as: 'authorAvatar'
+          }
+        },
+        {
+          $unwind: {
+            path: '$authorAvatar',
+            preserveNullAndEmptyArrays: true
+          }
+        },
+        {
+          $lookup: {
+            from: 'comments',
+            localField: '_id',
+            foreignField: 'parentId',
+            as: 'replies'
+          }
+        },
+        {
+          $lookup: {
+            from: 'reactions',
+            localField: '_id',
+            foreignField: 'contentId',
+            as: 'reactions'
+          }
+        },
+        {
+          $addFields: {
+            replyCount: {
+              $size: '$replies'
+            },
+            likes: {
+              $filter: {
+                input: '$reactions',
+                as: 'reaction',
+                cond: {
+                  $eq: ['$$reaction.type', ReactionType.Like]
+                }
+              }
+            },
+            dislikes: {
+              $filter: {
+                input: '$reactions',
+                as: 'reaction',
+                cond: {
+                  $eq: ['$$reaction.type', ReactionType.Dislike]
+                }
+              }
+            },
+            reactionOfUser: {
+              $filter: {
+                input: '$reactions',
+                as: 'reaction',
+                cond: {
+                  $eq: ['$$reaction.accountId', new ObjectId(accountId)]
+                }
+              }
+            },
+            'author.avatar': {
+              $cond: {
+                if: '$authorAvatar',
+                then: {
+                  $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$authorAvatar.name']
+                },
+                else: ''
+              }
+            }
+          }
+        },
+        {
+          $unwind: {
+            path: '$reactionOfUser',
+            preserveNullAndEmptyArrays: true
+          }
+        },
+        {
+          $addFields: {
+            likeCount: {
+              $size: '$likes'
+            },
+            dislikeCount: {
+              $size: '$dislikes'
+            },
+            isLiked: {
+              $cond: {
+                if: {
+                  $and: [
+                    '$reactionOfUser',
+                    {
+                      $eq: ['$reactionOfUser.type', ReactionType.Like]
+                    }
+                  ]
+                },
+                then: true,
+                else: false
+              }
+            },
+            isDisliked: {
+              $cond: {
+                if: {
+                  $and: [
+                    '$reactionOfUser',
+                    {
+                      $eq: ['$reactionOfUser.type', ReactionType.Dislike]
+                    }
+                  ]
+                },
+                then: true,
+                else: false
+              }
+            }
+          }
+        },
+        {
+          $group: {
+            _id: '$_id',
+            author: {
+              $first: '$author'
+            },
+            content: {
+              $first: '$content'
+            },
+            replyCount: {
+              $first: '$replyCount'
+            },
+            likeCount: {
+              $first: '$likeCount'
+            },
+            dislikeCount: {
+              $first: '$dislikeCount'
+            },
+            isLiked: {
+              $first: '$isLiked'
+            },
+            isDisliked: {
+              $first: '$isDisliked'
+            },
+            createdAt: {
+              $first: '$createdAt'
+            },
+            updatedAt: {
+              $first: '$updatedAt'
+            }
+          }
+        },
+        {
+          $project: {
+            'author.email': 0,
+            'author.password': 0,
+            'author.bio': 0,
+            'author.cover': 0,
+            'author.role': 0,
+            'author.status': 0,
+            'author.verify': 0,
+            'author.forgotPasswordToken': 0,
+            'author.resetPasswordToken': 0,
+            'author.verifyEmailToken': 0
+          }
+        }
+      ])
+      .toArray()
     return {
-      reply: newReplyComment
+      comment: newReplyComment[0]
     }
   }
 

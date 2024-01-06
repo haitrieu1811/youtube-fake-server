@@ -21,6 +21,7 @@ import {
   replyCommentValidator,
   updateCommentValidator
 } from '~/middlewares/comment.middlewares'
+import { paginationValidator } from '~/middlewares/common.middlewares'
 
 const commentRouter = Router()
 
@@ -60,6 +61,7 @@ commentRouter.get(
   '/content/:contentId',
   isLoggedAccountValidator(accessTokenValidator),
   isLoggedAccountValidator(verifiedAccountValidator),
+  paginationValidator,
   wrapRequestHandler(getCommentsController)
 )
 
@@ -69,6 +71,7 @@ commentRouter.get(
   isLoggedAccountValidator(accessTokenValidator),
   isLoggedAccountValidator(verifiedAccountValidator),
   commentIdValidator,
+  paginationValidator,
   wrapRequestHandler(getRepliesOfCommentController)
 )
 
