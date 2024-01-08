@@ -132,14 +132,17 @@ export const reactionContentIdValidator = validate(
                 status: HttpStatusCode.BadRequest
               })
             }
-            const reaction = await databaseService.reactions.findOne({ contentId: new ObjectId(value) })
+            const { accountId } = (req as Request).decodedAuthorization as TokenPayload
+            const reaction = await databaseService.reactions.findOne({
+              contentId: new ObjectId(value),
+              accountId: new ObjectId(accountId)
+            })
             if (!reaction) {
               throw new ErrorWithStatus({
                 message: REACTION_MESSAGES.CONTENT_ID_NOT_FOUND,
                 status: HttpStatusCode.NotFound
               })
             }
-            const { accountId } = (req as Request).decodedAuthorization as TokenPayload
             if (reaction.accountId.toString() !== accountId) {
               throw new ErrorWithStatus({
                 message: REACTION_MESSAGES.REACTION_AUTHOR_IS_INVALID,
