@@ -3,6 +3,7 @@ import { Router } from 'express'
 import {
   createCommentController,
   deleteCommentController,
+  getCommentDetailController,
   getCommentsController,
   getRepliesOfCommentController,
   replyCommentController,
@@ -73,6 +74,16 @@ commentRouter.get(
   commentIdValidator,
   paginationValidator,
   wrapRequestHandler(getRepliesOfCommentController)
+)
+
+// Lấy chi tiết bình luận
+commentRouter.get(
+  '/:commentId',
+  accessTokenValidator,
+  verifiedAccountValidator,
+  commentIdValidator,
+  authorOfCommentValidator,
+  wrapRequestHandler(getCommentDetailController)
 )
 
 export default commentRouter

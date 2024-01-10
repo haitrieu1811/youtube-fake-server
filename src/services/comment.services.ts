@@ -935,6 +935,14 @@ class CommentService {
       totalPages: Math.ceil(totalRows / _limit)
     }
   }
+
+  // Lấy thông tin một bình luận
+  async getCommentDetail(commentId: string) {
+    const comment = await databaseService.comments.findOne({ _id: new ObjectId(commentId) })
+    return {
+      comment
+    }
+  }
 }
 
 const commentService = new CommentService()

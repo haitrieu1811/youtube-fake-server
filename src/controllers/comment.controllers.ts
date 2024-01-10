@@ -98,3 +98,12 @@ export const getRepliesOfCommentController = async (
     }
   })
 }
+
+// Lấy thông tin một bình luận
+export const getCommentDetailController = async (req: Request<CommentIdReqParams>, res: Response) => {
+  const result = await commentService.getCommentDetail(req.params.commentId)
+  return res.json({
+    message: COMMENT_MESSAGES.GET_COMMENT_DETAIL_SUCCEED,
+    data: result
+  })
+}
