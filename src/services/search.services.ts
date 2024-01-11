@@ -99,6 +99,9 @@ class SearchService {
               title: {
                 $first: '$title'
               },
+              description: {
+                $first: '$description'
+              },
               author: {
                 $first: '$author'
               },
