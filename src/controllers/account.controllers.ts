@@ -160,7 +160,8 @@ export const updateMeController = async (req: Request<ParamsDictionary, any, Upd
 
 // Lấy thông tin trang cá nhân theo username
 export const getProfilePageController = async (req: Request<UsernameReqParams>, res: Response) => {
-  const result = await accountService.getProfilePage(req.params.username)
+  const accountId = req.decodedAuthorization?.accountId
+  const result = await accountService.getProfilePage({ username: req.params.username, referenceAccountId: accountId })
   return res.json({
     message: ACCOUNT_MESSAGES.GET_PROFILE_PAGE_SUCCEED,
     data: result

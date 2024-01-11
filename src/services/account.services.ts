@@ -431,8 +431,30 @@ class AccountService {
             videoCount: {
               $size: '$videos'
             },
-            subscriptionCount: {
+            subscribeCount: {
               $size: '$subscriptions'
+            },
+            isSubscribed: {
+              $filter: {
+                input: '$subscriptions',
+                as: 'subscription',
+                cond: {
+                  $eq: ['$$subscription.fromAccountId', new ObjectId(accountId)]
+                }
+              }
+            }
+          }
+        },
+        {
+          $addFields: {
+            isSubscribed: {
+              $cond: {
+                if: {
+                  $size: '$isSubscribed'
+                },
+                then: true,
+                else: false
+              }
             }
           }
         },
@@ -463,8 +485,11 @@ class AccountService {
             videoCount: {
               $first: '$videoCount'
             },
-            subscriptionCount: {
-              $first: '$subscriptionCount'
+            subscribeCount: {
+              $first: '$subscribeCount'
+            },
+            isSubscribed: {
+              $first: '$isSubscribed'
             },
             createdAt: {
               $first: '$createdAt'
@@ -541,24 +566,153 @@ class AccountService {
   }
 
   // Lấy thông tin trang cá nhân theo username
-  async getProfilePage(username: string) {
-    const account = (await databaseService.accounts.findOne(
-      {
-        username
-      },
-      {
-        projection: {
-          password: 0,
-          role: 0,
-          status: 0,
-          verify: 0,
-          forgotPasswordToken: 0,
-          verifyEmailToken: 0
+  async getProfilePage({ username, referenceAccountId }: { username: string; referenceAccountId?: string }) {
+    const accounts = await databaseService.accounts
+      .aggregate([
+        {
+          $match: {
+            username
+          }
+        },
+        {
+          $lookup: {
+            from: 'images',
+            localField: 'avatar',
+            foreignField: '_id',
+            as: 'avatar'
+          }
+        },
+        {
+          $unwind: {
+            path: '$avatar',
+            preserveNullAndEmptyArrays: true
+          }
+        },
+        {
+          $lookup: {
+            from: 'images',
+            localField: 'cover',
+            foreignField: '_id',
+            as: 'cover'
+          }
+        },
+        {
+          $unwind: {
+            path: '$cover',
+            preserveNullAndEmptyArrays: true
+          }
+        },
+        {
+          $lookup: {
+            from: 'videos',
+            localField: '_id',
+            foreignField: 'accountId',
+            as: 'videos'
+          }
+        },
+        {
+          $lookup: {
+            from: 'subscriptions',
+            localField: '_id',
+            foreignField: 'toAccountId',
+            as: 'subscriptions'
+          }
+        },
+        {
+          $addFields: {
+            avatar: {
+              $cond: {
+                if: '$avatar',
+                then: {
+                  $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$avatar.name']
+                },
+                else: ''
+              }
+            },
+            cover: {
+              $cond: {
+                if: '$cover',
+                then: {
+                  $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$cover.name']
+                },
+                else: ''
+              }
+            },
+            videoCount: {
+              $size: '$videos'
+            },
+            subscribeCount: {
+              $size: '$subscriptions'
+            },
+            isSubscribed: {
+              $filter: {
+                input: '$subscriptions',
+                as: 'subscription',
+                cond: {
+                  $eq: ['$$subscription.fromAccountId', new ObjectId(referenceAccountId)]
+                }
+              }
+            }
+          }
+        },
+        {
+          $addFields: {
+            isSubscribed: {
+              $cond: {
+                if: {
+                  $size: '$isSubscribed'
+                },
+                then: true,
+                else: false
+              }
+            }
+          }
+        },
+        {
+          $group: {
+            _id: '$_id',
+            email: {
+              $first: '$email'
+            },
+            username: {
+              $first: '$username'
+            },
+            channelName: {
+              $first: '$channelName'
+            },
+            bio: {
+              $first: '$bio'
+            },
+            avatar: {
+              $first: '$avatar'
+            },
+            cover: {
+              $first: '$cover'
+            },
+            tick: {
+              $first: '$tick'
+            },
+            videoCount: {
+              $first: '$videoCount'
+            },
+            subscribeCount: {
+              $first: '$subscribeCount'
+            },
+            isSubscribed: {
+              $first: '$isSubscribed'
+            },
+            createdAt: {
+              $first: '$createdAt'
+            },
+            updatedAt: {
+              $first: '$updatedAt'
+            }
+          }
         }
-      }
-    )) as WithId<Account>
+      ])
+      .toArray()
     return {
-      account
+      account: accounts[0]
     }
   }
 

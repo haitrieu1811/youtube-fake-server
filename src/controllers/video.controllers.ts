@@ -3,13 +3,14 @@ import { ParamsDictionary } from 'express-serve-static-core'
 
 import { HttpStatusCode } from '~/constants/enum'
 import { VIDEO_MESSAGES } from '~/constants/messages'
-import { TokenPayload } from '~/models/requests/Account.requests'
+import { TokenPayload, UsernameReqParams } from '~/models/requests/Account.requests'
 import { PaginationReqQuery } from '~/models/requests/Common.requests'
 import {
   CreateVideoCategoryReqBody,
   CreateVideoReqBody,
   DeleteVideosReqBody,
   GetPublicVideosReqQuery,
+  GetVideosOfMeReqQuery,
   IdNameReqParams,
   UpdateVideoCategoryReqBody,
   UpdateVideoReqBody,
@@ -120,6 +121,24 @@ export const getVideosOfMeController = async (
   const { videos, ...pagination } = await videoService.getVideosOfMe({ accountId, query: req.query })
   return res.json({
     message: VIDEO_MESSAGES.GET_VIDEOS_OF_ME_SUCCEED,
+    data: {
+      videos,
+      pagination
+    }
+  })
+}
+
+// Lấy danh sách video theo username
+export const getVideosByUsernameController = async (
+  req: Request<UsernameReqParams, any, any, GetVideosOfMeReqQuery>,
+  res: Response
+) => {
+  const { videos, ...pagination } = await videoService.getVideosByUsername({
+    username: req.params.username,
+    query: req.query
+  })
+  return res.json({
+    message: VIDEO_MESSAGES.GET_VIDEOS_BY_USERNAME_SUCCEED,
     data: {
       videos,
       pagination

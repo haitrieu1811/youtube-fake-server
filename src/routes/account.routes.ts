@@ -28,6 +28,7 @@ import {
   deleteAccountsValidator,
   forgotPasswordTokenValidator,
   forgotPasswordValidator,
+  isLoggedAccountValidator,
   loginValidator,
   refreshTokenValidator,
   registerValidator,
@@ -111,7 +112,13 @@ accountRouter.patch(
 )
 
 // Lấy thông tin trang cá nhân
-accountRouter.get('/profile/:username', usernameValidator, wrapRequestHandler(getProfilePageController))
+accountRouter.get(
+  '/profile/:username',
+  isLoggedAccountValidator(accessTokenValidator),
+  isLoggedAccountValidator(verifiedAccountValidator),
+  usernameValidator,
+  wrapRequestHandler(getProfilePageController)
+)
 
 // Lấy danh sách toàn bộ account trên hệ thống (chỉ admin)
 accountRouter.get(

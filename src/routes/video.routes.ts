@@ -9,6 +9,7 @@ import {
   getPublicVideosController,
   getVideoCategoriesController,
   getVideoDetailToUpdateController,
+  getVideosByUsernameController,
   getVideosOfMeController,
   updateVideoCategoryController,
   updateVideoController,
@@ -19,6 +20,7 @@ import {
   accessTokenValidator,
   adminRoleValidator,
   isLoggedAccountValidator,
+  usernameValidator,
   verifiedAccountValidator
 } from '~/middlewares/account.middlewares'
 import { filterReqBodyMiddleware, paginationValidator } from '~/middlewares/common.middlewares'
@@ -116,6 +118,14 @@ videoRouter.get(
   verifiedAccountValidator,
   paginationValidator,
   wrapRequestHandler(getVideosOfMeController)
+)
+
+// Lấy danh sách video theo username
+videoRouter.get(
+  '/username/:username',
+  usernameValidator,
+  paginationValidator,
+  wrapRequestHandler(getVideosByUsernameController)
 )
 
 // Xem video

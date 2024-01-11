@@ -112,7 +112,8 @@ export const VIDEO_MESSAGES = {
   GET_VIDEOS_OF_ME_SUCCEED: 'Lấy danh sách video của tôi thành công',
   GET_VIDEO_DETAIL_SUCCEED: 'Lấy thông tin chi tiết video thành công',
   GET_VIDEO_CATEGORIES_SUCCEED: 'Lấy danh sách danh mục video thành công',
-  DELETE_THUMBNAIL_IMAGE_SUCCEED: 'Xóa hình thu nhỏ thành công'
+  DELETE_THUMBNAIL_IMAGE_SUCCEED: 'Xóa hình thu nhỏ thành công',
+  GET_VIDEOS_BY_USERNAME_SUCCEED: 'Lấy danh sách video theo username thành công'
 } as const
 
 export const REACTION_MESSAGES = {

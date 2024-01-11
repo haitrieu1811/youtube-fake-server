@@ -66,3 +66,17 @@ export type GetPublicVideosReqQuery = Query &
   PaginationReqQuery & {
     category?: string
   }
+
+// Query: Lấy danh sách video của tôi
+export type GetVideosOfMeReqQuery = Query &
+  PaginationReqQuery & {
+    sortBy?: string
+    orderBy?: 'asc' | 'desc'
+  }
+
+// Query: Lấy danh sách video theo username
+export type GetVideosByUsernameReqQuery = Query &
+  PaginationReqQuery & {
+    sortBy?: string
+    orderBy?: 'asc' | 'desc'
+  }
