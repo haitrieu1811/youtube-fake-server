@@ -43,7 +43,7 @@ export const ACCOUNT_MESSAGES = {
   USERNAME_ALREADY_EXIST: 'Username đã tồn tại',
   CHANNEL_NAME_LENGTH_IS_INVALID: 'Tên channel phải có độ dài từ 6 đến 32 ký tự',
   CHANNEL_NAME_ALREADY_EXIST: 'Tên channel đã tồn tại',
-  BIO_LENGTH_IS_INVALID: 'Bio phải dài từ 6 đến 255 ký tự',
+  BIO_LENGTH_IS_INVALID: 'Bio phải dài từ 1 đến 1000 ký tự',
   AVATAR_IS_INVALID: 'Ảnh đại diện không hợp lệ',
   COVER_IS_INVALID: 'Ảnh bìa không hợp lệ',
   ACCOUNT_IS_UNVERIFIED: 'Tài khoản chưa được xác thực',

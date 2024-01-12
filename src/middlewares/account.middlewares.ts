@@ -569,7 +569,7 @@ export const updateMeValidator = validate(
         },
         custom: {
           options: async (value: string) => {
-            const account = await databaseService.accounts.findOne({ username: value })
+            const account = await databaseService.accounts.findOne({ channelName: value })
             if (account) {
               throw new Error(ACCOUNT_MESSAGES.CHANNEL_NAME_ALREADY_EXIST)
             }
@@ -582,8 +582,8 @@ export const updateMeValidator = validate(
         trim: true,
         isLength: {
           options: {
-            min: 6,
-            max: 255
+            min: 1,
+            max: 1000
           },
           errorMessage: ACCOUNT_MESSAGES.BIO_LENGTH_IS_INVALID
         }
