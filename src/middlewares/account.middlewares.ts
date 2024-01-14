@@ -590,10 +590,10 @@ export const updateMeValidator = validate(
       },
       avatar: {
         optional: true,
-        trim: true,
         custom: {
           options: (value: string) => {
-            if (!ObjectId.isValid(value)) {
+            const isValid = value === null || ObjectId.isValid(value)
+            if (!isValid) {
               throw new ErrorWithStatus({
                 message: ACCOUNT_MESSAGES.AVATAR_IS_INVALID,
                 status: HttpStatusCode.BadRequest
@@ -605,10 +605,10 @@ export const updateMeValidator = validate(
       },
       cover: {
         optional: true,
-        trim: true,
         custom: {
           options: (value: string) => {
-            if (!ObjectId.isValid(value)) {
+            const isValid = value === null || ObjectId.isValid(value)
+            if (!isValid) {
               throw new ErrorWithStatus({
                 message: ACCOUNT_MESSAGES.COVER_IS_INVALID,
                 status: HttpStatusCode.BadRequest

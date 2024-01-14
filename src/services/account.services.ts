@@ -535,143 +535,141 @@ class AccountService {
     const bodyConfig = omitBy(
       {
         ...body,
-        avatar: avatar ? new ObjectId(avatar) : undefined,
-        cover: cover ? new ObjectId(cover) : undefined
+        avatar: avatar !== undefined ? (avatar === null ? null : new ObjectId(avatar)) : undefined,
+        cover: cover !== undefined ? (cover === null ? null : new ObjectId(cover)) : undefined
       },
       isUndefined
     )
-    const [accounts] = await Promise.all([
-      databaseService.accounts
-        .aggregate([
-          {
-            $match: {
-              _id: new ObjectId(accountId)
-            }
-          },
-          {
-            $lookup: {
-              from: 'images',
-              localField: 'avatar',
-              foreignField: '_id',
-              as: 'avatar'
-            }
-          },
-          {
-            $unwind: {
-              path: '$avatar',
-              preserveNullAndEmptyArrays: true
-            }
-          },
-          {
-            $lookup: {
-              from: 'images',
-              localField: 'cover',
-              foreignField: '_id',
-              as: 'cover'
-            }
-          },
-          {
-            $unwind: {
-              path: '$cover',
-              preserveNullAndEmptyArrays: true
-            }
-          },
-          {
-            $lookup: {
-              from: 'videos',
-              localField: '_id',
-              foreignField: 'accountId',
-              as: 'videos'
-            }
-          },
-          {
-            $lookup: {
-              from: 'subscriptions',
-              localField: '_id',
-              foreignField: 'toAccountId',
-              as: 'subscriptions'
-            }
-          },
-          {
-            $addFields: {
-              avatar: {
-                $cond: {
-                  if: '$avatar',
-                  then: {
-                    $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$avatar.name']
-                  },
-                  else: ''
-                }
-              },
-              cover: {
-                $cond: {
-                  if: '$cover',
-                  then: {
-                    $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$cover.name']
-                  },
-                  else: ''
-                }
-              },
-              videoCount: {
-                $size: '$videos'
-              },
-              subscriptionCount: {
-                $size: '$subscriptions'
-              }
-            }
-          },
-          {
-            $group: {
-              _id: '$_id',
-              email: {
-                $first: '$email'
-              },
-              username: {
-                $first: '$username'
-              },
-              channelName: {
-                $first: '$channelName'
-              },
-              bio: {
-                $first: '$bio'
-              },
-              avatar: {
-                $first: '$avatar'
-              },
-              cover: {
-                $first: '$cover'
-              },
-              tick: {
-                $first: '$tick'
-              },
-              videoCount: {
-                $first: '$videoCount'
-              },
-              subscriptionCount: {
-                $first: '$subscriptionCount'
-              },
-              createdAt: {
-                $first: '$createdAt'
-              },
-              updatedAt: {
-                $first: '$updatedAt'
-              }
-            }
-          }
-        ])
-        .toArray(),
-      databaseService.accounts.updateOne(
+    await databaseService.accounts.updateOne(
+      {
+        _id: new ObjectId(accountId)
+      },
+      {
+        $set: bodyConfig,
+        $currentDate: {
+          updatedAt: true
+        }
+      }
+    )
+    const accounts = await databaseService.accounts
+      .aggregate([
         {
-          _id: new ObjectId(accountId)
+          $match: {
+            _id: new ObjectId(accountId)
+          }
         },
         {
-          $set: bodyConfig,
-          $currentDate: {
-            updatedAt: true
+          $lookup: {
+            from: 'images',
+            localField: 'avatar',
+            foreignField: '_id',
+            as: 'avatar'
+          }
+        },
+        {
+          $unwind: {
+            path: '$avatar',
+            preserveNullAndEmptyArrays: true
+          }
+        },
+        {
+          $lookup: {
+            from: 'images',
+            localField: 'cover',
+            foreignField: '_id',
+            as: 'cover'
+          }
+        },
+        {
+          $unwind: {
+            path: '$cover',
+            preserveNullAndEmptyArrays: true
+          }
+        },
+        {
+          $lookup: {
+            from: 'videos',
+            localField: '_id',
+            foreignField: 'accountId',
+            as: 'videos'
+          }
+        },
+        {
+          $lookup: {
+            from: 'subscriptions',
+            localField: '_id',
+            foreignField: 'toAccountId',
+            as: 'subscriptions'
+          }
+        },
+        {
+          $addFields: {
+            avatar: {
+              $cond: {
+                if: '$avatar',
+                then: {
+                  $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$avatar.name']
+                },
+                else: ''
+              }
+            },
+            cover: {
+              $cond: {
+                if: '$cover',
+                then: {
+                  $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$cover.name']
+                },
+                else: ''
+              }
+            },
+            videoCount: {
+              $size: '$videos'
+            },
+            subscriptionCount: {
+              $size: '$subscriptions'
+            }
+          }
+        },
+        {
+          $group: {
+            _id: '$_id',
+            email: {
+              $first: '$email'
+            },
+            username: {
+              $first: '$username'
+            },
+            channelName: {
+              $first: '$channelName'
+            },
+            bio: {
+              $first: '$bio'
+            },
+            avatar: {
+              $first: '$avatar'
+            },
+            cover: {
+              $first: '$cover'
+            },
+            tick: {
+              $first: '$tick'
+            },
+            videoCount: {
+              $first: '$videoCount'
+            },
+            subscriptionCount: {
+              $first: '$subscriptionCount'
+            },
+            createdAt: {
+              $first: '$createdAt'
+            },
+            updatedAt: {
+              $first: '$updatedAt'
+            }
           }
         }
-      )
-    ])
+      ])
+      .toArray()
     const [accessToken, refreshToken] = await this.signAccessAndRefreshToken({
       data: {
         accountId: accounts[0]._id.toString(),

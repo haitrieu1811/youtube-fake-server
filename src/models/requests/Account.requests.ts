@@ -58,8 +58,8 @@ export type UpdateMeReqBody = {
   username?: string
   channelName?: string
   bio?: string
-  avatar?: string
-  cover?: string
+  avatar?: string | null
+  cover?: string | null
 }
 
 // Params: Username
