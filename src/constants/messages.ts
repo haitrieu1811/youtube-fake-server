@@ -147,7 +147,13 @@ export const BOOKMARK_MESSAGES = {
 
 export const WATCH_HISTORY_MESSAGES = {
   CREATE_WATCH_HISTORY_SUCCEED: 'Tạo lịch sử xem thành công',
-  GET_WATCH_HISTORIES_SUCCEED: 'Lấy lịch sử xem thành công'
+  GET_WATCH_HISTORIES_SUCCEED: 'Lấy lịch sử xem thành công',
+  DELETE_WATCH_HISTORY_SUCCEED: 'Xóa lịch sử xem thành công',
+  DELETE_ALL_WATCH_HISTORIES_SUCCEED: 'Xóa toàn bộ lịch sử xem thành công',
+  WATCH_HISTORY_ID_IS_REQUIRED: 'Watch history id là bắt buộc',
+  WATCH_HISTORY_ID_IS_INVALID: 'Watch history id không hợp lệ',
+  WATCH_HISTORY_NOT_FOUND: 'Không tìm thấy watch history',
+  WATCH_HISTORY_AUTHOR_IS_INVALID: 'Bạn không phải là tác giả của watch history'
 } as const
 
 export const COMMENT_MESSAGES = {

@@ -4,6 +4,7 @@ import { ENV_CONFIG } from '~/constants/config'
 import { PaginationReqQuery } from '~/models/requests/Common.requests'
 import WatchHistory from '~/models/schemas/WatchHistory.schema'
 import databaseService from './database.services'
+import { GetWatchHistoriesReqQuery } from '~/models/requests/WatchHistory.requests'
 
 class WatchHistoryService {
   // Thêm một video vào lịch sử xem
@@ -36,18 +37,18 @@ class WatchHistoryService {
   }
 
   // Lấy lịch sử video đã xem
-  async getWatchHistories({ query, accountId }: { query: PaginationReqQuery; accountId: string }) {
-    const { page, limit } = query
+  async getWatchHistories({ query, accountId }: { query: GetWatchHistoriesReqQuery; accountId: string }) {
+    const { page, limit, searchQuery = '' } = query
     const _page = Number(page) || 1
     const _limit = Number(limit) || 20
     const skip = (_page - 1) * _limit
-    const [videos, totalRows] = await Promise.all([
+    const match = { accountId: new ObjectId(accountId) }
+    const regex = searchQuery.replace(/\\/g, '')
+    const [videos, totalArr] = await Promise.all([
       databaseService.watchHistories
         .aggregate([
           {
-            $match: {
-              accountId: new ObjectId(accountId)
-            }
+            $match: match
           },
           {
             $lookup: {
@@ -63,8 +64,22 @@ class WatchHistoryService {
             }
           },
           {
+            $addFields: {
+              'videoInfo.viewdAt': '$updatedAt',
+              'videoInfo.historyId': '$_id'
+            }
+          },
+          {
             $replaceRoot: {
               newRoot: '$videoInfo'
+            }
+          },
+          {
+            $match: {
+              title: {
+                $regex: regex,
+                $options: 'i'
+              }
             }
           },
           {
@@ -127,17 +142,29 @@ class WatchHistoryService {
           {
             $group: {
               _id: '$_id',
+              historyId: {
+                $first: '$historyId'
+              },
+              idName: {
+                $first: '$idName'
+              },
               thumbnail: {
                 $first: '$thumbnail'
               },
               title: {
                 $first: '$title'
               },
+              description: {
+                $first: '$description'
+              },
               viewCount: {
                 $first: '$views'
               },
               author: {
                 $first: '$author'
+              },
+              viewdAt: {
+                $first: '$viewdAt'
               },
               createdAt: {
                 $first: '$createdAt'
@@ -161,6 +188,11 @@ class WatchHistoryService {
             }
           },
           {
+            $sort: {
+              viewdAt: -1
+            }
+          },
+          {
             $skip: skip
           },
           {
@@ -168,8 +200,50 @@ class WatchHistoryService {
           }
         ])
         .toArray(),
-      await databaseService.watchHistories.countDocuments({ accountId: new ObjectId(accountId) })
+      await databaseService.watchHistories
+        .aggregate([
+          {
+            $match: match
+          },
+          {
+            $lookup: {
+              from: 'videos',
+              localField: 'videoId',
+              foreignField: '_id',
+              as: 'videoInfo'
+            }
+          },
+          {
+            $unwind: {
+              path: '$videoInfo'
+            }
+          },
+          {
+            $addFields: {
+              'videoInfo.viewdAt': '$updatedAt',
+              'videoInfo.historyId': '$_id'
+            }
+          },
+          {
+            $replaceRoot: {
+              newRoot: '$videoInfo'
+            }
+          },
+          {
+            $match: {
+              title: {
+                $regex: regex,
+                $options: 'i'
+              }
+            }
+          },
+          {
+            $count: 'totalRows'
+          }
+        ])
+        .toArray()
     ])
+    const totalRows = totalArr[0]?.totalRows || 0
     return {
       videos,
       page: _page,
@@ -177,6 +251,22 @@ class WatchHistoryService {
       totalRows,
       totalPages: Math.ceil(totalRows / _limit)
     }
+  }
+
+  // Xóa lịch sử xem
+  async deleteWatchHistory(watchHistoryId: string) {
+    await databaseService.watchHistories.deleteOne({
+      _id: new ObjectId(watchHistoryId)
+    })
+    return
+  }
+
+  // Xóa toàn bộ lịch sử xem
+  async deleteAllWatchHistories(accountId: string) {
+    await databaseService.watchHistories.deleteMany({
+      accountId: new ObjectId(accountId)
+    })
+    return
   }
 }
 
