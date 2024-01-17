@@ -172,3 +172,19 @@ export const deleteThumbnailImageController = async (req: Request<VideoIdReqPara
     message: VIDEO_MESSAGES.DELETE_THUMBNAIL_IMAGE_SUCCEED
   })
 }
+
+// Lấy danh sách video đã thích
+export const getLikedVideosController = async (
+  req: Request<ParamsDictionary, any, any, PaginationReqQuery>,
+  res: Response
+) => {
+  const { accountId } = req.decodedAuthorization as TokenPayload
+  const { videos, ...pagination } = await videoService.getLikedVideos({ accountId, query: req.query })
+  return res.json({
+    message: VIDEO_MESSAGES.GET_LIKED_VIDEOS_SUCCEED,
+    data: {
+      videos,
+      pagination
+    }
+  })
+}

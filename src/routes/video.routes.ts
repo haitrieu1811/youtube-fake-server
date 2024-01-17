@@ -6,6 +6,7 @@ import {
   deleteThumbnailImageController,
   deleteVideoCategoryController,
   deleteVideosController,
+  getLikedVideosController,
   getPublicVideosController,
   getVideoCategoriesController,
   getVideoDetailToUpdateController,
@@ -152,6 +153,15 @@ videoRouter.delete(
   videoIdValidator,
   authorOfVideoValidator,
   wrapRequestHandler(deleteThumbnailImageController)
+)
+
+// Lấy danh sách video đã thích
+videoRouter.get(
+  '/liked',
+  accessTokenValidator,
+  verifiedAccountValidator,
+  paginationValidator,
+  wrapRequestHandler(getLikedVideosController)
 )
 
 export default videoRouter

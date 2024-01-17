@@ -3,7 +3,7 @@ import omitBy from 'lodash/omitBy'
 import { ObjectId, WithId } from 'mongodb'
 
 import { ENV_CONFIG } from '~/constants/config'
-import { ReactionType, VideoAudience } from '~/constants/enum'
+import { ReactionContentType, ReactionType, VideoAudience } from '~/constants/enum'
 import { PaginationReqQuery } from '~/models/requests/Common.requests'
 import {
   CreateVideoCategoryReqBody,
@@ -1217,6 +1217,238 @@ class VideoService {
       await databaseService.images.deleteOne({ _id: updatedVideo.thumbnail })
     }
     return true
+  }
+
+  // Lấy danh sách video đã thích
+  async getLikedVideos({ query, accountId }: { query: PaginationReqQuery; accountId: string }) {
+    const { page, limit } = query
+    const _page = Number(page) || 1
+    const _limit = Number(limit) || 20
+    const skip = (_page - 1) * _limit
+    const match = {
+      contentType: ReactionContentType.Video,
+      accountId: new ObjectId(accountId)
+    }
+    const [videos, totalRowsArr] = await Promise.all([
+      databaseService.reactions
+        .aggregate([
+          {
+            $match: match
+          },
+          {
+            $lookup: {
+              from: 'videos',
+              localField: 'contentId',
+              foreignField: '_id',
+              as: 'videos'
+            }
+          },
+          {
+            $unwind: {
+              path: '$videos'
+            }
+          },
+          {
+            $addFields: {
+              'videos.likedAt': '$createdAt'
+            }
+          },
+          {
+            $replaceRoot: {
+              newRoot: '$videos'
+            }
+          },
+          {
+            $match: {
+              audience: VideoAudience.Everyone
+            }
+          },
+          {
+            $lookup: {
+              from: 'accounts',
+              localField: 'accountId',
+              foreignField: '_id',
+              as: 'author'
+            }
+          },
+          {
+            $unwind: {
+              path: '$author'
+            }
+          },
+          {
+            $lookup: {
+              from: 'images',
+              localField: 'thumbnail',
+              foreignField: '_id',
+              as: 'thumbnail'
+            }
+          },
+          {
+            $unwind: {
+              path: '$thumbnail',
+              preserveNullAndEmptyArrays: true
+            }
+          },
+          {
+            $lookup: {
+              from: 'videoCategories',
+              localField: 'category',
+              foreignField: '_id',
+              as: 'category'
+            }
+          },
+          {
+            $unwind: {
+              path: '$category',
+              preserveNullAndEmptyArrays: true
+            }
+          },
+          {
+            $lookup: {
+              from: 'images',
+              localField: 'author.avatar',
+              foreignField: '_id',
+              as: 'authorAvatar'
+            }
+          },
+          {
+            $unwind: {
+              path: '$authorAvatar',
+              preserveNullAndEmptyArrays: true
+            }
+          },
+          {
+            $addFields: {
+              thumbnail: {
+                $cond: {
+                  if: '$thumbnail',
+                  then: {
+                    $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$thumbnail.name']
+                  },
+                  else: ''
+                }
+              },
+              'author.avatar': {
+                $cond: {
+                  if: '$authorAvatar',
+                  then: {
+                    $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$authorAvatar.name']
+                  },
+                  else: ''
+                }
+              }
+            }
+          },
+          {
+            $group: {
+              _id: '$_id',
+              idName: {
+                $first: '$idName'
+              },
+              author: {
+                $first: '$author'
+              },
+              thumbnail: {
+                $first: '$thumbnail'
+              },
+              title: {
+                $first: '$title'
+              },
+              description: {
+                $first: '$description'
+              },
+              category: {
+                $first: '$category'
+              },
+              viewCount: {
+                $first: '$views'
+              },
+              likedAt: {
+                $first: '$likedAt'
+              },
+              createdAt: {
+                $first: '$createdAt'
+              },
+              updatedAt: {
+                $first: '$updatedAt'
+              }
+            }
+          },
+          {
+            $project: {
+              'author.email': 0,
+              'author.password': 0,
+              'author.bio': 0,
+              'author.cover': 0,
+              'author.role': 0,
+              'author.status': 0,
+              'author.verify': 0,
+              'author.forgotPasswordToken': 0,
+              'author.verifyEmailToken': 0,
+              'category.accountId': 0
+            }
+          },
+          {
+            $sort: {
+              likedAt: -1
+            }
+          },
+          {
+            $skip: skip
+          },
+          {
+            $limit: _limit
+          }
+        ])
+        .toArray(),
+      databaseService.reactions
+        .aggregate([
+          {
+            $match: match
+          },
+          {
+            $lookup: {
+              from: 'videos',
+              localField: 'contentId',
+              foreignField: '_id',
+              as: 'videos'
+            }
+          },
+          {
+            $unwind: {
+              path: '$videos'
+            }
+          },
+          {
+            $addFields: {
+              'videos.likedAt': '$createdAt'
+            }
+          },
+          {
+            $replaceRoot: {
+              newRoot: '$videos'
+            }
+          },
+          {
+            $match: {
+              audience: VideoAudience.Everyone
+            }
+          },
+          {
+            $count: 'totalRows'
+          }
+        ])
+        .toArray()
+    ])
+    const totalRows = totalRowsArr[0]?.totalRows || 0
+    return {
+      videos,
+      page: _page,
+      limit: _limit,
+      totalRows: totalRows as number,
+      totalPages: Math.ceil(totalRows / _limit)
+    }
   }
 }
 
