@@ -668,8 +668,7 @@ class CommentService {
         ])
         .toArray(),
       databaseService.comments.countDocuments({
-        contentId: new ObjectId(contentId),
-        parentId: null
+        contentId: new ObjectId(contentId)
       })
     ])
     return {
