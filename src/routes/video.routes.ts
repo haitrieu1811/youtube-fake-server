@@ -12,6 +12,7 @@ import {
   getVideoDetailToUpdateController,
   getVideosByUsernameController,
   getVideosOfMeController,
+  getVideosSameCategoryController,
   updateVideoCategoryController,
   updateVideoController,
   watchVideoController
@@ -162,6 +163,14 @@ videoRouter.get(
   verifiedAccountValidator,
   paginationValidator,
   wrapRequestHandler(getLikedVideosController)
+)
+
+// Lấy danh sách video cùng danh mục
+videoRouter.get(
+  '/category/:videoCategoryId',
+  paginationValidator,
+  videoCategoryIdValidator,
+  wrapRequestHandler(getVideosSameCategoryController)
 )
 
 export default videoRouter

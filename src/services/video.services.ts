@@ -872,10 +872,16 @@ class VideoService {
           },
           {
             $lookup: {
-              from: 'reactions',
-              localField: '_id',
-              foreignField: 'contentId',
-              as: 'reactions'
+              from: 'videoCategories',
+              localField: 'category',
+              foreignField: '_id',
+              as: 'category'
+            }
+          },
+          {
+            $unwind: {
+              path: '$category',
+              preserveNullAndEmptyArrays: true
             }
           },
           {
@@ -883,7 +889,7 @@ class VideoService {
               from: 'reactions',
               localField: '_id',
               foreignField: 'contentId',
-              as: 'likesAndDislikes'
+              as: 'reactions'
             }
           },
           {
@@ -897,21 +903,21 @@ class VideoService {
                   else: ''
                 }
               },
-              reactions: {
+              reactionOfMe: {
                 $filter: {
                   input: '$reactions',
+                  as: 'reaction',
                   cond: {
                     $eq: ['$$reaction.accountId', new ObjectId(accountId)]
-                  },
-                  as: 'reaction'
+                  }
                 }
               },
               likes: {
                 $cond: {
-                  if: '$likesAndDislikes',
+                  if: '$reactions',
                   then: {
                     $filter: {
-                      input: '$likesAndDislikes',
+                      input: '$reactions',
                       as: 'item',
                       cond: {
                         $eq: ['$$item.type', ReactionType.Like]
@@ -923,10 +929,10 @@ class VideoService {
               },
               dislikes: {
                 $cond: {
-                  if: '$likesAndDislikes',
+                  if: '$reactions',
                   then: {
                     $filter: {
-                      input: '$likesAndDislikes',
+                      input: '$reactions',
                       as: 'item',
                       cond: {
                         $eq: ['$$item.type', ReactionType.Dislike]
@@ -940,7 +946,7 @@ class VideoService {
           },
           {
             $unwind: {
-              path: '$reactions',
+              path: '$reactionOfMe',
               preserveNullAndEmptyArrays: true
             }
           },
@@ -949,7 +955,7 @@ class VideoService {
               isLiked: {
                 $cond: {
                   if: {
-                    $eq: ['$reactions.type', ReactionType.Like]
+                    $eq: ['$reactionOfMe.type', ReactionType.Like]
                   },
                   then: true,
                   else: false
@@ -958,7 +964,7 @@ class VideoService {
               isDisliked: {
                 $cond: {
                   if: {
-                    $eq: ['$reactions.type', ReactionType.Dislike]
+                    $eq: ['$reactionOfMe.type', ReactionType.Dislike]
                   },
                   then: true,
                   else: false
@@ -1060,6 +1066,9 @@ class VideoService {
               channel: {
                 $first: '$channel'
               },
+              category: {
+                $first: '$category'
+              },
               createdAt: {
                 $first: '$createdAt'
               },
@@ -1080,7 +1089,8 @@ class VideoService {
               'channel.forgotPasswordToken': 0,
               'channel.verifyEmailToken': 0,
               'channel.createdAt': 0,
-              'channel.updatedAt': 0
+              'channel.updatedAt': 0,
+              'category.accountId': 0
             }
           }
         ])
@@ -1447,6 +1457,164 @@ class VideoService {
       page: _page,
       limit: _limit,
       totalRows: totalRows as number,
+      totalPages: Math.ceil(totalRows / _limit)
+    }
+  }
+
+  // Lấy danh sách video cùng danh mục
+  async getVideosSameCategory({ query, categoryId }: { query: PaginationReqQuery; categoryId: string }) {
+    const { page, limit } = query
+    const _page = Number(page) || 1
+    const _limit = Number(limit) || 20
+    const skip = (_page - 1) * _limit
+    const match = {
+      category: new ObjectId(categoryId),
+      audience: VideoAudience.Everyone
+    }
+    const [videos, totalRows] = await Promise.all([
+      databaseService.videos
+        .aggregate([
+          {
+            $match: match
+          },
+          {
+            $lookup: {
+              from: 'accounts',
+              localField: 'accountId',
+              foreignField: '_id',
+              as: 'author'
+            }
+          },
+          {
+            $unwind: {
+              path: '$author'
+            }
+          },
+          {
+            $lookup: {
+              from: 'images',
+              localField: 'thumbnail',
+              foreignField: '_id',
+              as: 'thumbnail'
+            }
+          },
+          {
+            $unwind: {
+              path: '$thumbnail',
+              preserveNullAndEmptyArrays: true
+            }
+          },
+          {
+            $lookup: {
+              from: 'videoCategories',
+              localField: 'category',
+              foreignField: '_id',
+              as: 'category'
+            }
+          },
+          {
+            $unwind: {
+              path: '$category',
+              preserveNullAndEmptyArrays: true
+            }
+          },
+          {
+            $lookup: {
+              from: 'images',
+              localField: 'author.avatar',
+              foreignField: '_id',
+              as: 'authorAvatar'
+            }
+          },
+          {
+            $unwind: {
+              path: '$authorAvatar',
+              preserveNullAndEmptyArrays: true
+            }
+          },
+          {
+            $addFields: {
+              thumbnail: {
+                $cond: {
+                  if: '$thumbnail',
+                  then: {
+                    $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$thumbnail.name']
+                  },
+                  else: ''
+                }
+              },
+              'author.avatar': {
+                $cond: {
+                  if: '$authorAvatar',
+                  then: {
+                    $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$authorAvatar.name']
+                  },
+                  else: ''
+                }
+              }
+            }
+          },
+          {
+            $group: {
+              _id: '$_id',
+              idName: {
+                $first: '$idName'
+              },
+              author: {
+                $first: '$author'
+              },
+              thumbnail: {
+                $first: '$thumbnail'
+              },
+              title: {
+                $first: '$title'
+              },
+              description: {
+                $first: '$description'
+              },
+              category: {
+                $first: '$category'
+              },
+              viewCount: {
+                $first: '$views'
+              },
+              createdAt: {
+                $first: '$createdAt'
+              },
+              updatedAt: {
+                $first: '$updatedAt'
+              }
+            }
+          },
+          {
+            $project: {
+              'author.email': 0,
+              'author.password': 0,
+              'author.bio': 0,
+              'author.cover': 0,
+              'author.role': 0,
+              'author.status': 0,
+              'author.verify': 0,
+              'author.forgotPasswordToken': 0,
+              'author.verifyEmailToken': 0,
+              'category.accountId': 0
+            }
+          },
+          {
+            $skip: skip
+          },
+          {
+            $limit: _limit
+          }
+        ])
+        .toArray(),
+      databaseService.videos.countDocuments(match)
+    ])
+    return {
+      videos,
+      page: _page,
+      limit: _limit,
+      totalRows,
       totalPages: Math.ceil(totalRows / _limit)
     }
   }

@@ -188,3 +188,21 @@ export const getLikedVideosController = async (
     }
   })
 }
+
+// Lấy danh sách video cùng danh mục
+export const getVideosSameCategoryController = async (
+  req: Request<VideoCategoryIdReqParams, any, any, PaginationReqQuery>,
+  res: Response
+) => {
+  const { videos, ...pagination } = await videoService.getVideosSameCategory({
+    categoryId: req.params.videoCategoryId,
+    query: req.query
+  })
+  return res.json({
+    message: VIDEO_MESSAGES.GET_VIDEOS_SAME_CATEGORY_SUCCEED,
+    data: {
+      videos,
+      pagination
+    }
+  })
+}
