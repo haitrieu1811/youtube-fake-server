@@ -5,6 +5,7 @@ import { ReactionType } from '~/constants/enum'
 import { CreateCommentReqBody, GetCommentsReqQuery, ReplyCommentReqBody } from '~/models/requests/Comment.requests'
 import Comment from '~/models/schemas/Comment.schema'
 import databaseService from './database.services'
+import { PaginationReqQuery } from '~/models/requests/Common.requests'
 
 class CommentService {
   // Thêm một bình luận
@@ -687,14 +688,13 @@ class CommentService {
     accountId
   }: {
     commentId: string
-    query: GetCommentsReqQuery
+    query: PaginationReqQuery
     accountId?: string
   }) {
-    const { page, limit, orderBy } = query
+    const { page, limit } = query
     const _page = Number(page) || 1
     const _limit = Number(limit) || 20
     const skip = (_page - 1) * _limit
-    const _orderBy = orderBy === 'asc' ? 1 : -1
     const [comments, totalRows] = await Promise.all([
       databaseService.comments
         .aggregate([
@@ -911,7 +911,7 @@ class CommentService {
           },
           {
             $sort: {
-              createdAt: _orderBy
+              createdAt: 1
             }
           },
           {
