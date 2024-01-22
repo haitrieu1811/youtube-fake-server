@@ -30,6 +30,7 @@ export type ReplyCommentReqBody = {
 export type GetCommentsReqQuery = Query &
   PaginationReqQuery & {
     orderBy?: 'asc' | 'desc'
+    sortBy?: 'createdAt' | 'likeCount'
   }
 
 // Params: Content id

@@ -465,11 +465,11 @@ class CommentService {
     query: GetCommentsReqQuery
     accountId?: string
   }) {
-    const { page, limit, orderBy } = query
+    const { page, limit, orderBy, sortBy = 'createdAt' } = query
     const _page = Number(page) || 1
     const _limit = Number(limit) || 20
     const skip = (_page - 1) * _limit
-    const _orderBy = orderBy === 'asc' ? 1 : -1
+    const sort = { [sortBy]: orderBy === 'asc' ? 1 : -1 }
     const [comments, totalRows] = await Promise.all([
       databaseService.comments
         .aggregate([
@@ -656,9 +656,7 @@ class CommentService {
             }
           },
           {
-            $sort: {
-              createdAt: _orderBy
-            }
+            $sort: sort
           },
           {
             $skip: skip
