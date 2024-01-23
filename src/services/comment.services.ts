@@ -470,7 +470,7 @@ class CommentService {
     const _limit = Number(limit) || 20
     const skip = (_page - 1) * _limit
     const sort = { [sortBy]: orderBy === 'asc' ? 1 : -1 }
-    const [comments, totalRows] = await Promise.all([
+    const [comments, totalRows, totalRowsWithReplies] = await Promise.all([
       databaseService.comments
         .aggregate([
           {
@@ -667,6 +667,10 @@ class CommentService {
         ])
         .toArray(),
       databaseService.comments.countDocuments({
+        contentId: new ObjectId(contentId),
+        parentId: null
+      }),
+      databaseService.comments.countDocuments({
         contentId: new ObjectId(contentId)
       })
     ])
@@ -675,7 +679,8 @@ class CommentService {
       page: _page,
       limit: _limit,
       totalRows,
-      totalPages: Math.ceil(totalRows / _limit)
+      totalPages: Math.ceil(totalRows / _limit),
+      totalRowsWithReplies
     }
   }
 
