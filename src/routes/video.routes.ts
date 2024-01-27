@@ -3,7 +3,6 @@ import { Router } from 'express'
 import {
   createVideoCategoryController,
   createVideoController,
-  deleteThumbnailImageController,
   deleteVideoCategoryController,
   deleteVideosController,
   getLikedVideosController,
@@ -97,7 +96,7 @@ videoRouter.patch(
   videoIdValidator,
   authorOfVideoValidator,
   updateVideoValidator,
-  filterReqBodyMiddleware<UpdateVideoReqBody>(['title', 'description', 'thumbnail', 'category', 'audience', 'isDraft']),
+  filterReqBodyMiddleware<UpdateVideoReqBody>(['title', 'description', 'thumbnail', 'category', 'audience', 'status']),
   wrapRequestHandler(updateVideoController)
 )
 
@@ -145,15 +144,6 @@ videoRouter.get(
   videoIdValidator,
   authorOfVideoValidator,
   wrapRequestHandler(getVideoDetailToUpdateController)
-)
-
-// Xóa hình thu nhỏ video
-videoRouter.delete(
-  '/:videoId/thumbnail',
-  accessTokenValidator,
-  videoIdValidator,
-  authorOfVideoValidator,
-  wrapRequestHandler(deleteThumbnailImageController)
 )
 
 // Lấy danh sách video đã thích

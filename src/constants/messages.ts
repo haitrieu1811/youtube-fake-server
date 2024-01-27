@@ -115,7 +115,8 @@ export const VIDEO_MESSAGES = {
   DELETE_THUMBNAIL_IMAGE_SUCCEED: 'Xóa hình thu nhỏ thành công',
   GET_VIDEOS_BY_USERNAME_SUCCEED: 'Lấy danh sách video theo username thành công',
   GET_LIKED_VIDEOS_SUCCEED: 'Lấy danh sách video đã thích thành công',
-  GET_VIDEOS_SAME_CATEGORY_SUCCEED: 'Lấy danh sách video cùng danh mục thành công'
+  GET_VIDEOS_SAME_CATEGORY_SUCCEED: 'Lấy danh sách video cùng danh mục thành công',
+  STATUS_IS_INVALID: 'Trạng thái video không hợp lệ'
 } as const
 
 export const REACTION_MESSAGES = {

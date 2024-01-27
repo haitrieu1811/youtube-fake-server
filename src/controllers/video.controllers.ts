@@ -165,14 +165,6 @@ export const getVideoDetailToUpdateController = async (req: Request<VideoIdReqPa
   })
 }
 
-// Xóa ảnh thu nhỏ video
-export const deleteThumbnailImageController = async (req: Request<VideoIdReqParams>, res: Response) => {
-  await videoService.deleteThumbnailImage(req.params.videoId)
-  return res.json({
-    message: VIDEO_MESSAGES.DELETE_THUMBNAIL_IMAGE_SUCCEED
-  })
-}
-
 // Lấy danh sách video đã thích
 export const getLikedVideosController = async (
   req: Request<ParamsDictionary, any, any, PaginationReqQuery>,

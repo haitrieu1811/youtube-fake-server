@@ -87,18 +87,9 @@ class VideoService {
 
   // Tạo video mới
   async createVideo({ body, accountId }: { body: CreateVideoReqBody; accountId: string }) {
-    const { thumbnail, category } = body
-    const bodyConfig = omitBy(
-      {
-        ...body,
-        thumbnail: thumbnail ? new ObjectId(thumbnail) : undefined,
-        category: category ? new ObjectId(category) : undefined
-      },
-      isUndefined
-    )
     const { insertedId } = await databaseService.videos.insertOne(
       new Video({
-        ...(bodyConfig as any),
+        ...body,
         accountId: new ObjectId(accountId)
       })
     )
@@ -110,12 +101,12 @@ class VideoService {
 
   // Cập nhật video
   async updateVideo({ body, videoId }: { body: UpdateVideoReqBody; videoId: string }) {
-    const { category, thumbnail } = body
+    const { thumbnail, category } = body
     const bodyConfig = omitBy(
       {
         ...body,
-        category: category ? new ObjectId(category) : undefined,
-        thumbnail: thumbnail ? new ObjectId(thumbnail) : undefined
+        thumbnail: thumbnail ? new ObjectId(thumbnail) : undefined,
+        category: category ? new ObjectId(category) : undefined
       },
       isUndefined
     )
@@ -1208,27 +1199,6 @@ class VideoService {
     }
   }
 
-  // Xóa hình thu nhỏ video
-  async deleteThumbnailImage(videoId: string) {
-    const updatedVideo = await databaseService.videos.findOneAndUpdate(
-      {
-        _id: new ObjectId(videoId)
-      },
-      {
-        $set: {
-          thumbnail: null
-        },
-        $currentDate: {
-          updatedAt: true
-        }
-      }
-    )
-    if (updatedVideo && updatedVideo.thumbnail) {
-      await databaseService.images.deleteOne({ _id: updatedVideo.thumbnail })
-    }
-    return true
-  }
-
   // Lấy danh sách video đã thích
   async getLikedVideos({ query, accountId }: { query: PaginationReqQuery; accountId: string }) {
     const { page, limit } = query
@@ -1237,6 +1207,7 @@ class VideoService {
     const skip = (_page - 1) * _limit
     const match = {
       contentType: ReactionContentType.Video,
+      type: ReactionType.Like,
       accountId: new ObjectId(accountId)
     }
     const [videos, totalRowsArr] = await Promise.all([

@@ -143,3 +143,8 @@ export enum ReportStatus {
   Resolved,
   Unresolved
 }
+
+export enum VideoStatus {
+  Active,
+  Unactive
+}

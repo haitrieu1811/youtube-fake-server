@@ -1,6 +1,6 @@
 import { ParamsDictionary, Query } from 'express-serve-static-core'
 
-import { VideoAudience } from '~/constants/enum'
+import { VideoAudience, VideoStatus } from '~/constants/enum'
 import { PaginationReqQuery } from './Common.requests'
 
 // Body: Tạo danh mục video
@@ -20,7 +20,7 @@ export type VideoCategoryIdReqParams = ParamsDictionary & {
   videoCategoryId: string
 }
 
-// Params: Get video status
+// Params: Lấy trạng thái decode video
 export type GetVideoStatusReqParams = ParamsDictionary & {
   id: string
 }
@@ -28,12 +28,7 @@ export type GetVideoStatusReqParams = ParamsDictionary & {
 // Body: Tạo mới video
 export type CreateVideoReqBody = {
   idName: string
-  thumbnail: string
   title: string
-  category: string
-  description?: string
-  audience?: VideoAudience
-  isDraft: boolean
 }
 
 // Body: Cập nhật video
@@ -43,7 +38,7 @@ export type UpdateVideoReqBody = {
   category?: string
   description?: string
   audience?: VideoAudience
-  isDraft?: boolean
+  status?: VideoStatus
 }
 
 // Params: Video id

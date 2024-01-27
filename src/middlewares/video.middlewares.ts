@@ -28,7 +28,6 @@ const nameSchema: ParamSchema = {
 }
 
 const descriptionSchema: ParamSchema = {
-  optional: true,
   trim: true,
   isLength: {
     options: {
@@ -39,7 +38,7 @@ const descriptionSchema: ParamSchema = {
   }
 }
 
-const videoTitleSchema: ParamSchema = {
+const titleSchema: ParamSchema = {
   trim: true,
   notEmpty: {
     errorMessage: VIDEO_MESSAGES.TITLE_IS_REQUIRED
@@ -53,9 +52,8 @@ const videoTitleSchema: ParamSchema = {
   }
 }
 
-const videoCategorySchema: ParamSchema = {
+const categorySchema: ParamSchema = {
   trim: true,
-  optional: true,
   isMongoId: {
     errorMessage: VIDEO_MESSAGES.CATEGORY_IS_INVALID
   },
@@ -79,16 +77,14 @@ const videoDescriptionSchema: ParamSchema = {
 }
 
 const videoAudienceSchema: ParamSchema = {
-  optional: true,
   isIn: {
     options: [audiences],
     errorMessage: VIDEO_MESSAGES.AUDIENCE_IS_INVALID
   }
 }
 
-const videoThumbnailSchema: ParamSchema = {
+const thumbnailSchema: ParamSchema = {
   trim: true,
-  optional: true,
   isMongoId: {
     errorMessage: VIDEO_MESSAGES.THUMBNAIL_IS_INVALID
   }
@@ -196,11 +192,7 @@ export const createVideoValidator = validate(
           }
         }
       },
-      thumbnail: videoThumbnailSchema,
-      title: videoTitleSchema,
-      category: videoCategorySchema,
-      description: videoDescriptionSchema,
-      audience: videoAudienceSchema
+      title: titleSchema
     },
     ['body']
   )
@@ -210,15 +202,24 @@ export const createVideoValidator = validate(
 export const updateVideoValidator = validate(
   checkSchema(
     {
-      thumbnail: videoThumbnailSchema,
+      thumbnail: {
+        ...thumbnailSchema,
+        optional: true
+      },
       title: {
-        ...videoTitleSchema,
+        ...titleSchema,
         notEmpty: undefined,
         optional: true
       },
-      category: videoCategorySchema,
+      category: {
+        ...categorySchema,
+        optional: true
+      },
       description: videoDescriptionSchema,
-      audience: videoAudienceSchema
+      audience: {
+        ...videoAudienceSchema,
+        optional: true
+      }
     },
     ['body']
   )
@@ -278,7 +279,7 @@ export const authorOfVideoValidator = async (req: Request<VideoIdReqParams>, _: 
   next()
 }
 
-// Xóa videos
+// Xóa video (một hoặc nhiều)
 export const deleteVideosValidator = validate(
   checkSchema(
     {
@@ -324,7 +325,7 @@ export const getPublicVideosValidator = validate(
   checkSchema(
     {
       category: {
-        ...videoCategorySchema,
+        ...categorySchema,
         notEmpty: undefined,
         optional: true
       }
