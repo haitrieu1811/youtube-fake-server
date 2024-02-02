@@ -321,7 +321,7 @@ export const deleteVideosValidator = validate(
 )
 
 // Lấy danh sách video công khai
-export const getPublicVideosValidator = validate(
+export const getSuggestedVideosValidator = validate(
   checkSchema(
     {
       category: {

@@ -27,12 +27,12 @@ class SubscriptionService {
   }
 
   // Lấy danh sách kênh tôi đã đăng ký
-  async getChannelsSubscribedOfMe({ accountId, query }: { accountId: string; query: PaginationReqQuery }) {
+  async getMySubscribedAccounts({ accountId, query }: { accountId: string; query: PaginationReqQuery }) {
     const { page, limit } = query
     const _page = Number(page) || 1
     const _limit = Number(limit) || 20
     const skip = (_page - 1) * _limit
-    const [channels, totalRows] = await Promise.all([
+    const [accounts, totalRows] = await Promise.all([
       databaseService.subscriptions
         .aggregate([
           {
@@ -135,7 +135,7 @@ class SubscriptionService {
       })
     ])
     return {
-      channels,
+      accounts,
       page: _page,
       limit: _limit,
       totalRows,
@@ -144,12 +144,12 @@ class SubscriptionService {
   }
 
   // Lấy danh sách kênh đã đăng ký kênh của tôi
-  async getChannelsSubscribedForMe({ accountId, query }: { accountId: string; query: PaginationReqQuery }) {
+  async getAccountsSubscribedToMe({ accountId, query }: { accountId: string; query: PaginationReqQuery }) {
     const { page, limit } = query
     const _page = Number(page) || 1
     const _limit = Number(limit) || 20
     const skip = (_page - 1) * _limit
-    const [channels, totalRows] = await Promise.all([
+    const [accounts, totalRows] = await Promise.all([
       databaseService.subscriptions
         .aggregate([
           {
@@ -252,7 +252,7 @@ class SubscriptionService {
       })
     ])
     return {
-      channels,
+      accounts,
       page: _page,
       limit: _limit,
       totalRows,

@@ -6,12 +6,11 @@ import {
   deleteVideoCategoryController,
   deleteVideosController,
   getLikedVideosController,
-  getPublicVideosController,
+  getSuggestedVideosController,
   getVideoCategoriesController,
-  getVideoDetailToUpdateController,
+  getVideoToUpdateController,
   getVideosByUsernameController,
   getVideosOfMeController,
-  getVideosSameCategoryController,
   updateVideoCategoryController,
   updateVideoController,
   watchVideoController
@@ -31,7 +30,7 @@ import {
   createVideoCategoryValidator,
   createVideoValidator,
   deleteVideosValidator,
-  getPublicVideosValidator,
+  getSuggestedVideosValidator,
   idNameValidator,
   updateVideoCategoryValidator,
   updateVideoValidator,
@@ -109,8 +108,13 @@ videoRouter.delete(
   wrapRequestHandler(deleteVideosController)
 )
 
-// Lấy danh sách video công khai
-videoRouter.get('/public', paginationValidator, getPublicVideosValidator, wrapRequestHandler(getPublicVideosController))
+// Lấy danh sách video đề xuất
+videoRouter.get(
+  '/suggested',
+  paginationValidator,
+  getSuggestedVideosValidator,
+  wrapRequestHandler(getSuggestedVideosController)
+)
 
 // Lấy danh sách video tài khoản đăng nhập
 videoRouter.get(
@@ -139,11 +143,11 @@ videoRouter.get(
 
 // Xem thông tin chi tiết video
 videoRouter.get(
-  '/:videoId/to-update',
+  '/:videoId/update',
   accessTokenValidator,
   videoIdValidator,
   authorOfVideoValidator,
-  wrapRequestHandler(getVideoDetailToUpdateController)
+  wrapRequestHandler(getVideoToUpdateController)
 )
 
 // Lấy danh sách video đã thích
@@ -153,14 +157,6 @@ videoRouter.get(
   verifiedAccountValidator,
   paginationValidator,
   wrapRequestHandler(getLikedVideosController)
-)
-
-// Lấy danh sách video cùng danh mục
-videoRouter.get(
-  '/category/:videoCategoryId',
-  paginationValidator,
-  videoCategoryIdValidator,
-  wrapRequestHandler(getVideosSameCategoryController)
 )
 
 export default videoRouter

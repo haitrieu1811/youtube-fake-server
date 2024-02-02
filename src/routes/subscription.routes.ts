@@ -1,7 +1,7 @@
 import { Router } from 'express'
 
 import {
-  getChannelsSubscribedOfMeController,
+  getMySubscribedAccountsController,
   subscribeController,
   unsubscribeController
 } from '~/controllers/subscription.controllers'
@@ -34,20 +34,20 @@ subscriptionRouter.delete(
 
 // Lấy danh sách kênh tôi đã đăng ký
 subscriptionRouter.get(
-  '/of-me',
+  '/my-subscribed-accounts',
   accessTokenValidator,
   verifiedAccountValidator,
   paginationValidator,
-  wrapRequestHandler(getChannelsSubscribedOfMeController)
+  wrapRequestHandler(getMySubscribedAccountsController)
 )
 
 // Lấy danh sách kênh đã đăng ký kênh của tôi
 subscriptionRouter.get(
-  '/for-me',
+  '/accounts-subscribed-to-me',
   accessTokenValidator,
   verifiedAccountValidator,
   paginationValidator,
-  wrapRequestHandler(getChannelsSubscribedOfMeController)
+  wrapRequestHandler(getMySubscribedAccountsController)
 )
 
 export default subscriptionRouter

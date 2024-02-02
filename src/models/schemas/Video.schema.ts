@@ -20,9 +20,9 @@ export default class Video {
   _id?: ObjectId
   idName: string
   accountId: ObjectId
-  thumbnail: ObjectId
+  thumbnail: ObjectId | null
   title: string
-  category: ObjectId
+  category: ObjectId | null
   description: string
   views: number
   audience: VideoAudience
@@ -48,9 +48,9 @@ export default class Video {
     this._id = _id
     this.idName = idName
     this.accountId = accountId
-    this.thumbnail = thumbnail || new ObjectId('65b3413fd2d9b7a43b142e37')
+    this.thumbnail = thumbnail || null
     this.title = title
-    this.category = category || new ObjectId('657c5ef3ea516bac79a1bdf1')
+    this.category = category || null
     this.description = description || ''
     this.views = views || 0
     this.audience = audience || VideoAudience.Everyone

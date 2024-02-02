@@ -74,8 +74,8 @@ export const SUBSCRIPTION_MESSAGES = {
   ALREADY_SUBSCRIBE: 'Đã đăng ký kênh trước đó',
   UNSUBSCRIBE_SUCCEED: 'Hủy đăng ký kênh thành công',
   NOT_SUBSCRIBED: 'Chưa đăng ký kênh này',
-  GET_CHANNELS_SUBSCRIBED_OF_ME_SUCCEED: 'Lấy danh sách kênh tôi đã đăng ký thành công',
-  GET_CHANNELS_SUBSCRIBED_FOR_ME_SUCCEED: 'Lấy danh sách kênh đã đăng ký kênh của tôi thành công'
+  GET_MY_SUBSCRIBED_ACCOUNTS_SUCCEED: 'Lấy danh sách tài khoản đã đăng ký thành công',
+  GET_ACCOUNTS_SUBSCRIBED_TO_ME_SUCCEED: 'Lấy danh sách tài khoản đăng ký kênh của tôi thành công'
 } as const
 
 export const VIDEO_MESSAGES = {
@@ -108,7 +108,7 @@ export const VIDEO_MESSAGES = {
   VIDEO_IDS_MUST_BE_AN_ARRAY: 'Video ids phải là một mảng',
   VIDEO_IDS_HAVE_NOT_EMPTY: 'Video ids không được để trống',
   VIDEO_IDS_IS_INVALID: 'Video ids không hợp lệ',
-  GET_PUBLIC_VIDEOS_SUCCEED: 'Lấy danh sách video công khai thành công',
+  GET_PUBLIC_VIDEOS_SUCCEED: 'Lấy danh sách video đề xuất thành công',
   GET_VIDEOS_OF_ME_SUCCEED: 'Lấy danh sách video của tôi thành công',
   GET_VIDEO_DETAIL_SUCCEED: 'Lấy thông tin chi tiết video thành công',
   GET_VIDEO_CATEGORIES_SUCCEED: 'Lấy danh sách danh mục video thành công',

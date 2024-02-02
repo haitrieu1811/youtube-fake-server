@@ -57,7 +57,7 @@ export type DeleteVideosReqBody = {
 }
 
 // Query: Lấy danh sách các video công khai
-export type GetPublicVideosReqQuery = Query &
+export type GetSuggestedVideosReqQuery = Query &
   PaginationReqQuery & {
     category?: string
   }

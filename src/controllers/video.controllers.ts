@@ -9,7 +9,7 @@ import {
   CreateVideoCategoryReqBody,
   CreateVideoReqBody,
   DeleteVideosReqBody,
-  GetPublicVideosReqQuery,
+  GetSuggestedVideosReqQuery,
   GetVideosOfMeReqQuery,
   IdNameReqParams,
   UpdateVideoCategoryReqBody,
@@ -97,12 +97,12 @@ export const deleteVideosController = async (
   })
 }
 
-// Lấy danh sách video công khai
-export const getPublicVideosController = async (
-  req: Request<ParamsDictionary, any, any, GetPublicVideosReqQuery>,
+// Lấy danh sách video đề xuất
+export const getSuggestedVideosController = async (
+  req: Request<ParamsDictionary, any, any, GetSuggestedVideosReqQuery>,
   res: Response
 ) => {
-  const { videos, ...pagination } = await videoService.getPublicVideos(req.query)
+  const { videos, ...pagination } = await videoService.getSuggestedVideos(req.query)
   return res.json({
     message: VIDEO_MESSAGES.GET_PUBLIC_VIDEOS_SUCCEED,
     data: {
@@ -157,7 +157,7 @@ export const watchVideoController = async (req: Request<IdNameReqParams>, res: R
 }
 
 // Xem chi tiết video để cập nhật
-export const getVideoDetailToUpdateController = async (req: Request<VideoIdReqParams>, res: Response) => {
+export const getVideoToUpdateController = async (req: Request<VideoIdReqParams>, res: Response) => {
   const result = await videoService.getVideoDetailToUpdate(req.params.videoId)
   return res.json({
     message: VIDEO_MESSAGES.GET_VIDEO_DETAIL_SUCCEED,
@@ -174,24 +174,6 @@ export const getLikedVideosController = async (
   const { videos, ...pagination } = await videoService.getLikedVideos({ accountId, query: req.query })
   return res.json({
     message: VIDEO_MESSAGES.GET_LIKED_VIDEOS_SUCCEED,
-    data: {
-      videos,
-      pagination
-    }
-  })
-}
-
-// Lấy danh sách video cùng danh mục
-export const getVideosSameCategoryController = async (
-  req: Request<VideoCategoryIdReqParams, any, any, PaginationReqQuery>,
-  res: Response
-) => {
-  const { videos, ...pagination } = await videoService.getVideosSameCategory({
-    categoryId: req.params.videoCategoryId,
-    query: req.query
-  })
-  return res.json({
-    message: VIDEO_MESSAGES.GET_VIDEOS_SAME_CATEGORY_SUCCEED,
     data: {
       videos,
       pagination
