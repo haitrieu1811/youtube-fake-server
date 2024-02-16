@@ -20,7 +20,7 @@ const contentSchema: ParamSchema = {
   }
 }
 
-// Thêm một bình luận
+// Add a comment
 export const createCommentValidator = validate(
   checkSchema(
     {
@@ -59,8 +59,11 @@ export const createCommentValidator = validate(
                 status: HttpStatusCode.BadRequest
               })
             }
-            const video = await databaseService.videos.findOne({ _id: new ObjectId(value) })
-            if (!video) {
+            const [video, post] = await Promise.all([
+              databaseService.videos.findOne({ _id: new ObjectId(value) }),
+              databaseService.posts.findOne({ _id: new ObjectId(value) })
+            ])
+            if (!video && !post) {
               throw new ErrorWithStatus({
                 message: COMMENT_MESSAGES.COMMENT_CONTENT_ID_NOT_FOUND,
                 status: HttpStatusCode.NotFound
@@ -111,7 +114,7 @@ export const commentIdValidator = validate(
   )
 )
 
-// Kiểm tra xem có phải là tác giả của bình luận không
+// Check author of a post
 export const authorOfCommentValidator = async (req: Request<CommentIdReqParams>, res: Response, next: NextFunction) => {
   const { commentId } = req.params
   const comment = await databaseService.comments.findOne({ _id: new ObjectId(commentId) })
@@ -127,7 +130,7 @@ export const authorOfCommentValidator = async (req: Request<CommentIdReqParams>,
   return next()
 }
 
-// Cập nhật bình luận
+// Update a post
 export const updateCommentValidator = validate(
   checkSchema(
     {
@@ -137,7 +140,7 @@ export const updateCommentValidator = validate(
   )
 )
 
-// Trả lời bình luận
+// Reply a comment
 export const replyCommentValidator = validate(
   checkSchema(
     {

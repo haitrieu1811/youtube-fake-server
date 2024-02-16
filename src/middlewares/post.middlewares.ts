@@ -57,7 +57,7 @@ const audienceSchema: ParamSchema = {
   }
 }
 
-// Tạo bài viết
+// Create a new post
 export const createPostValidator = validate(
   checkSchema(
     {
@@ -105,7 +105,7 @@ export const postIdValidator = validate(
   )
 )
 
-// Kiểm tra tác giả của bài viết
+// Check author of post
 export const authorOfPostValidator = async (req: Request<PostIdReqParams>, res: Response, next: NextFunction) => {
   const { accountId } = req.decodedAuthorization as TokenPayload
   const post = (await databaseService.posts.findOne({ _id: new ObjectId(req.params.postId) })) as WithId<Post>
@@ -120,7 +120,7 @@ export const authorOfPostValidator = async (req: Request<PostIdReqParams>, res: 
   return next()
 }
 
-// Cập nhật bài viết
+// Update a post
 export const updatePostValidator = validate(
   checkSchema(
     {
@@ -136,7 +136,7 @@ export const updatePostValidator = validate(
   )
 )
 
-// Xóa bài viết
+// Delete posts
 export const deletePostsValidator = validate(
   checkSchema(
     {

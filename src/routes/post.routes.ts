@@ -3,15 +3,16 @@ import { Router } from 'express'
 import {
   createPostController,
   deletePostsController,
+  getMyPostsController,
+  getPostByUsernameController,
   getPostDetailController,
-  getPostsInProfilePageController,
   updatePostController
 } from '~/controllers/post.controllers'
 import { wrapRequestHandler } from '~/lib/handlers'
 import {
   accessTokenValidator,
-  accountIdValidator,
   isLoggedAccountValidator,
+  usernameValidator,
   verifiedAccountValidator
 } from '~/middlewares/account.middlewares'
 import { paginationValidator } from '~/middlewares/common.middlewares'
@@ -25,7 +26,7 @@ import {
 
 const postRouter = Router()
 
-// Tạo bài viết
+// Create a new post
 postRouter.post(
   '/',
   accessTokenValidator,
@@ -34,7 +35,7 @@ postRouter.post(
   wrapRequestHandler(createPostController)
 )
 
-// Cập nhật bài viết
+// Update a post
 postRouter.patch(
   '/:postId',
   accessTokenValidator,
@@ -45,7 +46,7 @@ postRouter.patch(
   wrapRequestHandler(updatePostController)
 )
 
-// Xóa bài viết
+// Delete post
 postRouter.delete(
   '/',
   accessTokenValidator,
@@ -54,16 +55,26 @@ postRouter.delete(
   wrapRequestHandler(deletePostsController)
 )
 
-// Lấy danh sách bài viết ở trang cá nhân
+// Get posts by username
 postRouter.get(
-  '/account/:accountId',
+  '/username/:username',
   isLoggedAccountValidator(accessTokenValidator),
-  accountIdValidator,
+  isLoggedAccountValidator(verifiedAccountValidator),
+  usernameValidator,
   paginationValidator,
-  wrapRequestHandler(getPostsInProfilePageController)
+  wrapRequestHandler(getPostByUsernameController)
 )
 
-// Xem chi tiết bài viết
+// Get my posts
+postRouter.get(
+  '/my',
+  accessTokenValidator,
+  verifiedAccountValidator,
+  paginationValidator,
+  wrapRequestHandler(getMyPostsController)
+)
+
+// Get post detail
 postRouter.get(
   '/:postId',
   isLoggedAccountValidator(accessTokenValidator),

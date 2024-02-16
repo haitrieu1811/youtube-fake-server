@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 
 import { POST_MESSAGES } from '~/constants/messages'
-import { AccountIdReqParams, TokenPayload } from '~/models/requests/Account.requests'
+import { TokenPayload, UsernameReqParams } from '~/models/requests/Account.requests'
 import { PaginationReqQuery } from '~/models/requests/Common.requests'
 import {
   CreatePostReqBody,
@@ -12,7 +12,7 @@ import {
 } from '~/models/requests/Post.requests'
 import postService from '~/services/post.services'
 
-// Tạo bài viết
+// Create a new post
 export const createPostController = async (req: Request<ParamsDictionary, any, CreatePostReqBody>, res: Response) => {
   const { accountId } = req.decodedAuthorization as TokenPayload
   const result = await postService.createPost({ body: req.body, accountId })
@@ -22,9 +22,8 @@ export const createPostController = async (req: Request<ParamsDictionary, any, C
   })
 }
 
-// Cập nhật bài viết
+// Update a post
 export const updatePostController = async (req: Request<PostIdReqParams, any, UpdatePostReqBody>, res: Response) => {
-  const { accountId } = req.decodedAuthorization as TokenPayload
   const result = await postService.updatePost({ body: req.body, postId: req.params.postId })
   return res.json({
     message: POST_MESSAGES.UPDATE_POST_SUCCEED,
@@ -32,7 +31,7 @@ export const updatePostController = async (req: Request<PostIdReqParams, any, Up
   })
 }
 
-// Xóa bài viết
+// Delete posts
 export const deletePostsController = async (req: Request<ParamsDictionary, any, DeletePostsReqBody>, res: Response) => {
   const { deletedCount } = await postService.deletePosts(req.body.postIds)
   return res.json({
@@ -40,19 +39,20 @@ export const deletePostsController = async (req: Request<ParamsDictionary, any, 
   })
 }
 
-// Lấy danh sách bài viết ở trang cá nhân
-export const getPostsInProfilePageController = async (
-  req: Request<AccountIdReqParams, any, any, PaginationReqQuery>,
+// Get posts by username
+export const getPostByUsernameController = async (
+  req: Request<UsernameReqParams, any, any, PaginationReqQuery>,
   res: Response
 ) => {
+  const { username } = req.params
   const accountId = req.decodedAuthorization?.accountId
-  const { posts, ...pagination } = await postService.getPostsInProfilePage({
+  const { posts, ...pagination } = await postService.getPostsByUsername({
     query: req.query,
-    profileId: req.params.accountId,
-    accountId
+    username,
+    loggedAccountId: accountId
   })
   return res.json({
-    message: POST_MESSAGES.GET_POSTS_IN_PROFILE_PAGE_SUCCEED,
+    message: POST_MESSAGES.GET_POSTS_SUCCEED,
     data: {
       posts,
       pagination
@@ -60,10 +60,29 @@ export const getPostsInProfilePageController = async (
   })
 }
 
-// Xem chi tiết bài viết
+// Get my posts
+export const getMyPostsController = async (
+  req: Request<ParamsDictionary, any, any, PaginationReqQuery>,
+  res: Response
+) => {
+  const { accountId } = req.decodedAuthorization as TokenPayload
+  const { posts, ...pagination } = await postService.getMyPosts({
+    query: req.query,
+    accountId
+  })
+  return res.json({
+    message: POST_MESSAGES.GET_POSTS_SUCCEED,
+    data: {
+      posts,
+      pagination
+    }
+  })
+}
+
+// Get post detail
 export const getPostDetailController = async (req: Request<PostIdReqParams>, res: Response) => {
   const accountId = req.decodedAuthorization?.accountId
-  const result = await postService.getPostDetail({ postId: req.params.postId, accountId })
+  const result = await postService.getPostDetail({ postId: req.params.postId, loggedAccountId: accountId })
   return res.json({
     message: POST_MESSAGES.GET_POST_DETAIL_SUCCEED,
     data: result
