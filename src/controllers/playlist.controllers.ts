@@ -13,7 +13,7 @@ import {
 } from '~/models/requests/Playlist.requests'
 import playlistService from '~/services/playlist.services'
 
-// Tạo playlist
+// Create new playlist
 export const createPlaylistController = async (
   req: Request<ParamsDictionary, any, CreatePlaylistReqBody>,
   res: Response
@@ -26,7 +26,7 @@ export const createPlaylistController = async (
   })
 }
 
-// Cập nhật playlist
+// Update a playlist
 export const updatePlaylistController = async (
   req: Request<PlaylistIdReqParams, any, UpdatePlaylistReqBody>,
   res: Response
@@ -38,7 +38,7 @@ export const updatePlaylistController = async (
   })
 }
 
-// Xóa playlist
+// Delete playlist
 export const deletePlaylistController = async (req: Request<PlaylistIdReqParams>, res: Response) => {
   await playlistService.deletePlaylist(req.params.playlistId)
   return res.json({
@@ -46,7 +46,7 @@ export const deletePlaylistController = async (req: Request<PlaylistIdReqParams>
   })
 }
 
-// Thêm video vào playlist
+// Add video to playlist
 export const addVideoToPlaylistController = async (req: Request<AddVideoToPlaylistReqParams>, res: Response) => {
   const { videoId, playlistId } = req.params
   const result = await playlistService.addVideoToPlaylist({ videoId, playlistId })
@@ -56,7 +56,7 @@ export const addVideoToPlaylistController = async (req: Request<AddVideoToPlayli
   })
 }
 
-// Xóa video khỏi playlist
+// Remove video from playlist
 export const removeVideoFromPlaylistController = async (
   req: Request<RemoveVideoFromPlaylistReqParams>,
   res: Response
@@ -68,7 +68,7 @@ export const removeVideoFromPlaylistController = async (
   })
 }
 
-// Lấy danh sách video của playlist
+// Get videos from playlist
 export const getVideosFromPlaylistController = async (
   req: Request<PlaylistIdReqParams, any, any, PaginationReqQuery>,
   res: Response
@@ -86,7 +86,7 @@ export const getVideosFromPlaylistController = async (
   })
 }
 
-// Lấy danh sách playlist của tôi
+// Get my playlists
 export const getPlaylistsOfMeController = async (
   req: Request<ParamsDictionary, any, any, PaginationReqQuery>,
   res: Response
@@ -102,5 +102,14 @@ export const getPlaylistsOfMeController = async (
       playlists,
       pagination
     }
+  })
+}
+
+// Get playlist by id
+export const getPlaylistByIdController = async (req: Request<PlaylistIdReqParams>, res: Response) => {
+  const result = await playlistService.getPlaylistById(req.params.playlistId)
+  return res.json({
+    message: PLAYLIST_MESSAGES.GET_PLAYLISTS_SUCCEED,
+    data: result
   })
 }

@@ -213,7 +213,7 @@ export const POST_MESSAGES = {
   POST_NOT_FOUND: 'Không tìm thấy bài viết',
   AUTHOR_IS_INVALID: 'Bạn không phải là tác giả của bài viết',
   UPDATE_POST_SUCCEED: 'Cập nhật bài viết thành công',
-  POST_IDS_IS_REQUIRED: 'Post ids không hợp lệ',
+  POST_IDS_IS_REQUIRED: 'Post ids là bắt buộc',
   POST_IDS_MUST_BE_AN_ARRAY: 'Post ids phải là một mảng',
   POST_IDS_CANNOT_BE_EMPTY: 'Post ids không được rỗng',
   POST_IDS_IS_INVALID: 'Post ids không hợp lệ',

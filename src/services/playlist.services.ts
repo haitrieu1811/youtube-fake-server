@@ -8,7 +8,7 @@ import PlaylistVideo from '~/models/schemas/PlaylistVideo.schema'
 import databaseService from './database.services'
 
 class PlaylistService {
-  // Tạo playlist
+  // Create new playlist
   async createPlaylist({ body, accountId }: { body: CreatePlaylistReqBody; accountId: string }) {
     const { name, description, audience } = body
     const { insertedId } = await databaseService.playlists.insertOne(
@@ -25,7 +25,7 @@ class PlaylistService {
     }
   }
 
-  // Cập nhật playlist
+  // Update playlist
   async updatePlaylist({ body, playlistId }: { body: UpdatePlaylistReqBody; playlistId: string }) {
     const updatedPlaylist = await databaseService.playlists.findOneAndUpdate(
       {
@@ -46,13 +46,16 @@ class PlaylistService {
     }
   }
 
-  // Xóa playlist
+  // Delete playlist
   async deletePlaylist(playlistId: string) {
-    await databaseService.playlists.deleteOne({ _id: new ObjectId(playlistId) })
+    await Promise.all([
+      databaseService.playlists.deleteOne({ _id: new ObjectId(playlistId) }),
+      databaseService.playlistVideos.deleteMany({ playlistId: new ObjectId(playlistId) })
+    ])
     return true
   }
 
-  // Thêm video vào playlist
+  // Add video to playlist
   async addVideoToPlaylist({ videoId, playlistId }: { videoId: string; playlistId: string }) {
     const { insertedId } = await databaseService.playlistVideos.insertOne(
       new PlaylistVideo({
@@ -66,7 +69,7 @@ class PlaylistService {
     }
   }
 
-  // Xóa video khỏi playlist
+  // Remove video from playlist
   async removeVideoFromPlaylist({ videoId, playlistId }: { videoId: string; playlistId: string }) {
     await databaseService.playlistVideos.deleteOne({
       videoId: new ObjectId(videoId),
@@ -75,7 +78,7 @@ class PlaylistService {
     return true
   }
 
-  // Lấy video từ playlist
+  // Get videos from playlist
   async getVideosFromPlaylist({ playlistId, query }: { playlistId: string; query: PaginationReqQuery }) {
     const { page, limit } = query
     const _page = Number(page) || 1
@@ -237,33 +240,120 @@ class PlaylistService {
     }
   }
 
-  // Lấy danh sách playlist của tôi
+  // Get my playlists
   async getPlaylistsOfMe({ accountId, query }: { accountId: string; query: PaginationReqQuery }) {
     const { page, limit } = query
     const _page = Number(page) || 1
     const _limit = Number(limit) || 20
     const skip = (_page - 1) * _limit
+    const match = { accountId: new ObjectId(accountId) }
     const [playlists, totalRows] = await Promise.all([
       databaseService.playlists
-        .find(
+        .aggregate([
           {
-            accountId: new ObjectId(accountId)
+            $match: match
           },
           {
-            projection: {
-              _id: 1,
-              name: 1,
-              createdAt: 1,
-              updatedAt: 1
+            $lookup: {
+              from: 'playlistVideos',
+              localField: '_id',
+              foreignField: 'playlistId',
+              as: 'videos'
             }
+          },
+          {
+            $lookup: {
+              from: 'videos',
+              localField: 'videos.videoId',
+              foreignField: '_id',
+              as: 'videos'
+            }
+          },
+          {
+            $addFields: {
+              videoCount: {
+                $size: '$videos'
+              },
+              thumbnailObj: {
+                $cond: {
+                  if: {
+                    $size: '$videos'
+                  },
+                  then: {
+                    $first: '$videos'
+                  },
+                  else: ''
+                }
+              }
+            }
+          },
+          {
+            $lookup: {
+              from: 'images',
+              localField: 'thumbnailObj.thumbnail',
+              foreignField: '_id',
+              as: 'thumbnail'
+            }
+          },
+          {
+            $unwind: {
+              path: '$thumbnail',
+              preserveNullAndEmptyArrays: true
+            }
+          },
+          {
+            $addFields: {
+              thumbnail: {
+                $cond: {
+                  if: '$thumbnail',
+                  then: {
+                    $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$thumbnail.name']
+                  },
+                  else: ''
+                }
+              }
+            }
+          },
+          {
+            $group: {
+              _id: '$_id',
+              name: {
+                $first: '$name'
+              },
+              thumbnail: {
+                $first: '$thumbnail'
+              },
+              description: {
+                $first: '$description'
+              },
+              audience: {
+                $first: '$audience'
+              },
+              videoCount: {
+                $first: '$videoCount'
+              },
+              createdAt: {
+                $first: '$createdAt'
+              },
+              updatedAt: {
+                $first: '$updatedAt'
+              }
+            }
+          },
+          {
+            $sort: {
+              createdAt: -1
+            }
+          },
+          {
+            $skip: skip
+          },
+          {
+            $limit: _limit
           }
-        )
-        .skip(skip)
-        .limit(_limit)
+        ])
         .toArray(),
-      databaseService.playlists.countDocuments({
-        accountId: new ObjectId(accountId)
-      })
+      databaseService.playlists.countDocuments(match)
     ])
     return {
       playlists,
@@ -271,6 +361,17 @@ class PlaylistService {
       limit: _limit,
       totalRows,
       totalPages: Math.ceil(totalRows / _limit)
+    }
+  }
+
+  // Get playlist by id
+  async getPlaylistById(playlistId: string) {
+    const playlist = await databaseService.playlists.findOne(
+      { _id: new ObjectId(playlistId) },
+      { projection: { accountId: 0 } }
+    )
+    return {
+      playlist
     }
   }
 }

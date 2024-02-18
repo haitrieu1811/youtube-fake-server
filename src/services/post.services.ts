@@ -60,11 +60,16 @@ class PostService {
   // Delete posts
   async deletePosts(postIds: string[]) {
     const _postIds = postIds.map((id) => new ObjectId(id))
-    const { deletedCount } = await databaseService.posts.deleteMany({
-      _id: {
-        $in: _postIds
-      }
-    })
+    const [{ deletedCount }] = await Promise.all([
+      databaseService.posts.deleteMany({
+        _id: { $in: _postIds }
+      }),
+      databaseService.comments.deleteMany({
+        contentId: {
+          $in: _postIds
+        }
+      })
+    ])
     return {
       deletedCount
     }
@@ -260,6 +265,9 @@ class PostService {
             },
             commentCount: {
               $first: '$commentCount'
+            },
+            audience: {
+              $first: '$audience'
             },
             createdAt: {
               $first: '$createdAt'
@@ -541,6 +549,9 @@ class PostService {
             },
             commentCount: {
               $first: '$commentCount'
+            },
+            audience: {
+              $first: '$audience'
             },
             createdAt: {
               $first: '$createdAt'

@@ -4,6 +4,7 @@ import {
   addVideoToPlaylistController,
   createPlaylistController,
   deletePlaylistController,
+  getPlaylistByIdController,
   getPlaylistsOfMeController,
   getVideosFromPlaylistController,
   removeVideoFromPlaylistController,
@@ -25,7 +26,7 @@ import { UpdatePlaylistReqBody } from '~/models/requests/Playlist.requests'
 
 const playlistRouter = Router()
 
-// Tạo playlist
+// Create new playlist
 playlistRouter.post(
   '/',
   accessTokenValidator,
@@ -34,7 +35,7 @@ playlistRouter.post(
   wrapRequestHandler(createPlaylistController)
 )
 
-// Cập nhật playlist
+// Update a playlist
 playlistRouter.patch(
   '/:playlistId',
   accessTokenValidator,
@@ -46,7 +47,7 @@ playlistRouter.patch(
   wrapRequestHandler(updatePlaylistController)
 )
 
-// Xóa playlist
+// Delete playlist
 playlistRouter.delete(
   '/:playlistId',
   accessTokenValidator,
@@ -68,7 +69,7 @@ playlistRouter.post(
   wrapRequestHandler(addVideoToPlaylistController)
 )
 
-// Thêm video vào playlist
+// Add video to playlist
 playlistRouter.delete(
   '/:playlistId/remove-from-playlist/video/:videoId',
   accessTokenValidator,
@@ -80,7 +81,7 @@ playlistRouter.delete(
   wrapRequestHandler(removeVideoFromPlaylistController)
 )
 
-// Lấy danh sách video từ playlist
+// Get videos from playlist
 playlistRouter.get(
   '/:playlistId/videos',
   playlistIdValidator,
@@ -88,7 +89,7 @@ playlistRouter.get(
   wrapRequestHandler(getVideosFromPlaylistController)
 )
 
-// Lấy danh sách playlist của tôi
+// Get my playlists
 playlistRouter.get(
   '/me',
   accessTokenValidator,
@@ -96,5 +97,8 @@ playlistRouter.get(
   paginationValidator,
   wrapRequestHandler(getPlaylistsOfMeController)
 )
+
+// Get videos from playlist
+playlistRouter.get('/:playlistId', playlistIdValidator, wrapRequestHandler(getPlaylistByIdController))
 
 export default playlistRouter

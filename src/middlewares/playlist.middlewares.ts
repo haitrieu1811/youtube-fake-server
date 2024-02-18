@@ -45,7 +45,7 @@ const audienceSchema: ParamSchema = {
   }
 }
 
-// Tạo playlist
+// Create new playlist
 export const createPlaylistValidator = validate(
   checkSchema(
     {
@@ -57,7 +57,7 @@ export const createPlaylistValidator = validate(
   )
 )
 
-// Cập nhật playlist
+// Update a playlist
 export const updatePlaylistValidator = validate(
   checkSchema(
     {
@@ -109,7 +109,7 @@ export const playlistIdValidator = validate(
   )
 )
 
-// Kiểm tra tác giả của playlist
+// Check author of playlist
 export const authorOfPlaylistValidator = async (req: Request<PlaylistIdReqParams>, _: Response, next: NextFunction) => {
   const { accountId } = req.decodedAuthorization as TokenPayload
   const { playlistId } = req.params
@@ -125,7 +125,7 @@ export const authorOfPlaylistValidator = async (req: Request<PlaylistIdReqParams
   return next()
 }
 
-// Kiểm tra đã thêm video vào playlist trước đó hay chưa
+// Check whether the video has been added to the playlist before or not
 export const videoNotAlreadyInPlaylistValidator = async (
   req: Request<AddVideoToPlaylistReqParams>,
   res: Response,
@@ -147,7 +147,7 @@ export const videoNotAlreadyInPlaylistValidator = async (
   return next()
 }
 
-// Kiểm tra video có nằm trong playlist hay chưa
+// Check if the video is in the playlist or not
 export const videoAlreadyInPlaylistValidator = async (
   req: Request<RemoveVideoFromPlaylistReqParams>,
   res: Response,
