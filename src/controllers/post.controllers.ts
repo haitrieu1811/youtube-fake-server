@@ -88,3 +88,22 @@ export const getPostDetailController = async (req: Request<PostIdReqParams>, res
     data: result
   })
 }
+
+// Get suggested posts
+export const getSuggestedPostsController = async (
+  req: Request<ParamsDictionary, any, any, PaginationReqQuery>,
+  res: Response
+) => {
+  const accountId = req.decodedAuthorization?.accountId
+  const { posts, ...pagination } = await postService.getSuggestedPosts({
+    query: req.query,
+    loggedAccountId: accountId
+  })
+  return res.json({
+    message: POST_MESSAGES.GET_POSTS_SUCCEED,
+    data: {
+      posts,
+      pagination
+    }
+  })
+}

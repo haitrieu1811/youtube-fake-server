@@ -107,7 +107,8 @@ class PlaylistService {
           },
           {
             $addFields: {
-              'videos.addedAt': '$createdAt'
+              'videos.addedAt': '$createdAt',
+              'videos.playlistId': '$playlistId'
             }
           },
           {
@@ -174,6 +175,9 @@ class PlaylistService {
           {
             $group: {
               _id: '$_id',
+              playlistId: {
+                $first: '$playlistId'
+              },
               author: {
                 $first: '$author'
               },

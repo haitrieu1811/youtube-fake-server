@@ -6,6 +6,7 @@ import {
   getMyPostsController,
   getPostByUsernameController,
   getPostDetailController,
+  getSuggestedPostsController,
   updatePostController
 } from '~/controllers/post.controllers'
 import { wrapRequestHandler } from '~/lib/handlers'
@@ -72,6 +73,15 @@ postRouter.get(
   verifiedAccountValidator,
   paginationValidator,
   wrapRequestHandler(getMyPostsController)
+)
+
+// Get suggested posts
+postRouter.get(
+  '/suggested',
+  isLoggedAccountValidator(accessTokenValidator),
+  isLoggedAccountValidator(verifiedAccountValidator),
+  paginationValidator,
+  wrapRequestHandler(getSuggestedPostsController)
 )
 
 // Get post detail

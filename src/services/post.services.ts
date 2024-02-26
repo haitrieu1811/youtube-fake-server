@@ -580,6 +580,236 @@ class PostService {
       post: post[0]
     }
   }
+
+  // Get suggested post
+  async getSuggestedPosts({ query, loggedAccountId }: { query: PaginationReqQuery; loggedAccountId?: string }) {
+    const { page, limit } = query
+    const _page = Number(page) || 1
+    const _limit = Number(limit) || 20
+    const skip = (_page - 1) * _limit
+    const match = { audience: PostAudience.Everyone }
+    const [posts, totalRows] = await Promise.all([
+      databaseService.posts
+        .aggregate([
+          {
+            $match: match
+          },
+          {
+            $lookup: {
+              from: 'accounts',
+              localField: 'accountId',
+              foreignField: '_id',
+              as: 'author'
+            }
+          },
+          {
+            $unwind: {
+              path: '$author'
+            }
+          },
+          {
+            $lookup: {
+              from: 'images',
+              localField: 'images',
+              foreignField: '_id',
+              as: 'images'
+            }
+          },
+          {
+            $lookup: {
+              from: 'reactions',
+              localField: '_id',
+              foreignField: 'contentId',
+              as: 'reactions'
+            }
+          },
+          {
+            $lookup: {
+              from: 'images',
+              localField: 'author.avatar',
+              foreignField: '_id',
+              as: 'authorAvatar'
+            }
+          },
+          {
+            $unwind: {
+              path: '$authorAvatar',
+              preserveNullAndEmptyArrays: true
+            }
+          },
+          {
+            $addFields: {
+              images: {
+                $map: {
+                  input: '$images',
+                  as: 'image',
+                  in: {
+                    $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$$image.name']
+                  }
+                }
+              },
+              likes: {
+                $filter: {
+                  input: '$reactions',
+                  as: 'reaction',
+                  cond: {
+                    $eq: ['$$reaction.type', ReactionType.Like]
+                  }
+                }
+              },
+              dislikes: {
+                $filter: {
+                  input: '$reactions',
+                  as: 'reaction',
+                  cond: {
+                    $eq: ['$$reaction.type', ReactionType.Dislike]
+                  }
+                }
+              },
+              reactionOfUser: {
+                $filter: {
+                  input: '$reactions',
+                  as: 'reaction',
+                  cond: {
+                    $eq: ['$$reaction.accountId', new ObjectId(loggedAccountId)]
+                  }
+                }
+              },
+              'author.avatar': {
+                $cond: {
+                  if: '$authorAvatar',
+                  then: {
+                    $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$authorAvatar.name']
+                  },
+                  else: ''
+                }
+              }
+            }
+          },
+          {
+            $unwind: {
+              path: '$reactionOfUser',
+              preserveNullAndEmptyArrays: true
+            }
+          },
+          {
+            $lookup: {
+              from: 'comments',
+              localField: '_id',
+              foreignField: 'contentId',
+              as: 'comments'
+            }
+          },
+          {
+            $addFields: {
+              likeCount: {
+                $size: '$likes'
+              },
+              dislikeCount: {
+                $size: '$dislikes'
+              },
+              isLiked: {
+                $cond: {
+                  if: {
+                    $and: [
+                      '$reactionOfUser',
+                      {
+                        $eq: ['$reactionOfUser.type', ReactionType.Like]
+                      }
+                    ]
+                  },
+                  then: true,
+                  else: false
+                }
+              },
+              isDisliked: {
+                $cond: {
+                  if: {
+                    $and: [
+                      '$reactionOfUser',
+                      {
+                        $eq: ['$reactionOfUser.type', ReactionType.Dislike]
+                      }
+                    ]
+                  },
+                  then: true,
+                  else: false
+                }
+              },
+              commentCount: {
+                $size: '$comments'
+              }
+            }
+          },
+          {
+            $group: {
+              _id: '$_id',
+              author: {
+                $first: '$author'
+              },
+              images: {
+                $first: '$images'
+              },
+              content: {
+                $first: '$content'
+              },
+              likeCount: {
+                $first: '$likeCount'
+              },
+              dislikeCount: {
+                $first: '$dislikeCount'
+              },
+              isLiked: {
+                $first: '$isLiked'
+              },
+              isDisliked: {
+                $first: '$isDisliked'
+              },
+              commentCount: {
+                $first: '$commentCount'
+              },
+              audience: {
+                $first: '$audience'
+              },
+              createdAt: {
+                $first: '$createdAt'
+              },
+              updatedAt: {
+                $first: '$updatedAt'
+              }
+            }
+          },
+          {
+            $project: {
+              'author.email': 0,
+              'author.password': 0,
+              'author.bio': 0,
+              'author.cover': 0,
+              'author.role': 0,
+              'author.status': 0,
+              'author.verify': 0,
+              'author.forgotPasswordToken': 0,
+              'author.verifyEmailToken': 0
+            }
+          },
+          {
+            $skip: skip
+          },
+          {
+            $limit: _limit
+          }
+        ])
+        .toArray(),
+      databaseService.posts.countDocuments(match)
+    ])
+    return {
+      posts,
+      page: _page,
+      limit: _limit,
+      totalRows,
+      totalPages: Math.ceil(totalRows / _limit)
+    }
+  }
 }
 
 const postService = new PostService()
