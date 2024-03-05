@@ -5,13 +5,14 @@ import {
   createPlaylistController,
   deletePlaylistController,
   getPlaylistByIdController,
+  getPlaylistsByUsernameController,
   getPlaylistsOfMeController,
   getVideosFromPlaylistController,
   removeVideoFromPlaylistController,
   updatePlaylistController
 } from '~/controllers/playlist.controllers'
 import { wrapRequestHandler } from '~/lib/handlers'
-import { accessTokenValidator, verifiedAccountValidator } from '~/middlewares/account.middlewares'
+import { accessTokenValidator, usernameValidator, verifiedAccountValidator } from '~/middlewares/account.middlewares'
 import { filterReqBodyMiddleware, paginationValidator } from '~/middlewares/common.middlewares'
 import {
   authorOfPlaylistValidator,
@@ -100,5 +101,13 @@ playlistRouter.get(
 
 // Get videos from playlist
 playlistRouter.get('/:playlistId', playlistIdValidator, wrapRequestHandler(getPlaylistByIdController))
+
+// Get playlists by username
+playlistRouter.get(
+  '/user/:username',
+  usernameValidator,
+  paginationValidator,
+  wrapRequestHandler(getPlaylistsByUsernameController)
+)
 
 export default playlistRouter

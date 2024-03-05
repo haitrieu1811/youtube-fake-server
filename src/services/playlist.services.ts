@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongodb'
 
 import { ENV_CONFIG } from '~/constants/config'
+import { PlaylistAudience } from '~/constants/enum'
 import { PaginationReqQuery } from '~/models/requests/Common.requests'
 import { CreatePlaylistReqBody, UpdatePlaylistReqBody } from '~/models/requests/Playlist.requests'
 import Playlist from '~/models/schemas/Playlist.schema'
@@ -84,7 +85,7 @@ class PlaylistService {
     const _page = Number(page) || 1
     const _limit = Number(limit) || 20
     const skip = (_page - 1) * _limit
-    const [videos, totalRows] = await Promise.all([
+    const [videos, totalRows, playlist] = await Promise.all([
       databaseService.playlistVideos
         .aggregate([
           {
@@ -233,15 +234,150 @@ class PlaylistService {
           }
         ])
         .toArray(),
-      databaseService.playlistVideos.countDocuments({ playlistId: new ObjectId(playlistId) })
+      databaseService.playlistVideos.countDocuments({ playlistId: new ObjectId(playlistId) }),
+      databaseService.playlists.findOne({ _id: new ObjectId(playlistId) })
     ])
     return {
       videos,
+      playlistName: playlist?.name,
       page: _page,
       limit: _limit,
       totalRows,
       totalPages: Math.ceil(totalRows / _limit)
     }
+  }
+
+  private async getPlaylists({
+    match,
+    sort = {
+      createdAt: -1
+    },
+    skip = 0,
+    limit = 20
+  }: {
+    match: any
+    sort?: any
+    skip?: number
+    limit?: number
+  }) {
+    const playlists = await databaseService.playlists
+      .aggregate([
+        {
+          $match: match
+        },
+        {
+          $lookup: {
+            from: 'playlistVideos',
+            localField: '_id',
+            foreignField: 'playlistId',
+            as: 'videos'
+          }
+        },
+        {
+          $lookup: {
+            from: 'videos',
+            localField: 'videos.videoId',
+            foreignField: '_id',
+            as: 'videos'
+          }
+        },
+        {
+          $addFields: {
+            videoCount: {
+              $size: '$videos'
+            },
+            thumbnailObj: {
+              $cond: {
+                if: {
+                  $size: '$videos'
+                },
+                then: {
+                  $first: '$videos'
+                },
+                else: ''
+              }
+            }
+          }
+        },
+        {
+          $lookup: {
+            from: 'images',
+            localField: 'thumbnailObj.thumbnail',
+            foreignField: '_id',
+            as: 'thumbnail'
+          }
+        },
+        {
+          $unwind: {
+            path: '$thumbnail',
+            preserveNullAndEmptyArrays: true
+          }
+        },
+        {
+          $addFields: {
+            thumbnail: {
+              $cond: {
+                if: '$thumbnail',
+                then: {
+                  $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$thumbnail.name']
+                },
+                else: ''
+              }
+            },
+            firstVideoIdName: {
+              $cond: {
+                if: {
+                  $size: '$videos'
+                },
+                then: {
+                  $first: '$videos.idName'
+                },
+                else: ''
+              }
+            }
+          }
+        },
+        {
+          $group: {
+            _id: '$_id',
+            firstVideoIdName: {
+              $first: '$firstVideoIdName'
+            },
+            name: {
+              $first: '$name'
+            },
+            thumbnail: {
+              $first: '$thumbnail'
+            },
+            description: {
+              $first: '$description'
+            },
+            audience: {
+              $first: '$audience'
+            },
+            videoCount: {
+              $first: '$videoCount'
+            },
+            createdAt: {
+              $first: '$createdAt'
+            },
+            updatedAt: {
+              $first: '$updatedAt'
+            }
+          }
+        },
+        {
+          $sort: sort
+        },
+        {
+          $skip: skip
+        },
+        {
+          $limit: limit
+        }
+      ])
+      .toArray()
+    return playlists
   }
 
   // Get my playlists
@@ -252,111 +388,7 @@ class PlaylistService {
     const skip = (_page - 1) * _limit
     const match = { accountId: new ObjectId(accountId) }
     const [playlists, totalRows] = await Promise.all([
-      databaseService.playlists
-        .aggregate([
-          {
-            $match: match
-          },
-          {
-            $lookup: {
-              from: 'playlistVideos',
-              localField: '_id',
-              foreignField: 'playlistId',
-              as: 'videos'
-            }
-          },
-          {
-            $lookup: {
-              from: 'videos',
-              localField: 'videos.videoId',
-              foreignField: '_id',
-              as: 'videos'
-            }
-          },
-          {
-            $addFields: {
-              videoCount: {
-                $size: '$videos'
-              },
-              thumbnailObj: {
-                $cond: {
-                  if: {
-                    $size: '$videos'
-                  },
-                  then: {
-                    $first: '$videos'
-                  },
-                  else: ''
-                }
-              }
-            }
-          },
-          {
-            $lookup: {
-              from: 'images',
-              localField: 'thumbnailObj.thumbnail',
-              foreignField: '_id',
-              as: 'thumbnail'
-            }
-          },
-          {
-            $unwind: {
-              path: '$thumbnail',
-              preserveNullAndEmptyArrays: true
-            }
-          },
-          {
-            $addFields: {
-              thumbnail: {
-                $cond: {
-                  if: '$thumbnail',
-                  then: {
-                    $concat: [ENV_CONFIG.HOST, ENV_CONFIG.PUBLIC_IMAGES_PATH, '/', '$thumbnail.name']
-                  },
-                  else: ''
-                }
-              }
-            }
-          },
-          {
-            $group: {
-              _id: '$_id',
-              name: {
-                $first: '$name'
-              },
-              thumbnail: {
-                $first: '$thumbnail'
-              },
-              description: {
-                $first: '$description'
-              },
-              audience: {
-                $first: '$audience'
-              },
-              videoCount: {
-                $first: '$videoCount'
-              },
-              createdAt: {
-                $first: '$createdAt'
-              },
-              updatedAt: {
-                $first: '$updatedAt'
-              }
-            }
-          },
-          {
-            $sort: {
-              createdAt: -1
-            }
-          },
-          {
-            $skip: skip
-          },
-          {
-            $limit: _limit
-          }
-        ])
-        .toArray(),
+      this.getPlaylists({ match, skip, limit: _limit }),
       databaseService.playlists.countDocuments(match)
     ])
     return {
@@ -376,6 +408,27 @@ class PlaylistService {
     )
     return {
       playlist
+    }
+  }
+
+  // Get playlists by username
+  async getPlaylistsByUsername({ username, query }: { username: string; query: PaginationReqQuery }) {
+    const account = await databaseService.accounts.findOne({ username })
+    const { page, limit } = query
+    const _page = Number(page) || 1
+    const _limit = Number(limit) || 20
+    const skip = (_page - 1) * _limit
+    const match = { accountId: account?._id, audience: PlaylistAudience.Everyone }
+    const [playlists, totalRows] = await Promise.all([
+      this.getPlaylists({ match, skip, limit: _limit }),
+      databaseService.playlists.countDocuments(match)
+    ])
+    return {
+      playlists,
+      page: _page,
+      limit: _limit,
+      totalRows,
+      totalPages: Math.ceil(totalRows / _limit)
     }
   }
 }

@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 
 import { PLAYLIST_MESSAGES } from '~/constants/messages'
-import { TokenPayload } from '~/models/requests/Account.requests'
+import { TokenPayload, UsernameReqParams } from '~/models/requests/Account.requests'
 import { PaginationReqQuery } from '~/models/requests/Common.requests'
 import {
   AddVideoToPlaylistReqParams,
@@ -73,13 +73,14 @@ export const getVideosFromPlaylistController = async (
   req: Request<PlaylistIdReqParams, any, any, PaginationReqQuery>,
   res: Response
 ) => {
-  const { videos, ...pagination } = await playlistService.getVideosFromPlaylist({
+  const { videos, playlistName, ...pagination } = await playlistService.getVideosFromPlaylist({
     playlistId: req.params.playlistId,
     query: req.query
   })
   return res.json({
     message: PLAYLIST_MESSAGES.GET_VIDEOS_FROM_PLAYLIST_SUCCEED,
     data: {
+      playlistName,
       videos,
       pagination
     }
@@ -111,5 +112,24 @@ export const getPlaylistByIdController = async (req: Request<PlaylistIdReqParams
   return res.json({
     message: PLAYLIST_MESSAGES.GET_PLAYLISTS_SUCCEED,
     data: result
+  })
+}
+
+// Get playlists by username
+export const getPlaylistsByUsernameController = async (
+  req: Request<UsernameReqParams, any, any, PaginationReqQuery>,
+  res: Response
+) => {
+  const { username } = req.params
+  const { playlists, ...pagination } = await playlistService.getPlaylistsByUsername({
+    username,
+    query: req.query
+  })
+  return res.json({
+    message: PLAYLIST_MESSAGES.GET_PLAYLISTS_SUCCEED,
+    data: {
+      playlists,
+      pagination
+    }
   })
 }
