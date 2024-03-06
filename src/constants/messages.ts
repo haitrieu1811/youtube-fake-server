@@ -145,7 +145,8 @@ export const BOOKMARK_MESSAGES = {
   BOOKMARK_NOT_FOUND: 'Không tìm thấy bookmark',
   BOOKMARK_AUTHOR_IS_INVALID: 'Bạn không phải là tác giả của bookmark này',
   DELETE_BOOKMARK_SUCCEED: 'Xóa bookmark thành công',
-  ALREADY_BOOKMARK_THIS_VIDEO: 'Đã bookmark video này trước đó'
+  ALREADY_BOOKMARK_THIS_VIDEO: 'Đã bookmark video này trước đó',
+  GET_BOOKMARK_VIDEOS_SUCCEED: 'Lấy danh sách video Xem sau thành công'
 } as const
 
 export const WATCH_HISTORY_MESSAGES = {
