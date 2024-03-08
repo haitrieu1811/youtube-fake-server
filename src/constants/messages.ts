@@ -238,7 +238,8 @@ export const PLAYLIST_MESSAGES = {
   REMOVE_VIDEO_FROM_PLAYLIST_SUCCEED: 'Xóa video khỏi playlist thành công',
   VIDEO_NOT_ALREADY_IN_PLAYLIST: 'Video chưa được thêm vào playlist',
   GET_VIDEOS_FROM_PLAYLIST_SUCCEED: 'Lấy danh sách video từ playlist thành công',
-  GET_PLAYLISTS_SUCCEED: 'Lấy danh sách playlist thành công'
+  GET_PLAYLISTS_SUCCEED: 'Lấy danh sách playlist thành công',
+  GET_PLAYLISTS_CONTAINING_VIDEO_SUCCEED: 'Lấy danh sách playlist đang chứa video thành công'
 } as const
 
 export const SEARCH_MESSAGES = {

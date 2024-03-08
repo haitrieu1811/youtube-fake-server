@@ -6,6 +6,7 @@ import {
   deletePlaylistController,
   getPlaylistByIdController,
   getPlaylistsByUsernameController,
+  getPlaylistsContainingVideoController,
   getPlaylistsOfMeController,
   getVideosFromPlaylistController,
   removeVideoFromPlaylistController,
@@ -58,7 +59,7 @@ playlistRouter.delete(
   wrapRequestHandler(deletePlaylistController)
 )
 
-// Thêm video vào playlist
+// Add video to playlist
 playlistRouter.post(
   '/:playlistId/add-to-playlist/video/:videoId',
   accessTokenValidator,
@@ -70,7 +71,7 @@ playlistRouter.post(
   wrapRequestHandler(addVideoToPlaylistController)
 )
 
-// Add video to playlist
+// Remove video from playlist
 playlistRouter.delete(
   '/:playlistId/remove-from-playlist/video/:videoId',
   accessTokenValidator,
@@ -108,6 +109,15 @@ playlistRouter.get(
   usernameValidator,
   paginationValidator,
   wrapRequestHandler(getPlaylistsByUsernameController)
+)
+
+// Get playlists containing video
+playlistRouter.get(
+  '/containing/video/:videoId',
+  accessTokenValidator,
+  verifiedAccountValidator,
+  videoIdValidator,
+  wrapRequestHandler(getPlaylistsContainingVideoController)
 )
 
 export default playlistRouter

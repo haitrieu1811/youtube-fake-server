@@ -11,6 +11,7 @@ import {
   RemoveVideoFromPlaylistReqParams,
   UpdatePlaylistReqBody
 } from '~/models/requests/Playlist.requests'
+import { VideoIdReqParams } from '~/models/requests/Video.requests'
 import playlistService from '~/services/playlist.services'
 
 // Create new playlist
@@ -49,7 +50,8 @@ export const deletePlaylistController = async (req: Request<PlaylistIdReqParams>
 // Add video to playlist
 export const addVideoToPlaylistController = async (req: Request<AddVideoToPlaylistReqParams>, res: Response) => {
   const { videoId, playlistId } = req.params
-  const result = await playlistService.addVideoToPlaylist({ videoId, playlistId })
+  const { accountId } = req.decodedAuthorization as TokenPayload
+  const result = await playlistService.addVideoToPlaylist({ videoId, playlistId, accountId })
   return res.json({
     message: PLAYLIST_MESSAGES.ADD_VIDEO_TO_PLAYLIST_SUCCEED,
     data: result
@@ -131,5 +133,16 @@ export const getPlaylistsByUsernameController = async (
       playlists,
       pagination
     }
+  })
+}
+
+// Get playlists containing video
+export const getPlaylistsContainingVideoController = async (req: Request<VideoIdReqParams>, res: Response) => {
+  const { videoId } = req.params
+  const { accountId } = req.decodedAuthorization as TokenPayload
+  const result = await playlistService.getPlaylistsContainingVideo({ accountId, videoId })
+  return res.json({
+    message: PLAYLIST_MESSAGES.GET_PLAYLISTS_CONTAINING_VIDEO_SUCCEED,
+    data: result
   })
 }

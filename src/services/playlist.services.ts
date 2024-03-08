@@ -57,11 +57,20 @@ class PlaylistService {
   }
 
   // Add video to playlist
-  async addVideoToPlaylist({ videoId, playlistId }: { videoId: string; playlistId: string }) {
+  async addVideoToPlaylist({
+    videoId,
+    playlistId,
+    accountId
+  }: {
+    videoId: string
+    playlistId: string
+    accountId: string
+  }) {
     const { insertedId } = await databaseService.playlistVideos.insertOne(
       new PlaylistVideo({
         videoId: new ObjectId(videoId),
-        playlistId: new ObjectId(playlistId)
+        playlistId: new ObjectId(playlistId),
+        accountId: new ObjectId(accountId)
       })
     )
     const newPlaylistVideo = await databaseService.playlistVideos.findOne({ _id: insertedId })
@@ -429,6 +438,17 @@ class PlaylistService {
       limit: _limit,
       totalRows,
       totalPages: Math.ceil(totalRows / _limit)
+    }
+  }
+
+  // Get playlists containing video
+  async getPlaylistsContainingVideo({ videoId, accountId }: { videoId: string; accountId: string }) {
+    const playlists = await databaseService.playlistVideos
+      .find({ videoId: new ObjectId(videoId), accountId: new ObjectId(accountId) })
+      .toArray()
+    const playlistsConfig = playlists.map((playlist) => playlist.playlistId)
+    return {
+      playlists: playlistsConfig
     }
   }
 }
