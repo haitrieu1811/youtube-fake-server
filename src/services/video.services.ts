@@ -304,6 +304,9 @@ class VideoService {
               title: {
                 $first: '$title'
               },
+              description: {
+                $first: '$description'
+              },
               author: {
                 $first: '$author'
               },

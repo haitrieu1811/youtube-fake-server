@@ -61,6 +61,31 @@ const audienceSchema: ParamSchema = {
 export const createPostValidator = validate(
   checkSchema(
     {
+      contentId: {
+        optional: true,
+        trim: true,
+        custom: {
+          options: async (value: string) => {
+            if (!ObjectId.isValid(value)) {
+              throw new ErrorWithStatus({
+                message: POST_MESSAGES.CONTENT_ID_IS_INVALID,
+                status: HttpStatusCode.BadRequest
+              })
+            }
+            const [video, post] = await Promise.all([
+              databaseService.videos.findOne({ _id: new ObjectId(value) }),
+              databaseService.posts.findOne({ _id: new ObjectId(value) })
+            ])
+            if (!video && !post) {
+              throw new ErrorWithStatus({
+                message: POST_MESSAGES.CONTENT_ID_NOT_EXIST,
+                status: HttpStatusCode.NotFound
+              })
+            }
+            return true
+          }
+        }
+      },
       content: contentSchema,
       images: imagesSchema,
       audience: audienceSchema

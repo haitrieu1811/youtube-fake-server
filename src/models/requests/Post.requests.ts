@@ -4,6 +4,7 @@ import { PostAudience } from '~/constants/enum'
 
 // Body: Tạo bài viết
 export type CreatePostReqBody = {
+  contentId?: string
   content: string
   images?: string[]
   audience?: PostAudience

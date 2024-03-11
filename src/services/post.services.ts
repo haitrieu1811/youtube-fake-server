@@ -13,12 +13,13 @@ import databaseService from './database.services'
 class PostService {
   // Create a new post
   async createPost({ body, accountId }: { body: CreatePostReqBody; accountId: string }) {
-    const { images, content, audience } = body
+    const { images, content, audience, contentId } = body
     const { insertedId } = await databaseService.posts.insertOne(
       new Post({
         accountId: new ObjectId(accountId),
         content,
         images: images ? images.map((item) => new ObjectId(item)) : undefined,
+        contentId: contentId ? new ObjectId(contentId) : undefined,
         audience
       })
     )
