@@ -55,6 +55,7 @@ class BookmarkService {
           },
           {
             $addFields: {
+              'videoInfo.bookmarkId': '$_id',
               'videoInfo.addedAt': '$createdAt'
             }
           },
@@ -123,6 +124,9 @@ class BookmarkService {
           {
             $group: {
               _id: '$_id',
+              bookmarkId: {
+                $first: '$bookmarkId'
+              },
               playlistId: {
                 $first: '$playlistId'
               },
